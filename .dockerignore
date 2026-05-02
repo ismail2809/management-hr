@@ -1,0 +1,12 @@
+.env
+.env.local
+.git
+.gitignore
+node_modules
+vendor
+storage/app/public
+storage/logs/*.log
+bootstrap/cache/*.php
+docker-compose*.yml
+*.md
+tests/

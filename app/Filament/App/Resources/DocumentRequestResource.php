@@ -6,6 +6,7 @@ use App\Filament\App\Resources\DocumentRequestResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\Employee;
 use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -110,6 +111,10 @@ class DocumentRequestResource extends Resource
                     ->options(['digital' => 'Digitale', 'papier' => 'Papier']),
             ])
             ->actions([
+                ViewAction::make()
+                    ->label('Voir')
+                    ->icon('heroicon-o-eye'),
+
                 Action::make('generate_pdf')
                     ->label('Générer PDF')
                     ->icon('heroicon-o-arrow-down-tray')
@@ -150,6 +155,7 @@ class DocumentRequestResource extends Resource
         return [
             'index'  => Pages\ListDocumentRequests::route('/'),
             'create' => Pages\CreateDocumentRequest::route('/create'),
+            'view'   => Pages\ViewDocumentRequest::route('/{record}'),
             'edit'   => Pages\EditDocumentRequest::route('/{record}/edit'),
         ];
     }
