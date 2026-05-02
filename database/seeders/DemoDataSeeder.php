@@ -19,7 +19,7 @@ class DemoDataSeeder extends Seeder
 {
     public function run(): void
     {
-        $company = Company::where('name', 'Société Test SARL')->first();
+        $company = Company::where('name', 'Les Écoles Al Baraime')->first();
         if (!$company) {
             $this->command->error('Lance d\'abord migrate:fresh --seed pour créer la company de test.');
             return;

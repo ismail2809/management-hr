@@ -19,14 +19,14 @@ class TestCompanySeeder extends Seeder
 
         // Company de test
         $company = Company::firstOrCreate(
-            ['name' => 'Société Test SARL'],
+            ['name' => 'Les Écoles Al Baraime'],
             [
                 'ice'              => '001234567000012',
                 'rc'               => 'RC-123456',
                 'patente'          => 'PAT-789',
                 'cnss_affiliation' => 'CNSS-00123',
                 'city'             => 'Casablanca',
-                'email'            => 'contact@societe-test.ma',
+                'email'            => 'contact@albaraime.ma',
                 'phone'            => '+212522000000',
             ]
         );
