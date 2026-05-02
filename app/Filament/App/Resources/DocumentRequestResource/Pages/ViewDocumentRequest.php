@@ -15,8 +15,16 @@ class ViewDocumentRequest extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('preview_pdf')
+                ->label('Voir PDF')
+                ->icon('heroicon-o-eye')
+                ->color('info')
+                ->visible(fn () => $this->record->format === 'digital')
+                ->url(fn () => route('documents.preview', $this->record))
+                ->openUrlInNewTab(),
+
             Action::make('generate_pdf')
-                ->label('Générer PDF')
+                ->label('Télécharger PDF')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary')
                 ->visible(fn () => $this->record->format === 'digital')

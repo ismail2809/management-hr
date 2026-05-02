@@ -9,15 +9,27 @@ class DocumentPdfController extends Controller
 {
     public function download(DocumentRequest $documentRequest)
     {
+        return $this->render($documentRequest, download: true);
+    }
+
+    public function preview(DocumentRequest $documentRequest)
+    {
+        return $this->render($documentRequest, download: false);
+    }
+
+    private function render(DocumentRequest $documentRequest, bool $download)
+    {
         abort_if(auth()->user()->company_id !== $documentRequest->company_id, 403);
 
         $documentRequest->load(['employee.position', 'employee.department', 'company']);
 
-        $documentRequest->update([
-            'status'       => 'traité',
-            'processed_by' => auth()->id(),
-            'processed_at' => now(),
-        ]);
+        if ($download) {
+            $documentRequest->update([
+                'status'       => 'traité',
+                'processed_by' => auth()->id(),
+                'processed_at' => now(),
+            ]);
+        }
 
         $employee = $documentRequest->employee;
         $company  = $documentRequest->company;
@@ -33,6 +45,6 @@ class DocumentPdfController extends Controller
 
         $filename = $documentRequest->type . '-' . $employee->matricule . '-' . now()->format('Y-m-d') . '.pdf';
 
-        return $pdf->download($filename);
+        return $download ? $pdf->download($filename) : $pdf->stream($filename);
     }
 }

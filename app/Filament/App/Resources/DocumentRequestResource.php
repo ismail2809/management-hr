@@ -115,8 +115,16 @@ class DocumentRequestResource extends Resource
                     ->label('Voir')
                     ->icon('heroicon-o-eye'),
 
+                Action::make('preview_pdf')
+                    ->label('Voir PDF')
+                    ->icon('heroicon-o-eye')
+                    ->color('info')
+                    ->visible(fn (DocumentRequest $record) => $record->format === 'digital')
+                    ->url(fn (DocumentRequest $record) => route('documents.preview', $record))
+                    ->openUrlInNewTab(),
+
                 Action::make('generate_pdf')
-                    ->label('Générer PDF')
+                    ->label('Télécharger PDF')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('primary')
                     ->visible(fn (DocumentRequest $record) => $record->format === 'digital')
