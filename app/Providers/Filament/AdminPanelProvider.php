@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(\App\Filament\Admin\Pages\Auth\Login::class)
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary'  => Color::hex('#0da8b1'),
