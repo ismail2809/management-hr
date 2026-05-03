@@ -8,6 +8,7 @@ use App\Models\Employee;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -18,24 +19,28 @@ class DepartmentResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-building-office';
     protected static ?string $navigationLabel = 'Départements';
     protected static ?string $modelLabel = 'Département';
+    protected static \UnitEnum|string|null $navigationGroup = 'Organisation';
     protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')
-                ->label('Nom')
-                ->required()
-                ->maxLength(255),
+            Section::make('Informations du département')->schema([
+                TextInput::make('name')
+                    ->label('Nom du département')
+                    ->required()
+                    ->maxLength(255),
 
-            Select::make('manager_id')
-                ->label('Responsable')
-                ->options(fn () => Employee::withoutGlobalScopes()
-                    ->where('company_id', auth()->user()?->company_id)
-                    ->get()
-                    ->pluck('full_name', 'id'))
-                ->searchable()
-                ->nullable(),
+                Select::make('manager_id')
+                    ->label('Responsable')
+                    ->options(fn () => Employee::withoutGlobalScopes()
+                        ->where('company_id', auth()->user()?->company_id)
+                        ->get()
+                        ->pluck('full_name', 'id'))
+                    ->searchable()
+                    ->nullable()
+                    ->helperText('Optionnel — peut être défini plus tard'),
+            ]),
         ]);
     }
 
@@ -43,10 +48,26 @@ class DepartmentResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label('Nom')->searchable()->sortable(),
-                TextColumn::make('manager.full_name')->label('Responsable')->default('—'),
-                TextColumn::make('employees_count')->label('Employés')->counts('employees')->sortable(),
-                TextColumn::make('created_at')->label('Créé le')->date('d/m/Y')->sortable(),
+                TextColumn::make('name')
+                    ->label('Département')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('semibold'),
+                TextColumn::make('manager.full_name')
+                    ->label('Responsable')
+                    ->default('—')
+                    ->sortable(),
+                TextColumn::make('employees_count')
+                    ->label('Effectif')
+                    ->counts('employees')
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
+                TextColumn::make('created_at')
+                    ->label('Créé le')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('name');
     }

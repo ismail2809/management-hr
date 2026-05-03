@@ -6,6 +6,7 @@ use App\Filament\App\Resources\LeaveTypeResource\Pages;
 use App\Models\LeaveType;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -16,24 +17,27 @@ class LeaveTypeResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationLabel = 'Types de congé';
     protected static ?string $modelLabel = 'Type de congé';
-    protected static \UnitEnum|string|null $navigationGroup = 'Congés';
+    protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
     protected static ?int $navigationSort = 6;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')
-                ->label('Nom')
-                ->placeholder('Annuel, Maladie, Maternité, Sans solde…')
-                ->required()
-                ->maxLength(100),
+            Section::make('Type de congé')->schema([
+                TextInput::make('name')
+                    ->label('Nom')
+                    ->placeholder('Annuel, Maladie, Maternité, Sans solde…')
+                    ->required()
+                    ->maxLength(100),
 
-            TextInput::make('legal_days_per_year')
-                ->label('Jours légaux / an')
-                ->numeric()
-                ->minValue(0)
-                ->default(0)
-                ->required(),
+                TextInput::make('legal_days_per_year')
+                    ->label('Jours légaux par an')
+                    ->numeric()
+                    ->minValue(0)
+                    ->default(0)
+                    ->required()
+                    ->suffix('jours'),
+            ]),
         ]);
     }
 
@@ -41,9 +45,21 @@ class LeaveTypeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')->label('Nom')->searchable()->sortable(),
-                TextColumn::make('legal_days_per_year')->label('Jours / an')->sortable(),
-                TextColumn::make('leaves_count')->label('Demandes')->counts('leaves')->sortable(),
+                TextColumn::make('name')
+                    ->label('Type')
+                    ->searchable()
+                    ->sortable()
+                    ->weight('semibold'),
+                TextColumn::make('legal_days_per_year')
+                    ->label('Jours / an')
+                    ->suffix(' j')
+                    ->sortable(),
+                TextColumn::make('leaves_count')
+                    ->label('Demandes')
+                    ->counts('leaves')
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
             ])
             ->defaultSort('name');
     }

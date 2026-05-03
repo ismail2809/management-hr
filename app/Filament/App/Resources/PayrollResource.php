@@ -28,59 +28,63 @@ class PayrollResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationLabel = 'Fiches de paie';
     protected static ?string $modelLabel = 'Fiche de paie';
+    protected static \UnitEnum|string|null $navigationGroup = 'Paie';
     protected static ?int $navigationSort = 5;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Select::make('employee_id')
-                    ->label('Employé')
-                    ->relationship('employee', 'first_name')
-                    ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                    ->searchable()
-                    ->default(fn () => auth()->user()?->employee_id)
-                    ->required(),
+            Section::make('Employé & Période')->schema([
+                Grid::make(2)->schema([
+                    Select::make('employee_id')
+                        ->label('Employé')
+                        ->relationship('employee', 'first_name')
+                        ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                        ->searchable()
+                        ->default(fn () => auth()->user()?->employee_id)
+                        ->required(),
 
-                Select::make('status')
-                    ->label('Statut')
-                    ->options(['brouillon' => 'Brouillon', 'validé' => 'Validé', 'payé' => 'Payé'])
-                    ->required(),
-            ]),
+                    Select::make('status')
+                        ->label('Statut')
+                        ->options(['brouillon' => 'Brouillon', 'validé' => 'Validé', 'payé' => 'Payé'])
+                        ->required(),
+                ]),
 
-            Grid::make(3)->schema([
-                Select::make('month')
-                    ->label('Mois')
-                    ->options([
-                        1 => 'Janvier', 2 => 'Février', 3 => 'Mars',
-                        4 => 'Avril', 5 => 'Mai', 6 => 'Juin',
-                        7 => 'Juillet', 8 => 'Août', 9 => 'Septembre',
-                        10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
-                    ])
-                    ->required(),
+                Grid::make(3)->schema([
+                    Select::make('month')
+                        ->label('Mois')
+                        ->options([
+                            1 => 'Janvier', 2 => 'Février', 3 => 'Mars',
+                            4 => 'Avril', 5 => 'Mai', 6 => 'Juin',
+                            7 => 'Juillet', 8 => 'Août', 9 => 'Septembre',
+                            10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
+                        ])
+                        ->required(),
 
-                TextInput::make('year')
-                    ->label('Année')
-                    ->numeric()
-                    ->default(now()->year)
-                    ->required(),
+                    TextInput::make('year')
+                        ->label('Année')
+                        ->numeric()
+                        ->default(now()->year)
+                        ->required(),
 
-                TextInput::make('salaire_brut')
-                    ->label('Salaire brut (MAD)')
-                    ->numeric()
-                    ->required(),
+                    TextInput::make('salaire_brut')
+                        ->label('Salaire brut')
+                        ->numeric()
+                        ->required()
+                        ->suffix('MAD'),
+                ]),
             ]),
 
             Section::make('Heures supplémentaires & Prorata')
                 ->schema([
                     Grid::make(3)->schema([
                         TextInput::make('overtime_hours')
-                            ->label('Heures sup (auto depuis pointage)')
+                            ->label('Heures supplémentaires')
                             ->numeric()
                             ->default(0)
                             ->suffix('h'),
                         TextInput::make('overtime_amount')
-                            ->label('Montant heures sup (MAD)')
+                            ->label('Montant heures sup.')
                             ->numeric()
                             ->readOnly()
                             ->suffix('MAD'),
@@ -101,7 +105,8 @@ class PayrollResource extends Resource
                             ->visible(fn ($get) => $get('is_prorata')),
                     ]),
                 ])
-                ->collapsible(),
+                ->collapsible()
+                ->collapsed(),
 
             Section::make('Résultat du calcul')
                 ->schema([
@@ -115,24 +120,30 @@ class PayrollResource extends Resource
                         TextInput::make('amo_employer')->label('AMO patronal')->numeric()->readOnly()->suffix('MAD'),
                         TextInput::make('salaire_net')->label('Salaire net')->numeric()->readOnly()->suffix('MAD'),
                     ]),
-                ]),
+                ])
+                ->collapsible(),
 
-            Repeater::make('components')
-                ->label('Composantes (primes / retenues / avantages)')
-                ->relationship()
+            Section::make('Composantes (primes / retenues / avantages)')
                 ->schema([
-                    Grid::make(4)->schema([
-                        Select::make('type')
-                            ->label('Type')
-                            ->options(['prime' => 'Prime', 'retenue' => 'Retenue', 'avantage' => 'Avantage'])
-                            ->required(),
-                        TextInput::make('label')->label('Libellé')->required(),
-                        TextInput::make('amount')->label('Montant (MAD)')->numeric()->required(),
-                        Toggle::make('taxable')->label('Imposable')->default(true)->inline(false),
-                    ]),
+                    Repeater::make('components')
+                        ->label('')
+                        ->relationship()
+                        ->schema([
+                            Grid::make(4)->schema([
+                                Select::make('type')
+                                    ->label('Type')
+                                    ->options(['prime' => 'Prime', 'retenue' => 'Retenue', 'avantage' => 'Avantage'])
+                                    ->required(),
+                                TextInput::make('label')->label('Libellé')->required(),
+                                TextInput::make('amount')->label('Montant (MAD)')->numeric()->required(),
+                                Toggle::make('taxable')->label('Imposable')->default(true)->inline(false),
+                            ]),
+                        ])
+                        ->addActionLabel('Ajouter une composante')
+                        ->collapsible(),
                 ])
                 ->collapsible()
-                ->addActionLabel('Ajouter une composante'),
+                ->collapsed(),
         ]);
     }
 
@@ -140,13 +151,35 @@ class PayrollResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('employee.full_name')->label('Employé')->searchable(['employees.first_name', 'employees.last_name'])->sortable(),
-                TextColumn::make('periode_label')->label('Période')->sortable('year'),
-                TextColumn::make('salaire_brut')->label('Brut')->money('MAD')->sortable(),
-                TextColumn::make('total_cnss_employee')->label('CNSS sal.')->money('MAD'),
-                TextColumn::make('ir')->label('IR')->money('MAD'),
-                TextColumn::make('salaire_net')->label('Net')->money('MAD')->sortable(),
-                TextColumn::make('status')->label('Statut')->badge()
+                TextColumn::make('employee.full_name')
+                    ->label('Employé')
+                    ->searchable(['employees.first_name', 'employees.last_name'])
+                    ->sortable()
+                    ->weight('semibold'),
+                TextColumn::make('periode_label')
+                    ->label('Période')
+                    ->sortable('year'),
+                TextColumn::make('salaire_brut')
+                    ->label('Brut')
+                    ->money('MAD')
+                    ->sortable(),
+                TextColumn::make('total_cnss_employee')
+                    ->label('CNSS')
+                    ->money('MAD')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('ir')
+                    ->label('IR')
+                    ->money('MAD')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('salaire_net')
+                    ->label('Net')
+                    ->money('MAD')
+                    ->sortable()
+                    ->weight('semibold')
+                    ->color('success'),
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
                         'brouillon' => 'gray',
                         'validé'    => 'warning',
@@ -209,12 +242,14 @@ class PayrollResource extends Resource
                     ->requiresConfirmation()
                     ->action(fn (Payroll $record) => $record->update(['status' => 'payé'])),
 
-                Action::make('download_pdf')
-                    ->label('Bulletin PDF')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
-                    ->url(fn (Payroll $record) => route('payrolls.pdf', $record))
-                    ->openUrlInNewTab(),
+                ActionGroup::make([
+                    Action::make('download_pdf')
+                        ->label('Bulletin PDF')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('gray')
+                        ->url(fn (Payroll $record) => route('payrolls.pdf', $record))
+                        ->openUrlInNewTab(),
+                ])->icon('heroicon-m-ellipsis-horizontal'),
             ])
             ->bulkActions([
                 BulkAction::make('bulk_pdf')

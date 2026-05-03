@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -10,6 +11,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
 use Filament\Widgets\AccountWidget;
@@ -30,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary'  => Color::hex('#0da8b1'),
                 'warning'  => Color::hex('#fda31a'),
@@ -39,9 +42,15 @@ class AdminPanelProvider extends PanelProvider
                 'gray'     => Color::Slate,
             ])
             ->brandName('GestionHR · Admin')
+            ->maxContentWidth(Width::Full)
+            ->sidebarWidth('240px')
+            ->sidebarCollapsibleOnDesktop()
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=1">')
+                fn () => new HtmlString(
+                    '<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=6">' .
+                    '<script>document.documentElement.classList.add("dark");</script>'
+                )
             )
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')

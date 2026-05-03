@@ -8,6 +8,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -20,49 +21,51 @@ class DeclarationResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-chart-bar';
     protected static ?string $navigationLabel = 'Déclarations';
     protected static ?string $modelLabel = 'Déclaration';
-    protected static \UnitEnum|string|null $navigationGroup = 'Déclarations';
+    protected static \UnitEnum|string|null $navigationGroup = 'Légal';
     protected static ?int $navigationSort = 9;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Select::make('type')
-                    ->label('Type')
-                    ->options([
-                        'CNSS'      => 'CNSS',
-                        'IR'        => 'IR',
-                        'Etat_9421' => 'État 9421',
-                    ])
-                    ->required(),
+            Section::make('Type & Période')->schema([
+                Grid::make(2)->schema([
+                    Select::make('type')
+                        ->label('Type de déclaration')
+                        ->options([
+                            'CNSS'      => 'CNSS',
+                            'IR'        => 'IR',
+                            'Etat_9421' => 'État 9421',
+                        ])
+                        ->required(),
 
-                Select::make('status')
-                    ->label('Statut')
-                    ->options([
-                        'en_cours' => 'En cours',
-                        'générée'  => 'Générée',
-                        'soumise'  => 'Soumise',
-                    ])
-                    ->default('en_cours')
-                    ->required(),
-            ]),
+                    Select::make('status')
+                        ->label('Statut')
+                        ->options([
+                            'en_cours' => 'En cours',
+                            'générée'  => 'Générée',
+                            'soumise'  => 'Soumise',
+                        ])
+                        ->default('en_cours')
+                        ->required(),
+                ]),
 
-            Grid::make(2)->schema([
-                Select::make('month')
-                    ->label('Mois')
-                    ->options([
-                        1 => 'Janvier', 2 => 'Février', 3 => 'Mars',
-                        4 => 'Avril', 5 => 'Mai', 6 => 'Juin',
-                        7 => 'Juillet', 8 => 'Août', 9 => 'Septembre',
-                        10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
-                    ])
-                    ->required(),
+                Grid::make(2)->schema([
+                    Select::make('month')
+                        ->label('Mois')
+                        ->options([
+                            1 => 'Janvier', 2 => 'Février', 3 => 'Mars',
+                            4 => 'Avril', 5 => 'Mai', 6 => 'Juin',
+                            7 => 'Juillet', 8 => 'Août', 9 => 'Septembre',
+                            10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
+                        ])
+                        ->required(),
 
-                TextInput::make('year')
-                    ->label('Année')
-                    ->numeric()
-                    ->default(now()->year)
-                    ->required(),
+                    TextInput::make('year')
+                        ->label('Année')
+                        ->numeric()
+                        ->default(now()->year)
+                        ->required(),
+                ]),
             ]),
         ]);
     }
@@ -71,15 +74,21 @@ class DeclarationResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('type')->label('Type')->badge()
+                TextColumn::make('type')
+                    ->label('Type')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
                         'CNSS'      => 'info',
                         'IR'        => 'warning',
                         'Etat_9421' => 'gray',
                         default     => 'gray',
                     }),
-                TextColumn::make('periode_label')->label('Période'),
-                TextColumn::make('status')->label('Statut')->badge()
+                TextColumn::make('periode_label')
+                    ->label('Période')
+                    ->weight('semibold'),
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
                         'en_cours' => 'gray',
                         'générée'  => 'warning',
@@ -87,10 +96,14 @@ class DeclarationResource extends Resource
                         default    => 'gray',
                     }),
                 TextColumn::make('generated_file_path')
-                    ->label('Fichier')
+                    ->label('Fichier généré')
                     ->default('—')
-                    ->limit(40),
-                TextColumn::make('created_at')->label('Créée le')->date('d/m/Y')->sortable(),
+                    ->limit(40)
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('created_at')
+                    ->label('Créée le')
+                    ->date('d/m/Y')
+                    ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('type')

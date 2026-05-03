@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
@@ -22,46 +23,52 @@ class LeaveResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationLabel = 'Demandes de congé';
     protected static ?string $modelLabel = 'Congé';
-    protected static \UnitEnum|string|null $navigationGroup = 'Congés';
+    protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
     protected static ?int $navigationSort = 7;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Grid::make(2)->schema([
-                Select::make('employee_id')
-                    ->label('Employé')
-                    ->relationship('employee', 'first_name')
-                    ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                    ->searchable()
-                    ->default(fn () => auth()->user()?->employee_id)
-                    ->required(),
+            Section::make('Demandeur & Type')->schema([
+                Grid::make(2)->schema([
+                    Select::make('employee_id')
+                        ->label('Employé')
+                        ->relationship('employee', 'first_name')
+                        ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                        ->searchable()
+                        ->default(fn () => auth()->user()?->employee_id)
+                        ->required(),
 
-                Select::make('leave_type_id')
-                    ->label('Type de congé')
-                    ->relationship('leaveType', 'name')
-                    ->required(),
+                    Select::make('leave_type_id')
+                        ->label('Type de congé')
+                        ->relationship('leaveType', 'name')
+                        ->required(),
+                ]),
             ]),
 
-            Grid::make(2)->schema([
-                DatePicker::make('start_date')->label('Date de début')->required(),
-                DatePicker::make('end_date')->label('Date de fin')->required(),
+            Section::make('Période')->schema([
+                Grid::make(2)->schema([
+                    DatePicker::make('start_date')->label('Date de début')->required(),
+                    DatePicker::make('end_date')->label('Date de fin')->required(),
+                ]),
+
+                Textarea::make('reason')
+                    ->label('Motif (optionnel)')
+                    ->rows(3)
+                    ->nullable(),
             ]),
 
-            Textarea::make('reason')
-                ->label('Motif')
-                ->rows(3)
-                ->nullable(),
-
-            Select::make('status')
-                ->label('Statut')
-                ->options([
-                    'en_attente' => 'En attente',
-                    'approuvé'   => 'Approuvé',
-                    'refusé'     => 'Refusé',
-                ])
-                ->default('en_attente')
-                ->required(),
+            Section::make('Décision')->schema([
+                Select::make('status')
+                    ->label('Statut')
+                    ->options([
+                        'en_attente' => 'En attente',
+                        'approuvé'   => 'Approuvé',
+                        'refusé'     => 'Refusé',
+                    ])
+                    ->default('en_attente')
+                    ->required(),
+            ]),
         ]);
     }
 
@@ -72,19 +79,38 @@ class LeaveResource extends Resource
                 TextColumn::make('employee.full_name')
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
+                    ->sortable()
+                    ->weight('semibold'),
+                TextColumn::make('leaveType.name')
+                    ->label('Type')
+                    ->sortable()
+                    ->badge()
+                    ->color('primary'),
+                TextColumn::make('start_date')
+                    ->label('Début')
+                    ->date('d/m/Y')
                     ->sortable(),
-                TextColumn::make('leaveType.name')->label('Type')->sortable(),
-                TextColumn::make('start_date')->label('Début')->date('d/m/Y')->sortable(),
-                TextColumn::make('end_date')->label('Fin')->date('d/m/Y')->sortable(),
-                TextColumn::make('duration_days')->label('Jours'),
-                TextColumn::make('status')->label('Statut')->badge()
+                TextColumn::make('end_date')
+                    ->label('Fin')
+                    ->date('d/m/Y')
+                    ->sortable(),
+                TextColumn::make('duration_days')
+                    ->label('Durée')
+                    ->suffix(' j')
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
                         'en_attente' => 'warning',
                         'approuvé'   => 'success',
                         'refusé'     => 'danger',
                         default      => 'gray',
                     }),
-                TextColumn::make('approver.name')->label('Approuvé par')->default('—'),
+                TextColumn::make('approver.name')
+                    ->label('Approuvé par')
+                    ->default('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -95,7 +121,7 @@ class LeaveResource extends Resource
                         'refusé'     => 'Refusé',
                     ]),
                 SelectFilter::make('leave_type_id')
-                    ->label('Type')
+                    ->label('Type de congé')
                     ->relationship('leaveType', 'name'),
             ])
             ->actions([

@@ -10,6 +10,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
 use App\Filament\App\Widgets\HrStatsOverview;
@@ -39,6 +40,9 @@ class AppPanelProvider extends PanelProvider
                 'gray'     => Color::Slate,
             ])
             ->brandName('GestionHR')
+            ->maxContentWidth(Width::Full)
+            ->sidebarWidth('220px')
+            ->sidebarCollapsibleOnDesktop()
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=1">')

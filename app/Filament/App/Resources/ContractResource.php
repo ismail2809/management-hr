@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -21,50 +22,60 @@ class ContractResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Contrats';
     protected static ?string $modelLabel = 'Contrat';
+    protected static \UnitEnum|string|null $navigationGroup = 'Paie';
     protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('employee_id')
-                ->label('Employé')
-                ->relationship('employee', 'first_name')
-                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                ->searchable()
-                ->default(fn () => auth()->user()?->employee_id)
-                ->required(),
+            Section::make('Employé & Type de contrat')->schema([
+                Grid::make(2)->schema([
+                    Select::make('employee_id')
+                        ->label('Employé')
+                        ->relationship('employee', 'first_name')
+                        ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                        ->searchable()
+                        ->default(fn () => auth()->user()?->employee_id)
+                        ->required(),
 
-            Grid::make(2)->schema([
-                Select::make('contract_type')
-                    ->label('Type de contrat')
-                    ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
-                    ->required(),
+                    Select::make('contract_type')
+                        ->label('Type de contrat')
+                        ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
+                        ->required(),
+                ]),
 
                 Select::make('status')
-                    ->label('Statut')
+                    ->label('Statut du contrat')
                     ->options(['actif' => 'Actif', 'termine' => 'Terminé', 'suspendu' => 'Suspendu'])
                     ->required(),
             ]),
 
-            Grid::make(2)->schema([
-                DatePicker::make('start_date')->label('Début')->required(),
-                DatePicker::make('end_date')->label('Fin')->nullable(),
+            Section::make('Période')->schema([
+                Grid::make(2)->schema([
+                    DatePicker::make('start_date')->label('Date de début')->required(),
+                    DatePicker::make('end_date')->label('Date de fin')->nullable()->helperText('Laisser vide pour un CDI'),
+                ]),
+                DatePicker::make('trial_period_end')
+                    ->label("Fin de période d'essai")
+                    ->nullable(),
             ]),
 
-            Grid::make(2)->schema([
-                TextInput::make('salary_base')
-                    ->label('Salaire de base (MAD)')
-                    ->numeric()
-                    ->minValue(0)
-                    ->required(),
+            Section::make('Rémunération & Horaires')->schema([
+                Grid::make(2)->schema([
+                    TextInput::make('salary_base')
+                        ->label('Salaire de base (MAD)')
+                        ->numeric()
+                        ->minValue(0)
+                        ->required()
+                        ->suffix('MAD'),
 
-                TextInput::make('working_hours_per_week')
-                    ->label('Heures/semaine')
-                    ->numeric()
-                    ->default(44),
+                    TextInput::make('working_hours_per_week')
+                        ->label('Heures par semaine')
+                        ->numeric()
+                        ->default(44)
+                        ->suffix('h'),
+                ]),
             ]),
-
-            DatePicker::make('trial_period_end')->label("Fin période d'essai")->nullable(),
         ]);
     }
 
@@ -72,8 +83,14 @@ class ContractResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('employee.full_name')->label('Employé')->searchable(['employees.first_name', 'employees.last_name'])->sortable(),
-                TextColumn::make('contract_type')->label('Type')->badge()
+                TextColumn::make('employee.full_name')
+                    ->label('Employé')
+                    ->searchable(['employees.first_name', 'employees.last_name'])
+                    ->sortable()
+                    ->weight('semibold'),
+                TextColumn::make('contract_type')
+                    ->label('Type')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
                         'CDI'    => 'success',
                         'CDD'    => 'warning',
@@ -81,10 +98,21 @@ class ContractResource extends Resource
                         'ANAPEC' => 'gray',
                         default  => 'gray',
                     }),
-                TextColumn::make('salary_base')->label('Salaire base')->money('MAD')->sortable(),
-                TextColumn::make('start_date')->label('Début')->date('d/m/Y')->sortable(),
-                TextColumn::make('end_date')->label('Fin')->date('d/m/Y')->placeholder('—'),
-                TextColumn::make('status')->label('Statut')->badge()
+                TextColumn::make('salary_base')
+                    ->label('Salaire de base')
+                    ->money('MAD')
+                    ->sortable(),
+                TextColumn::make('start_date')
+                    ->label('Début')
+                    ->date('d/m/Y')
+                    ->sortable(),
+                TextColumn::make('end_date')
+                    ->label('Fin')
+                    ->date('d/m/Y')
+                    ->placeholder('—'),
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
                     ->color(fn ($state) => match ($state) {
                         'actif'    => 'success',
                         'termine'  => 'danger',

@@ -6,6 +6,7 @@ use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Employee extends Model
 {
@@ -29,6 +30,9 @@ class Employee extends Model
         'position_id',
         'rib',
         'status',
+        'photo',
+        'address',
+        'city',
     ];
 
     protected $casts = [
@@ -56,8 +60,7 @@ class Employee extends Model
         return $this->belongsTo(Position::class);
     }
 
-    public function contracts(): HasMany
-    {
-        return $this->hasMany(Contract::class);
-    }
+    public function contracts(): HasMany { return $this->hasMany(Contract::class); }
+    public function documents(): HasMany { return $this->hasMany(EmployeeDocument::class); }
+    public function leaves(): HasMany { return $this->hasMany(Leave::class); }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Resources\DocumentRequestResource\Pages;
+use App\Filament\Admin\Resources\DocumentRequestResource\Pages;
+use App\Models\Company;
 use App\Models\DocumentRequest;
 use App\Models\Employee;
 use Filament\Actions\Action;
@@ -12,11 +13,13 @@ use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class DocumentRequestResource extends Resource
 {
@@ -25,19 +28,33 @@ class DocumentRequestResource extends Resource
     protected static ?string $navigationLabel = 'Demandes de documents';
     protected static ?string $modelLabel = 'Demande de document';
     protected static \UnitEnum|string|null $navigationGroup = 'Légal';
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 12;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Demandeur & Document')->schema([
-                Select::make('employee_id')
-                    ->label('Employé')
-                    ->relationship('employee', 'first_name')
-                    ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                    ->searchable()
-                    ->default(fn () => auth()->user()?->employee_id)
-                    ->required(),
+            Section::make('Entreprise & Demandeur')->schema([
+                Grid::make(2)->schema([
+                    Select::make('company_id')
+                        ->label('Entreprise')
+                        ->options(Company::pluck('name', 'id'))
+                        ->required()
+                        ->live()
+                        ->afterStateUpdated(fn ($set) => $set('employee_id', null)),
+
+                    Select::make('employee_id')
+                        ->label('Employé')
+                        ->options(fn ($get) => Employee::withoutGlobalScopes()
+                            ->when($get('company_id'), fn ($q, $cid) => $q->where('company_id', $cid))
+                            ->get()->pluck('full_name', 'id'))
+                        ->searchable()
+                        ->required(),
+                ]),
 
                 Select::make('type')
                     ->label('Type de document')
@@ -46,28 +63,18 @@ class DocumentRequestResource extends Resource
 
                 Radio::make('format')
                     ->label('Format souhaité')
-                    ->options([
-                        'digital' => 'Version digitale (PDF)',
-                        'papier'  => 'Version papier',
-                    ])
+                    ->options(['digital' => 'Version digitale (PDF)', 'papier' => 'Version papier'])
                     ->default('digital')
                     ->inline()
                     ->required(),
             ]),
 
             Section::make('Détails & Statut')->schema([
-                Textarea::make('reason')
-                    ->label('Remarques / raison de la demande')
-                    ->rows(3)
-                    ->nullable(),
+                Textarea::make('reason')->label('Remarques / raison de la demande')->rows(3)->nullable(),
 
                 Select::make('status')
                     ->label('Statut')
-                    ->options([
-                        'en_attente' => 'En attente',
-                        'traité'     => 'Traité',
-                        'refusé'     => 'Refusé',
-                    ])
+                    ->options(['en_attente' => 'En attente', 'traité' => 'Traité', 'refusé' => 'Refusé'])
                     ->default('en_attente')
                     ->required(),
             ]),
@@ -78,46 +85,24 @@ class DocumentRequestResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('employee.full_name')
-                    ->label('Employé')
-                    ->searchable(['employees.first_name', 'employees.last_name'])
-                    ->sortable()
-                    ->weight('semibold'),
-
-                TextColumn::make('type')
-                    ->label('Document')
+                TextColumn::make('company.name')->label('Entreprise')->sortable()->badge()->color('gray'),
+                TextColumn::make('employee.full_name')->label('Employé')->searchable(['employees.first_name', 'employees.last_name'])->sortable()->weight('semibold'),
+                TextColumn::make('type')->label('Document')
                     ->formatStateUsing(fn ($state) => DocumentRequest::$typeLabels[$state] ?? $state)
-                    ->badge()
-                    ->color('info'),
-
-                TextColumn::make('format')
-                    ->label('Format')
-                    ->badge()
+                    ->badge()->color('info'),
+                TextColumn::make('format')->label('Format')->badge()
                     ->color(fn ($state) => $state === 'digital' ? 'primary' : 'gray')
                     ->formatStateUsing(fn ($state) => $state === 'digital' ? 'PDF' : 'Papier'),
-
-                TextColumn::make('status')
-                    ->label('Statut')
-                    ->badge()
+                TextColumn::make('status')->label('Statut')->badge()
                     ->color(fn ($state) => match ($state) {
-                        'en_attente' => 'warning',
-                        'traité'     => 'success',
-                        'refusé'     => 'danger',
-                        default      => 'gray',
+                        'en_attente' => 'warning', 'traité' => 'success', 'refusé' => 'danger', default => 'gray',
                     }),
-
-                TextColumn::make('created_at')
-                    ->label('Demandé le')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                TextColumn::make('created_at')->label('Demandé le')->date('d/m/Y')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')
-                    ->label('Statut')
-                    ->options(['en_attente' => 'En attente', 'traité' => 'Traité', 'refusé' => 'Refusé']),
-                SelectFilter::make('format')
-                    ->label('Format')
-                    ->options(['digital' => 'Digitale (PDF)', 'papier' => 'Papier']),
+                SelectFilter::make('company_id')->label('Entreprise')->options(Company::pluck('name', 'id')),
+                SelectFilter::make('status')->label('Statut')->options(['en_attente' => 'En attente', 'traité' => 'Traité', 'refusé' => 'Refusé']),
+                SelectFilter::make('format')->label('Format')->options(['digital' => 'Digitale (PDF)', 'papier' => 'Papier']),
             ])
             ->actions([
                 Action::make('approve_pdf')
@@ -141,9 +126,6 @@ class DocumentRequestResource extends Resource
                     ])),
 
                 ActionGroup::make([
-                    ViewAction::make()
-                        ->label('Voir la demande'),
-
                     Action::make('preview_pdf')
                         ->label('Aperçu PDF')
                         ->icon('heroicon-o-eye')
@@ -173,7 +155,6 @@ class DocumentRequestResource extends Resource
         return [
             'index'  => Pages\ListDocumentRequests::route('/'),
             'create' => Pages\CreateDocumentRequest::route('/create'),
-            'view'   => Pages\ViewDocumentRequest::route('/{record}'),
             'edit'   => Pages\EditDocumentRequest::route('/{record}/edit'),
         ];
     }
