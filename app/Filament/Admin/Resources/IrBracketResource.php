@@ -16,7 +16,12 @@ class IrBracketResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-calculator';
     protected static ?string $navigationLabel = 'Barème IR';
     protected static ?string $modelLabel = 'Tranche IR';
-    protected static \UnitEnum|string|null $navigationGroup = 'Paramètres légaux';
+    protected static \UnitEnum|string|null $navigationGroup = 'Administration';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('super-admin') ?? false;
+    }
 
     public static function form(Schema $schema): Schema
     {

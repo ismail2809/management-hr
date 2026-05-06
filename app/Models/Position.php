@@ -11,7 +11,14 @@ class Position extends Model
 {
     use HasCompanyScope;
 
-    protected $fillable = ['company_id', 'title', 'base_salary'];
+    public const CATEGORIES = [
+        'Enseignement' => 'Enseignement',
+        'Administration' => 'Administration',
+        'Support' => 'Support',
+        'Transport' => 'Transport',
+    ];
+
+    protected $fillable = ['company_id', 'title', 'category', 'base_salary'];
 
     public function company(): BelongsTo
     {

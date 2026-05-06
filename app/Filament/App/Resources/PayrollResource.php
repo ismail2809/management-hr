@@ -6,11 +6,12 @@ use App\Filament\App\Resources\PayrollResource\Pages;
 use App\Models\Employee;
 use App\Models\Payroll;
 use App\Services\PayrollCalculator;
+use App\Models\Leave;
 use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -33,6 +34,8 @@ class PayrollResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
+        $locked = fn ($get, $record) => $record?->isLocked() ?? false;
+
         return $schema->components([
             Section::make('Employé & Période')->schema([
                 Grid::make(2)->schema([
@@ -42,11 +45,13 @@ class PayrollResource extends Resource
                         ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
                         ->searchable()
                         ->default(fn () => auth()->user()?->employee_id)
+                        ->disabled(fn ($record) => $record?->isLocked() ?? false)
                         ->required(),
 
                     Select::make('status')
                         ->label('Statut')
                         ->options(['brouillon' => 'Brouillon', 'validé' => 'Validé', 'payé' => 'Payé'])
+                        ->disabled(fn ($record) => $record?->isLocked() ?? false)
                         ->required(),
                 ]),
 
@@ -59,18 +64,21 @@ class PayrollResource extends Resource
                             7 => 'Juillet', 8 => 'Août', 9 => 'Septembre',
                             10 => 'Octobre', 11 => 'Novembre', 12 => 'Décembre',
                         ])
+                        ->disabled(fn ($record) => $record?->isLocked() ?? false)
                         ->required(),
 
                     TextInput::make('year')
                         ->label('Année')
                         ->numeric()
                         ->default(now()->year)
+                        ->disabled(fn ($record) => $record?->isLocked() ?? false)
                         ->required(),
 
                     TextInput::make('salaire_brut')
                         ->label('Salaire brut')
                         ->numeric()
                         ->required()
+                        ->disabled(fn ($record) => $record?->isLocked() ?? false)
                         ->suffix('MAD'),
                 ]),
             ]),
@@ -79,19 +87,34 @@ class PayrollResource extends Resource
                 ->schema([
                     Grid::make(3)->schema([
                         TextInput::make('overtime_hours')
-                            ->label('Heures supplémentaires')
+                            ->label('Heures sup. jour (+25%)')
                             ->numeric()
                             ->default(0)
+                            ->disabled(fn ($record) => $record?->isLocked() ?? false)
                             ->suffix('h'),
-                        TextInput::make('overtime_amount')
-                            ->label('Montant heures sup.')
+                        TextInput::make('overtime_hours_night')
+                            ->label('Heures sup. nuit (+50%)')
                             ->numeric()
-                            ->readOnly()
-                            ->suffix('MAD'),
+                            ->default(0)
+                            ->disabled(fn ($record) => $record?->isLocked() ?? false)
+                            ->suffix('h'),
                         Toggle::make('is_prorata')
                             ->label('Mois incomplet (prorata)')
                             ->inline(false)
+                            ->disabled(fn ($record) => $record?->isLocked() ?? false)
                             ->reactive(),
+                    ]),
+                    Grid::make(2)->schema([
+                        TextInput::make('overtime_amount')
+                            ->label('Montant HS jour')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('MAD'),
+                        TextInput::make('overtime_amount_night')
+                            ->label('Montant HS nuit')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('MAD'),
                     ]),
                     Grid::make(2)->schema([
                         TextInput::make('worked_days')
@@ -108,16 +131,94 @@ class PayrollResource extends Resource
                 ->collapsible()
                 ->collapsed(),
 
+            Section::make('Absences sans solde')
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('absence_days')
+                            ->label('Jours d\'absence sans solde')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('j')
+                            ->helperText('Calculé automatiquement depuis les congés "Sans solde" approuvés'),
+                        TextInput::make('absence_deduction')
+                            ->label('Déduction absence')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('MAD'),
+                    ]),
+                    Placeholder::make('pending_leaves_warning')
+                        ->label('')
+                        ->content(function ($get) {
+                            $employeeId = $get('employee_id');
+                            $month      = $get('month');
+                            $year       = $get('year');
+                            if (! $employeeId || ! $month || ! $year) {
+                                return null;
+                            }
+                            $pending = Leave::withoutGlobalScopes()
+                                ->where('employee_id', $employeeId)
+                                ->where('status', 'en_attente')
+                                ->whereMonth('start_date', $month)
+                                ->whereYear('start_date', $year)
+                                ->count();
+                            if ($pending > 0) {
+                                return "⚠️ Attention : {$pending} demande(s) de congé en attente de validation pour cette période.";
+                            }
+                            return null;
+                        })
+                        ->reactive(),
+                ])
+                ->collapsible()
+                ->collapsed(),
+
+            Section::make('Prime ancienneté')
+                ->schema([
+                    Grid::make(3)->schema([
+                        TextInput::make('anciennete_years')
+                            ->label('Ancienneté (ans)')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('ans'),
+                        TextInput::make('anciennete_rate')
+                            ->label('Taux ancienneté')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('%'),
+                        TextInput::make('anciennete_amount')
+                            ->label('Montant prime ancienneté')
+                            ->numeric()
+                            ->readOnly()
+                            ->suffix('MAD'),
+                    ]),
+                ])
+                ->collapsible()
+                ->collapsed(),
+
             Section::make('Résultat du calcul')
                 ->schema([
                     Grid::make(3)->schema([
-                        TextInput::make('total_cnss_employee')->label('CNSS salarié')->numeric()->readOnly()->suffix('MAD'),
-                        TextInput::make('amo_employee')->label('AMO salarié')->numeric()->readOnly()->suffix('MAD'),
-                        TextInput::make('ir')->label('IR')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_cnss_employee')
+                            ->label('CNSS salarié')
+                            ->numeric()->readOnly()->suffix('MAD')
+                            ->helperText(fn ($record) => $record?->cnss_employee_rate ? "Taux : {$record->cnss_employee_rate}%" : null),
+                        TextInput::make('amo_employee')
+                            ->label('AMO salarié')
+                            ->numeric()->readOnly()->suffix('MAD')
+                            ->helperText(fn ($record) => $record?->amo_employee_rate ? "Taux : {$record->amo_employee_rate}%" : null),
+                        TextInput::make('ir')
+                            ->label('IR')
+                            ->numeric()->readOnly()->suffix('MAD')
+                            ->helperText(fn ($record) => $record?->ir_rate_applied ? "Tranche : {$record->ir_rate_applied}%" : null),
                     ]),
                     Grid::make(3)->schema([
-                        TextInput::make('total_cnss_employer')->label('CNSS patronal')->numeric()->readOnly()->suffix('MAD'),
-                        TextInput::make('amo_employer')->label('AMO patronal')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_cnss_employer')
+                            ->label('CNSS patronal')
+                            ->numeric()->readOnly()->suffix('MAD')
+                            ->helperText(fn ($record) => $record?->cnss_employer_rate ? "Taux : {$record->cnss_employer_rate}%" : null),
+                        TextInput::make('amo_employer')
+                            ->label('AMO patronal')
+                            ->numeric()->readOnly()->suffix('MAD')
+                            ->helperText(fn ($record) => $record?->amo_employer_rate ? "Taux : {$record->amo_employer_rate}%" : null),
                         TextInput::make('salaire_net')->label('Salaire net')->numeric()->readOnly()->suffix('MAD'),
                     ]),
                 ])
@@ -129,17 +230,24 @@ class PayrollResource extends Resource
                         ->label('')
                         ->relationship()
                         ->schema([
-                            Grid::make(4)->schema([
+                            Grid::make(3)->schema([
                                 Select::make('type')
                                     ->label('Type')
-                                    ->options(['prime' => 'Prime', 'retenue' => 'Retenue', 'avantage' => 'Avantage'])
-                                    ->required(),
+                                    ->options(\App\Models\PayrollComponent::TYPES)
+                                    ->required()
+                                    ->helperText(fn ($state) => match ($state) {
+                                        'prime_imposable'     => 'Entre dans la base CNSS et IR',
+                                        'prime_non_imposable' => 'Exclue de CNSS et IR',
+                                        'avantage_imposable'  => 'Entre dans la base IR',
+                                        'retenue'             => 'Déduite du salaire net',
+                                        default               => null,
+                                    }),
                                 TextInput::make('label')->label('Libellé')->required(),
                                 TextInput::make('amount')->label('Montant (MAD)')->numeric()->required(),
-                                Toggle::make('taxable')->label('Imposable')->default(true)->inline(false),
                             ]),
                         ])
                         ->addActionLabel('Ajouter une composante')
+                        ->disabled(fn ($record) => $record?->isLocked() ?? false)
                         ->collapsible(),
                 ])
                 ->collapsible()
@@ -177,6 +285,10 @@ class PayrollResource extends Resource
                     ->sortable()
                     ->weight('semibold')
                     ->color('success'),
+                TextColumn::make('anciennete_rate')
+                    ->label('Anc.')
+                    ->formatStateUsing(fn ($state) => $state > 0 ? $state . '%' : '—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -185,7 +297,8 @@ class PayrollResource extends Resource
                         'validé'    => 'warning',
                         'payé'      => 'success',
                         default     => 'gray',
-                    }),
+                    })
+                    ->description(fn (Payroll $record) => $record->isLocked() ? '🔒 Verrouillé' : null),
             ])
             ->filters([
                 SelectFilter::make('status')

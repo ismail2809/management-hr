@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Resources\DeclarationResource\Pages;
 use App\Models\Declaration;
+use App\Services\DeclarationReportService;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -11,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -67,6 +69,24 @@ class DeclarationResource extends Resource
                         ->required(),
                 ]),
             ]),
+
+            Section::make('Totaux agrégés')
+                ->schema([
+                    Grid::make(4)->schema([
+                        TextInput::make('employee_count')->label('Employés')->numeric()->readOnly(),
+                        TextInput::make('total_brut')->label('Total brut')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_net')->label('Total net')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_ir')->label('Total IR')->numeric()->readOnly()->suffix('MAD'),
+                    ]),
+                    Grid::make(4)->schema([
+                        TextInput::make('total_cnss_employee')->label('CNSS salarié')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_cnss_employer')->label('CNSS patronal')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_amo_employee')->label('AMO salarié')->numeric()->readOnly()->suffix('MAD'),
+                        TextInput::make('total_amo_employer')->label('AMO patronal')->numeric()->readOnly()->suffix('MAD'),
+                    ]),
+                ])
+                ->collapsible()
+                ->collapsed(fn ($record) => $record === null),
         ]);
     }
 
@@ -86,6 +106,26 @@ class DeclarationResource extends Resource
                 TextColumn::make('periode_label')
                     ->label('Période')
                     ->weight('semibold'),
+                TextColumn::make('employee_count')
+                    ->label('Employés')
+                    ->default('—'),
+                TextColumn::make('total_brut')
+                    ->label('Total brut')
+                    ->money('MAD')
+                    ->default('—'),
+                TextColumn::make('total_cnss_employee')
+                    ->label('CNSS sal.')
+                    ->money('MAD')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('total_ir')
+                    ->label('Total IR')
+                    ->money('MAD')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('total_net')
+                    ->label('Total net')
+                    ->money('MAD')
+                    ->weight('semibold')
+                    ->color('success'),
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -95,11 +135,6 @@ class DeclarationResource extends Resource
                         'soumise'  => 'success',
                         default    => 'gray',
                     }),
-                TextColumn::make('generated_file_path')
-                    ->label('Fichier généré')
-                    ->default('—')
-                    ->limit(40)
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label('Créée le')
                     ->date('d/m/Y')
@@ -114,6 +149,51 @@ class DeclarationResource extends Resource
                     ->options(['en_cours' => 'En cours', 'générée' => 'Générée', 'soumise' => 'Soumise']),
             ])
             ->actions([
+                Action::make('generate')
+                    ->label('Générer rapport')
+                    ->icon('heroicon-o-calculator')
+                    ->color('info')
+                    ->visible(fn (Declaration $record) => $record->status === 'en_cours')
+                    ->requiresConfirmation()
+                    ->modalHeading('Générer le rapport de déclaration')
+                    ->modalDescription('Les totaux seront calculés depuis les fiches de paie validées/payées de la période.')
+                    ->action(function (Declaration $record) {
+                        $service = new DeclarationReportService();
+
+                        $drafts = $service->countDraftPayrolls(
+                            $record->company_id,
+                            $record->month,
+                            $record->year
+                        );
+
+                        if ($drafts > 0) {
+                            Notification::make()
+                                ->title('Attention')
+                                ->body("{$drafts} fiche(s) de paie en brouillon non incluses — seules les fiches validées/payées sont agrégées.")
+                                ->warning()
+                                ->send();
+                        }
+
+                        $totals = $service->generate($record);
+
+                        Notification::make()
+                            ->title('Rapport généré')
+                            ->body("Période {$record->periode_label} — {$totals['employee_count']} employés — Masse salariale brute : " . number_format($totals['total_brut'], 2) . " MAD")
+                            ->success()
+                            ->send();
+                    }),
+
+                Action::make('regenerate')
+                    ->label('Recalculer')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->visible(fn (Declaration $record) => $record->status === 'générée')
+                    ->requiresConfirmation()
+                    ->action(function (Declaration $record) {
+                        (new DeclarationReportService())->generate($record);
+                        Notification::make()->title('Rapport recalculé')->success()->send();
+                    }),
+
                 Action::make('mark_submitted')
                     ->label('Marquer soumise')
                     ->icon('heroicon-o-paper-airplane')

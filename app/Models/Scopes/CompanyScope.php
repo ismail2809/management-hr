@@ -10,7 +10,7 @@ class CompanyScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
-        if (auth()->check()) {
+        if (auth()->check() && ! auth()->user()->hasRole('super-admin')) {
             $builder->where($model->getTable() . '.company_id', auth()->user()->company_id);
         }
     }

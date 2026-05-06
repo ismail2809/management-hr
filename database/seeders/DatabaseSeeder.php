@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             IrBracketSeeder::class,
             CnssRateSeeder::class,
             SuperAdminSeeder::class,
+            RolesPermissionsSeeder::class,
             TestCompanySeeder::class,
             DemoDataSeeder::class,
         ]);

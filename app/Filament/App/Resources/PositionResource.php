@@ -4,11 +4,14 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Resources\PositionResource\Pages;
 use App\Models\Position;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class PositionResource extends Resource
@@ -24,10 +27,18 @@ class PositionResource extends Resource
     {
         return $schema->components([
             Section::make('Informations du poste')->schema([
-                TextInput::make('title')
-                    ->label('Intitulé du poste')
-                    ->required()
-                    ->maxLength(255),
+                Grid::make(2)->schema([
+                    TextInput::make('title')
+                        ->label('Intitulé du poste')
+                        ->required()
+                        ->maxLength(255),
+
+                    Select::make('category')
+                        ->label('Catégorie')
+                        ->options(Position::CATEGORIES)
+                        ->required()
+                        ->native(false),
+                ]),
 
                 TextInput::make('base_salary')
                     ->label('Salaire de base (MAD)')
@@ -44,15 +55,29 @@ class PositionResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('category')
+                    ->label('Catégorie')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'Enseignement'  => 'primary',
+                        'Administration' => 'warning',
+                        'Support'        => 'gray',
+                        'Transport'      => 'info',
+                        default          => 'gray',
+                    })
+                    ->sortable(),
+
                 TextColumn::make('title')
                     ->label('Intitulé')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
+
                 TextColumn::make('base_salary')
                     ->label('Salaire de base')
                     ->money('MAD')
                     ->sortable(),
+
                 TextColumn::make('employees_count')
                     ->label('Effectif')
                     ->counts('employees')
@@ -60,7 +85,12 @@ class PositionResource extends Resource
                     ->badge()
                     ->color('primary'),
             ])
-            ->defaultSort('title');
+            ->filters([
+                SelectFilter::make('category')
+                    ->label('Catégorie')
+                    ->options(Position::CATEGORIES),
+            ])
+            ->defaultSort('category');
     }
 
     public static function getPages(): array

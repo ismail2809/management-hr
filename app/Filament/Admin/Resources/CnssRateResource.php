@@ -19,7 +19,12 @@ class CnssRateResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-percent-badge';
     protected static ?string $navigationLabel = 'Taux CNSS/AMO';
     protected static ?string $modelLabel = 'Taux';
-    protected static \UnitEnum|string|null $navigationGroup = 'Paramètres légaux';
+    protected static \UnitEnum|string|null $navigationGroup = 'Administration';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('super-admin') ?? false;
+    }
 
     // Le super-admin voit TOUS les taux (globaux + toutes companies)
     public static function getEloquentQuery(): Builder

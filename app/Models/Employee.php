@@ -7,10 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Employee extends Model
 {
-    use HasCompanyScope;
+    use HasCompanyScope, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['first_name', 'last_name', 'status', 'department_id', 'position_id', 'contract_type'])
+            ->logOnlyDirty()
+            ->useLogName('employee')
+            ->dontSubmitEmptyLogs();
+    }
 
     protected $fillable = [
         'company_id',

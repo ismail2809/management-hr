@@ -45,7 +45,7 @@ class PayrollCalculator
         $rates = $this->loadRates($employee->company_id);
 
         // Taux horaire
-        $tauxHoraire   = $salaireBrut / self::HEURES_MENSUELLES;
+        $tauxHoraire    = $salaireBrut / self::HEURES_MENSUELLES;
         $overtimeAmount = round($overtimeHours * $tauxHoraire * self::HS_TAUX_JOUR, 2);
 
         // Prorata sur salaire de base uniquement
@@ -54,9 +54,15 @@ class PayrollCalculator
             $salaireBrutEffectif = round($salaireBrut * $workedDays / $totalWorkingDays, 2);
         }
 
-        $primesImposables = collect($components)->where('type', 'prime')->where('taxable', true)->sum('amount');
+        // Prime ancienneté
+        [$ancienneteYears, $ancienneteRate, $ancienneteAmount] = $this->computeAnciennete(
+            $employee->hire_date,
+            $salaireBrutEffectif
+        );
+
+        $primesImposables = collect($components)->whereIn('type', ['prime_imposable', 'avantage_imposable'])->sum('amount');
         $retenuesSup      = collect($components)->where('type', 'retenue')->sum('amount');
-        $brutImposable    = $salaireBrutEffectif + $overtimeAmount + $primesImposables;
+        $brutImposable    = $salaireBrutEffectif + $overtimeAmount + $ancienneteAmount + $primesImposables;
 
         $baseCnss     = $rates['cnss_plafond'] ? min($brutImposable, $rates['cnss_plafond']) : $brutImposable;
         $cnssEmployee = round($baseCnss * $rates['cnss_employee'] / 100, 2);
@@ -71,6 +77,7 @@ class PayrollCalculator
 
         return compact(
             'salaireBrutEffectif', 'overtimeAmount',
+            'ancienneteYears', 'ancienneteRate', 'ancienneteAmount',
             'cnssEmployee', 'cnssEmployer',
             'amoEmployee', 'amoEmployer',
             'ir', 'salaireNet'
@@ -89,7 +96,8 @@ class PayrollCalculator
         ?float $overtimeHours = null,
         bool $isProrata = false,
         ?int $workedDays = null,
-        ?int $totalWorkingDays = null
+        ?int $totalWorkingDays = null,
+        float $overtimeHoursNight = 0.0
     ): Payroll {
         $rates = $this->loadRates($employee->company_id);
 
@@ -98,9 +106,10 @@ class PayrollCalculator
             $overtimeHours = $this->fetchOvertimeHours($employee->id, $month, $year);
         }
 
-        // Taux horaire & heures sup
-        $tauxHoraire    = $salaireBrut / self::HEURES_MENSUELLES;
-        $overtimeAmount = round($overtimeHours * $tauxHoraire * self::HS_TAUX_JOUR, 2);
+        // Taux horaire & heures sup (jour 25% + nuit 50%)
+        $tauxHoraire        = $salaireBrut / self::HEURES_MENSUELLES;
+        $overtimeAmount     = round($overtimeHours * $tauxHoraire * self::HS_TAUX_JOUR, 2);
+        $overtimeAmountNight = round($overtimeHoursNight * $tauxHoraire * self::HS_TAUX_NUIT, 2);
 
         // Prorata
         $salaireBrutEffectif = $salaireBrut;
@@ -111,9 +120,20 @@ class PayrollCalculator
             $totalWorkingDays = $this->countWorkingDays($month, $year);
         }
 
-        $primesImposables = collect($components)->where('type', 'prime')->where('taxable', true)->sum('amount');
+        // Absences sans solde approuvées dans la période
+        [$absenceDays, $absenceDeduction] = $this->computeAbsenceDeduction(
+            $employee->id, $month, $year, $salaireBrutEffectif, $totalWorkingDays
+        );
+
+        // Prime ancienneté
+        [$ancienneteYears, $ancienneteRate, $ancienneteAmount] = $this->computeAnciennete(
+            $employee->hire_date,
+            $salaireBrutEffectif
+        );
+
+        $primesImposables = collect($components)->whereIn('type', ['prime_imposable', 'avantage_imposable'])->sum('amount');
         $retenuesSup      = collect($components)->where('type', 'retenue')->sum('amount');
-        $brutImposable    = $salaireBrutEffectif + $overtimeAmount + $primesImposables;
+        $brutImposable    = $salaireBrutEffectif + $overtimeAmount + $overtimeAmountNight + $ancienneteAmount + $primesImposables - $absenceDeduction;
 
         $baseCnss     = $rates['cnss_plafond'] ? min($brutImposable, $rates['cnss_plafond']) : $brutImposable;
         $cnssEmployee = round($baseCnss * $rates['cnss_employee'] / 100, 2);
@@ -123,25 +143,41 @@ class PayrollCalculator
 
         $fraisProMensuel = min($brutImposable * self::FRAIS_PRO_RATE / 100, self::FRAIS_PRO_PLAFOND_AN / 12);
         $baseIr          = max(0, $brutImposable - $cnssEmployee - $fraisProMensuel);
+        $irBracket       = $this->getIrBracket($baseIr * 12);
+        $irRate          = $irBracket ? $irBracket->rate_percentage : 0;
         $ir              = $this->calculateIr($baseIr, $employee->number_of_children ?? 0);
         $salaireNet      = round($brutImposable - $cnssEmployee - $amoEmployee - $ir - $retenuesSup, 2);
 
         $payroll = Payroll::updateOrCreate(
             ['company_id' => $employee->company_id, 'employee_id' => $employee->id, 'month' => $month, 'year' => $year],
             [
-                'salaire_brut'         => $salaireBrut,
-                'overtime_hours'       => $overtimeHours,
-                'overtime_amount'      => $overtimeAmount,
-                'is_prorata'           => $isProrata,
-                'worked_days'          => $workedDays,
-                'total_working_days'   => $totalWorkingDays,
-                'total_cnss_employee'  => $cnssEmployee,
-                'total_cnss_employer'  => $cnssEmployer,
-                'amo_employee'         => $amoEmployee,
-                'amo_employer'         => $amoEmployer,
-                'ir'                   => $ir,
-                'salaire_net'          => $salaireNet,
-                'status'               => 'brouillon',
+                'salaire_brut'          => $salaireBrut,
+                'overtime_hours'        => $overtimeHours,
+                'overtime_amount'       => $overtimeAmount,
+                'overtime_hours_night'  => $overtimeHoursNight,
+                'overtime_amount_night' => $overtimeAmountNight,
+                'is_prorata'            => $isProrata,
+                'worked_days'           => $workedDays,
+                'total_working_days'    => $totalWorkingDays,
+                'absence_days'          => $absenceDays,
+                'absence_deduction'     => $absenceDeduction,
+                'total_cnss_employee'   => $cnssEmployee,
+                'total_cnss_employer'   => $cnssEmployer,
+                'amo_employee'          => $amoEmployee,
+                'amo_employer'          => $amoEmployer,
+                'ir'                    => $ir,
+                'salaire_net'           => $salaireNet,
+                'status'                => 'brouillon',
+                // Snapshot taux
+                'cnss_employee_rate'    => $rates['cnss_employee'],
+                'cnss_employer_rate'    => $rates['cnss_employer'],
+                'amo_employee_rate'     => $rates['amo_employee'],
+                'amo_employer_rate'     => $rates['amo_employer'],
+                'ir_rate_applied'       => $irRate,
+                // Prime ancienneté
+                'anciennete_years'      => $ancienneteYears,
+                'anciennete_rate'       => $ancienneteRate,
+                'anciennete_amount'     => $ancienneteAmount,
             ]
         );
 
@@ -152,7 +188,6 @@ class PayrollCalculator
                 'type'       => $comp['type'],
                 'label'      => $comp['label'],
                 'amount'     => $comp['amount'],
-                'taxable'    => $comp['taxable'] ?? true,
             ]);
         }
 
@@ -181,6 +216,90 @@ class PayrollCalculator
         $period = CarbonPeriod::create($start, $end);
 
         return collect($period)->filter(fn ($d) => ! $d->isWeekend())->count();
+    }
+
+    /**
+     * Calcule les jours d'absence sans solde approuvés dans le mois
+     * et la déduction correspondante (taux journalier = salaire / jours ouvrables).
+     * Retourne [absenceDays, absenceDeduction].
+     */
+    private function computeAbsenceDeduction(
+        int $employeeId,
+        int $month,
+        int $year,
+        float $salaireBrut,
+        int $totalWorkingDays
+    ): array {
+        if ($totalWorkingDays <= 0 || $salaireBrut <= 0) {
+            return [0, 0.0];
+        }
+
+        $leaves = \App\Models\Leave::withoutGlobalScopes()
+            ->where('employee_id', $employeeId)
+            ->where('status', 'approuvé')
+            ->whereHas('leaveType', fn ($q) => $q->where('name', 'like', '%sans solde%'))
+            ->get()
+            ->filter(function ($leave) use ($month, $year) {
+                // Garde uniquement les congés qui chevauchent le mois
+                $start = $leave->start_date;
+                $end   = $leave->end_date;
+                $mStart = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
+                $mEnd   = $mStart->copy()->endOfMonth();
+                return $start->lte($mEnd) && $end->gte($mStart);
+            });
+
+        $absenceDays = 0;
+        foreach ($leaves as $leave) {
+            $mStart = \Carbon\Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $mEnd   = $mStart->copy()->endOfMonth();
+            $start  = $leave->start_date->max($mStart);
+            $end    = $leave->end_date->min($mEnd);
+            $absenceDays += $start->diffInWeekdays($end) + 1;
+        }
+
+        $dailyRate       = $salaireBrut / $totalWorkingDays;
+        $absenceDeduction = round($absenceDays * $dailyRate, 2);
+
+        return [$absenceDays, $absenceDeduction];
+    }
+
+    /**
+     * Prime d'ancienneté Maroc : 5%/10%/15%/20% selon années d'ancienneté.
+     * Retourne [years, rate%, amount].
+     */
+    private function computeAnciennete(?\Carbon\Carbon $hireDate, float $salaireBrut): array
+    {
+        if (! $hireDate) {
+            return [0, 0.0, 0.0];
+        }
+
+        $years = (int) $hireDate->diffInYears(now());
+
+        $rate = match (true) {
+            $years >= 25 => 20.0,
+            $years >= 20 => 15.0,
+            $years >= 12 => 10.0,
+            $years >= 5  => 5.0,
+            default      => 0.0,
+        };
+
+        return [$years, $rate, round($salaireBrut * $rate / 100, 2)];
+    }
+
+    /**
+     * Retourne la tranche IR correspondant à la base annuelle.
+     */
+    private function getIrBracket(float $baseIrAnnuel): ?object
+    {
+        $brackets = IrBracket::orderBy('min_salary')->get();
+        if ($brackets->isEmpty()) {
+            $brackets = $this->defaultBrackets();
+        }
+
+        return $brackets->first(function ($b) use ($baseIrAnnuel) {
+            $max = $b->max_salary ?? PHP_FLOAT_MAX;
+            return $baseIrAnnuel >= $b->min_salary && $baseIrAnnuel <= $max;
+        });
     }
 
     private function loadRates(int $companyId): array

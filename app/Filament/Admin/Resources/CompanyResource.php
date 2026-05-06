@@ -19,6 +19,12 @@ class CompanyResource extends Resource
     protected static ?string $navigationLabel = 'Companies';
     protected static ?string $modelLabel = 'Company';
     protected static ?int $navigationSort = 1;
+    protected static \UnitEnum|string|null $navigationGroup = 'Administration';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole('super-admin') ?? false;
+    }
 
     public static function form(Schema $schema): Schema
     {

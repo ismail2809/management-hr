@@ -15,27 +15,60 @@ class HrStatsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $companyId = auth()->user()?->company_id;
+        $moisCourant  = now()->month;
+        $annee        = now()->year;
+        $moisPrecedent = now()->subMonth()->month;
+        $anneePrev    = now()->subMonth()->year;
+        $moisLabel    = now()->subMonth()->format('m/Y');
 
-        $totalEmployes = Employee::count();
+        // Effectif actif
+        $totalEmployes = Employee::where('status', 'actif')->count();
 
+        // Congés en attente
         $congesEnAttente = Leave::where('status', 'en_attente')->count();
 
+        // Fiches brouillon mois courant
         $paiesBrouillon = Payroll::where('status', 'brouillon')
-            ->where('month', now()->month)
-            ->where('year', now()->year)
+            ->where('month', $moisCourant)
+            ->where('year', $annee)
             ->count();
 
-        $presencesAujourd = Attendance::whereDate('date', today())->count();
+        // Masse salariale brute mois précédent (validé + payé)
+        $masseBrute = Payroll::whereIn('status', ['validé', 'payé'])
+            ->where('month', $moisPrecedent)
+            ->where('year', $anneePrev)
+            ->sum('salaire_brut');
 
-        $masseSalariale = Payroll::where('status', 'payé')
-            ->where('month', now()->subMonth()->month)
-            ->where('year', now()->subMonth()->year)
-            ->sum('salaire_net');
+        // Total CNSS salarié mois précédent
+        $totalCnss = Payroll::whereIn('status', ['validé', 'payé'])
+            ->where('month', $moisPrecedent)
+            ->where('year', $anneePrev)
+            ->sum('total_cnss_employee');
+
+        // Total IR mois précédent
+        $totalIr = Payroll::whereIn('status', ['validé', 'payé'])
+            ->where('month', $moisPrecedent)
+            ->where('year', $anneePrev)
+            ->sum('ir');
+
+        // Taux absentéisme : jours d'absence sans solde approuvés / (effectif × jours ouvrables)
+        $absenceDays = Payroll::whereIn('status', ['validé', 'payé'])
+            ->where('month', $moisPrecedent)
+            ->where('year', $anneePrev)
+            ->sum('absence_days');
+
+        $totalWorkingDays = Payroll::whereIn('status', ['validé', 'payé'])
+            ->where('month', $moisPrecedent)
+            ->where('year', $anneePrev)
+            ->avg('total_working_days') ?? 22;
+
+        $tauxAbsenteisme = $totalEmployes > 0
+            ? round(($absenceDays / max(1, $totalEmployes * $totalWorkingDays)) * 100, 1)
+            : 0;
 
         return [
-            Stat::make('Employés actifs', $totalEmployes)
-                ->description('Total dans la société')
+            Stat::make('Effectif actif', $totalEmployes)
+                ->description('Employés avec statut actif')
                 ->descriptionIcon('heroicon-o-users')
                 ->color('primary'),
 
@@ -44,20 +77,30 @@ class HrStatsOverview extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-o-clock')
                 ->color($congesEnAttente > 0 ? 'warning' : 'success'),
 
-            Stat::make('Fiches brouillon', $paiesBrouillon)
-                ->description('Mois ' . now()->translatedFormat('F Y'))
-                ->descriptionIcon('heroicon-o-document')
-                ->color($paiesBrouillon > 0 ? 'danger' : 'success'),
-
-            Stat::make('Présences aujourd\'hui', $presencesAujourd)
-                ->description('Pointages enregistrés')
-                ->descriptionIcon('heroicon-o-check-circle')
-                ->color('info'),
-
-            Stat::make('Masse salariale nette', number_format($masseSalariale, 2, ',', ' ') . ' MAD')
-                ->description('Mois ' . now()->subMonth()->translatedFormat('F Y') . ' (payé)')
+            Stat::make('Masse salariale brute', number_format($masseBrute, 0, ',', ' ') . ' MAD')
+                ->description('Mois ' . $moisLabel . ' (validé/payé)')
                 ->descriptionIcon('heroicon-o-banknotes')
                 ->color('success'),
+
+            Stat::make('Total CNSS salarié', number_format($totalCnss, 0, ',', ' ') . ' MAD')
+                ->description('Mois ' . $moisLabel)
+                ->descriptionIcon('heroicon-o-shield-check')
+                ->color('info'),
+
+            Stat::make('Total IR', number_format($totalIr, 0, ',', ' ') . ' MAD')
+                ->description('Mois ' . $moisLabel)
+                ->descriptionIcon('heroicon-o-receipt-percent')
+                ->color('warning'),
+
+            Stat::make('Taux absentéisme', $tauxAbsenteisme . '%')
+                ->description('Sans solde — mois ' . $moisLabel)
+                ->descriptionIcon('heroicon-o-exclamation-triangle')
+                ->color($tauxAbsenteisme > 5 ? 'danger' : ($tauxAbsenteisme > 2 ? 'warning' : 'success')),
+
+            Stat::make('Fiches brouillon', $paiesBrouillon)
+                ->description('Mois ' . now()->format('m/Y') . ' à valider')
+                ->descriptionIcon('heroicon-o-document')
+                ->color($paiesBrouillon > 0 ? 'danger' : 'success'),
         ];
     }
 }
