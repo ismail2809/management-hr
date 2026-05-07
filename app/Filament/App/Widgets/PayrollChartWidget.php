@@ -9,6 +9,7 @@ class PayrollChartWidget extends ChartWidget
 {
     protected ?string $heading = 'Masse salariale brute — 6 derniers mois';
     protected static ?int $sort = 2;
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {
