@@ -19,7 +19,11 @@ class DocumentPdfController extends Controller
 
     private function render(DocumentRequest $documentRequest, bool $download)
     {
-        abort_if(auth()->user()->company_id !== $documentRequest->company_id, 403);
+        $user = auth()->user();
+        abort_if(
+            ! $user->hasRole('super-admin') && $user->company_id !== $documentRequest->company_id,
+            403
+        );
 
         $documentRequest->load(['employee.position', 'employee.department', 'company']);
 

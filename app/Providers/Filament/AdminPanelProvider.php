@@ -32,8 +32,8 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('app')
-            ->path('app')
+            ->id('admin')
+            ->path('admin')
             ->login()
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
@@ -51,7 +51,7 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn () => new HtmlString(
-                    '<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=6">' .
+                    '<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=7">' .
                     '<script>document.documentElement.classList.add("dark");</script>'
                 )
             )

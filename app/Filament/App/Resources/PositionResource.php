@@ -4,6 +4,10 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Resources\PositionResource\Pages;
 use App\Models\Position;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -25,7 +29,7 @@ class PositionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Informations du poste')->schema([
                 Grid::make(2)->schema([
                     TextInput::make('title')
@@ -89,6 +93,19 @@ class PositionResource extends Resource
                 SelectFilter::make('category')
                     ->label('Catégorie')
                     ->options(Position::CATEGORIES),
+            ])
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make()
+                    ->tooltip(fn (Position $record) => $record->employees()->count() > 0 && ! auth()->user()?->hasAnyRole(['admin','super-admin'])
+                        ? 'Poste utilisé par ' . $record->employees()->count() . ' employé(s)'
+                        : null
+                    ),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('category');
     }

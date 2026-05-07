@@ -14,6 +14,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,7 +32,7 @@ class EmployeeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Grid::make(3)->schema([
 
                 /* ── Colonne gauche (2/3) ── */
@@ -60,33 +62,6 @@ class EmployeeResource extends Resource
                             Grid::make(2)->schema([
                                 DatePicker::make('birth_date')->label('Date de naissance')->nullable(),
                                 DatePicker::make('hire_date')->label("Date d'embauche")->nullable(),
-                            ]),
-                        ]),
-
-                    Section::make('Contrat & Affectation')
-                        ->icon('heroicon-o-document-text')
-                        ->schema([
-                            Grid::make(2)->schema([
-                                Select::make('contract_type')
-                                    ->label('Type de contrat')
-                                    ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
-                                    ->required(),
-                                Select::make('status')
-                                    ->label('Statut')
-                                    ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'suspendu' => 'Suspendu'])
-                                    ->required(),
-                            ]),
-                            Grid::make(2)->schema([
-                                Select::make('department_id')
-                                    ->label('Département')
-                                    ->relationship('department', 'name')
-                                    ->searchable()
-                                    ->nullable(),
-                                Select::make('position_id')
-                                    ->label('Poste')
-                                    ->relationship('position', 'title')
-                                    ->searchable()
-                                    ->nullable(),
                             ]),
                         ]),
 
@@ -130,6 +105,40 @@ class EmployeeResource extends Resource
                 ])->columnSpan(1),
 
             ]),
+
+            /* ── Pleine largeur ── */
+            Section::make('Contrat & Affectation')
+                ->icon('heroicon-o-document-text')
+                ->schema([
+                    Grid::make(4)->schema([
+                        Select::make('contract_type')
+                            ->label('Type de contrat')
+                            ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
+                            ->required(),
+                        Select::make('status')
+                            ->label('Statut')
+                            ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'suspendu' => 'Suspendu'])
+                            ->required(),
+                        Select::make('department_id')
+                            ->label('Département')
+                            ->relationship('department', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->nullable(),
+                        Select::make('position_id')
+                            ->label('Poste')
+                            ->relationship('position', 'title')
+                            ->getOptionLabelFromRecordUsing(fn (\App\Models\Position $record)
+                                => implode(' — ', array_filter([
+                                    $record->company?->name,
+                                    $record->title,
+                                    $record->category,
+                                ])))
+                            ->searchable()
+                            ->preload()
+                            ->nullable(),
+                    ]),
+                ]),
         ]);
     }
 
@@ -166,6 +175,11 @@ class EmployeeResource extends Resource
             ->recordUrl(fn (Employee $record) => static::getUrl('view', ['record' => $record]))
             ->actions([
                 ViewAction::make()->label('Profil'),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

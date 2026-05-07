@@ -39,7 +39,7 @@ class DeclarationPolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:Declaration');
+        return $authUser->can('DeleteAny:Declaration') && $authUser->hasAnyRole(['admin', 'super-admin']);
     }
 
     public function restore(AuthUser $authUser, Declaration $declaration): bool

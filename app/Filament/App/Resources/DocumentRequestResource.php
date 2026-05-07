@@ -14,6 +14,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -29,7 +31,7 @@ class DocumentRequestResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Demandeur & Document')->schema([
                 Select::make('employee_id')
                     ->label('Employé')
@@ -164,6 +166,11 @@ class DocumentRequestResource extends Resource
                             'processed_at' => now(),
                         ])),
                 ])->icon('heroicon-m-ellipsis-horizontal'),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

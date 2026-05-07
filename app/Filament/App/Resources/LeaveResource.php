@@ -13,6 +13,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -28,7 +30,7 @@ class LeaveResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Demandeur & Type')->schema([
                 Grid::make(2)->schema([
                     Select::make('employee_id')
@@ -148,6 +150,11 @@ class LeaveResource extends Resource
                         'approved_by' => auth()->id(),
                         'approved_at' => now(),
                     ])),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('start_date', 'desc');
     }

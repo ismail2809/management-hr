@@ -39,7 +39,7 @@ class ContractPolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:Contract');
+        return $authUser->can('DeleteAny:Contract') && $authUser->hasAnyRole(['admin', 'super-admin']);
     }
 
     public function restore(AuthUser $authUser, Contract $contract): bool

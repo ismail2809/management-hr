@@ -9,6 +9,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -28,7 +30,7 @@ class CompanyResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Informations générales')->schema([
                 Grid::make(2)->schema([
                     TextInput::make('name')
@@ -87,6 +89,11 @@ class CompanyResource extends Resource
                 TextColumn::make('city')->label('Ville')->default('—'),
                 TextColumn::make('email')->label('Email')->default('—'),
                 TextColumn::make('created_at')->label('Créée le')->date('d/m/Y')->sortable(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('name');
     }

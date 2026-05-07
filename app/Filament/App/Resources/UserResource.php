@@ -12,6 +12,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Spatie\Permission\Models\Role;
@@ -57,7 +59,7 @@ class UserResource extends Resource
             ->pluck('name', 'name')
             ->mapWithKeys(fn ($name) => [$name => $labels[$name] ?? $name]);
 
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Informations de connexion')->schema([
                 Grid::make(2)->schema([
                     TextInput::make('name')
@@ -167,6 +169,11 @@ class UserResource extends Resource
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('name');
     }

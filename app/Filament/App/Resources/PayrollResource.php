@@ -12,6 +12,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -36,7 +37,7 @@ class PayrollResource extends Resource
     {
         $locked = fn ($get, $record) => $record?->isLocked() ?? false;
 
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Employé & Période')->schema([
                 Grid::make(2)->schema([
                     Select::make('employee_id')

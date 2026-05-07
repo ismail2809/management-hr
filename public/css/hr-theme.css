@@ -521,15 +521,68 @@ textarea::placeholder {
 /* ════════════════════════════════
    LOGIN PAGE
    ════════════════════════════════ */
-.fi-simple-main {
+.fi-simple-layout {
   background: linear-gradient(135deg, #070d18 0%, #0d1a2e 60%, #060e1a 100%) !important;
+  min-height: 100vh !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+}
+
+.fi-simple-main {
+  background: transparent !important;
+  width: 100% !important;
+  max-width: 420px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
 }
 
 .fi-simple-page {
   background-color: var(--hr-bg-card) !important;
   border: 1px solid var(--hr-border) !important;
-  border-radius: 16px !important;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(13,168,177,0.08) !important;
+  padding: 36px 32px !important;
+  width: 100% !important;
+}
+
+/* Brand/logo area at top of login card */
+.fi-simple-header {
+  text-align: center !important;
+  margin-bottom: 28px !important;
+  padding: 0 !important;
+}
+
+.fi-simple-header .fi-logo,
+.fi-simple-header .fi-brand-name {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  letter-spacing: -0.5px !important;
+  display: block !important;
+  margin-bottom: 4px !important;
+}
+
+/* Subtle tagline under the brand */
+.fi-simple-header::after {
+  content: 'Gestion RH · Maroc' !important;
+  display: block !important;
+  font-size: 0.72rem !important;
+  color: var(--hr-text-muted) !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  margin-top: 6px !important;
+}
+
+/* Login form submit button — full width */
+.fi-simple-page .fi-btn-color-primary {
+  width: 100% !important;
+  justify-content: center !important;
+  padding-block: 10px !important;
+  font-size: 0.88rem !important;
+  letter-spacing: 0.2px !important;
 }
 
 /* ════════════════════════════════

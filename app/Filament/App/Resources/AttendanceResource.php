@@ -14,6 +14,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -30,7 +32,7 @@ class AttendanceResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Employé & Date')->schema([
                 Grid::make(2)->schema([
                     Select::make('employee_id')
@@ -135,6 +137,11 @@ class AttendanceResource extends Resource
                             ->when($data['from'],  fn ($q, $v) => $q->whereDate('date', '>=', $v))
                             ->when($data['until'], fn ($q, $v) => $q->whereDate('date', '<=', $v));
                     }),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('date', 'desc');
     }

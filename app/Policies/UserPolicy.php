@@ -36,7 +36,7 @@ class UserPolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:User');
+        return $authUser->can('DeleteAny:User') && $authUser->hasAnyRole(['admin', 'super-admin']);
     }
 
     public function restore(AuthUser $authUser): bool

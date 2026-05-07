@@ -34,13 +34,20 @@ class PositionPolicy
 
     public function delete(AuthUser $authUser, Position $position): bool
     {
-        // Interdit si des employés sont affectés à ce poste
-        return $authUser->can('Delete:Position') && $position->employees()->count() === 0;
+        if (! $authUser->can('Delete:Position')) {
+            return false;
+        }
+        // admin et super-admin peuvent toujours supprimer
+        if ($authUser->hasAnyRole(['admin', 'super-admin'])) {
+            return true;
+        }
+        // autres rôles : interdit si des employés sont affectés
+        return $position->employees()->count() === 0;
     }
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return false; // suppression en masse toujours interdite
+        return $authUser->hasAnyRole(['admin', 'super-admin']);
     }
 
     public function restore(AuthUser $authUser, Position $position): bool

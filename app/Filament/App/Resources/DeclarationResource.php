@@ -13,6 +13,8 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -28,7 +30,7 @@ class DeclarationResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        return $schema->columns(1)->components([
             Section::make('Type & Période')->schema([
                 Grid::make(2)->schema([
                     Select::make('type')
@@ -201,6 +203,11 @@ class DeclarationResource extends Resource
                     ->visible(fn (Declaration $record) => $record->status === 'générée')
                     ->requiresConfirmation()
                     ->action(fn (Declaration $record) => $record->update(['status' => 'soumise'])),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('created_at', 'desc');
     }

@@ -6,7 +6,11 @@ use App\Filament\Admin\Resources\IrBracketResource\Pages;
 use App\Models\IrBracket;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -25,30 +29,40 @@ class IrBracketResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            TextInput::make('min_salary')
-                ->label('Salaire min (MAD/an)')
-                ->numeric()
-                ->required(),
+        return $schema->columns(1)->components([
+            Section::make('Tranche IR')
+                ->icon('heroicon-o-calculator')
+                ->schema([
+                    Grid::make(2)->schema([
+                        TextInput::make('min_salary')
+                            ->label('Salaire min (MAD/an)')
+                            ->numeric()
+                            ->required(),
 
-            TextInput::make('max_salary')
-                ->label('Salaire max (MAD/an)')
-                ->numeric()
-                ->nullable()
-                ->helperText('Laisser vide pour la tranche supérieure sans plafond'),
+                        TextInput::make('max_salary')
+                            ->label('Salaire max (MAD/an)')
+                            ->numeric()
+                            ->nullable()
+                            ->helperText('Laisser vide pour la tranche supérieure sans plafond'),
+                    ]),
 
-            TextInput::make('rate_percentage')
-                ->label('Taux (%)')
-                ->numeric()
-                ->minValue(0)
-                ->maxValue(100)
-                ->required(),
+                    Grid::make(2)->schema([
+                        TextInput::make('rate_percentage')
+                            ->label('Taux (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->suffix('%')
+                            ->required(),
 
-            TextInput::make('deduction_amount')
-                ->label('Déduction (MAD/an)')
-                ->numeric()
-                ->default(0)
-                ->required(),
+                        TextInput::make('deduction_amount')
+                            ->label('Déduction (MAD/an)')
+                            ->numeric()
+                            ->default(0)
+                            ->suffix('MAD')
+                            ->required(),
+                    ]),
+                ]),
         ]);
     }
 
@@ -60,6 +74,11 @@ class IrBracketResource extends Resource
                 TextColumn::make('max_salary')->label('Max (MAD/an)')->money('MAD')->default('Sans plafond')->sortable(),
                 TextColumn::make('rate_percentage')->label('Taux')->suffix('%')->sortable(),
                 TextColumn::make('deduction_amount')->label('Déduction')->money('MAD'),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('min_salary');
     }

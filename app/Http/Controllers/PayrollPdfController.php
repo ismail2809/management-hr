@@ -9,8 +9,11 @@ class PayrollPdfController extends Controller
 {
     public function download(Payroll $payroll)
     {
-        // Vérifier que l'utilisateur appartient à la même company
-        abort_if(auth()->user()->company_id !== $payroll->company_id, 403);
+        $user = auth()->user();
+        abort_if(
+            ! $user->hasRole('super-admin') && $user->company_id !== $payroll->company_id,
+            403
+        );
 
         $payroll->load(['employee.position', 'employee.department', 'components', 'company']);
 

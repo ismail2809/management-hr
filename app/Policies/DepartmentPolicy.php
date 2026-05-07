@@ -34,13 +34,18 @@ class DepartmentPolicy
 
     public function delete(AuthUser $authUser, Department $department): bool
     {
-        // Interdit si des employés appartiennent à ce département
-        return $authUser->can('Delete:Department') && $department->employees()->count() === 0;
+        if (! $authUser->can('Delete:Department')) {
+            return false;
+        }
+        if ($authUser->hasAnyRole(['admin', 'super-admin'])) {
+            return true;
+        }
+        return $department->employees()->count() === 0;
     }
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return false;
+        return $authUser->hasAnyRole(['admin', 'super-admin']);
     }
 
     public function restore(AuthUser $authUser, Department $department): bool

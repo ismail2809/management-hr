@@ -7,7 +7,11 @@ use App\Models\CnssRate;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -34,29 +38,39 @@ class CnssRateResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Select::make('type')
-                ->label('Type')
-                ->options(['employee' => 'Salarié', 'employer' => 'Patronal'])
-                ->required(),
+        return $schema->columns(1)->components([
+            Section::make('Taux CNSS / AMO')
+                ->icon('heroicon-o-percent-badge')
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('type')
+                            ->label('Type')
+                            ->options(['employee' => 'Salarié', 'employer' => 'Patronal'])
+                            ->required(),
 
-            TextInput::make('label')
-                ->label('Libellé')
-                ->placeholder('CNSS, AMO, CIMR, Formation…')
-                ->required(),
+                        TextInput::make('label')
+                            ->label('Libellé')
+                            ->placeholder('CNSS, AMO, CIMR, Formation…')
+                            ->required(),
+                    ]),
 
-            TextInput::make('rate_percentage')
-                ->label('Taux (%)')
-                ->numeric()
-                ->minValue(0)
-                ->maxValue(100)
-                ->required(),
+                    Grid::make(2)->schema([
+                        TextInput::make('rate_percentage')
+                            ->label('Taux (%)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(100)
+                            ->suffix('%')
+                            ->required(),
 
-            TextInput::make('plafond')
-                ->label('Plafond mensuel (MAD)')
-                ->numeric()
-                ->nullable()
-                ->helperText('Laisser vide = pas de plafond'),
+                        TextInput::make('plafond')
+                            ->label('Plafond mensuel (MAD)')
+                            ->numeric()
+                            ->nullable()
+                            ->suffix('MAD')
+                            ->helperText('Laisser vide = pas de plafond'),
+                    ]),
+                ]),
         ]);
     }
 
@@ -75,6 +89,11 @@ class CnssRateResource extends Resource
                 SelectFilter::make('type')
                     ->label('Type')
                     ->options(['employee' => 'Salarié', 'employer' => 'Patronal']),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
             ])
             ->defaultSort('type');
     }
