@@ -236,7 +236,11 @@
                     <tr>
                         <th>Employé</th>
                         <th>Statut</th>
-                        <th>Détail</th>
+                        <th style="text-align:right;">Brut (MAD)</th>
+                        <th style="text-align:right;">CNSS</th>
+                        <th style="text-align:right;">AMO</th>
+                        <th style="text-align:right;">IR</th>
+                        <th style="text-align:right;">Net (MAD)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -268,7 +272,15 @@
                                 </span>
                             @endif
                         </td>
-                        <td style="color:#64748b;">{{ $row['detail'] }}</td>
+                        @if ($row['status'] === 'généré')
+                            <td style="text-align:right;font-variant-numeric:tabular-nums;">{{ number_format($row['salaire_brut'], 2, ',', ' ') }}</td>
+                            <td style="text-align:right;font-variant-numeric:tabular-nums;color:#ef4444;">−{{ number_format($row['cnss'], 2, ',', ' ') }}</td>
+                            <td style="text-align:right;font-variant-numeric:tabular-nums;color:#ef4444;">−{{ number_format($row['amo'], 2, ',', ' ') }}</td>
+                            <td style="text-align:right;font-variant-numeric:tabular-nums;color:#ef4444;">−{{ number_format($row['ir'], 2, ',', ' ') }}</td>
+                            <td style="text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:#059669;">{{ number_format($row['salaire_net'], 2, ',', ' ') }}</td>
+                        @else
+                            <td colspan="5" style="color:#94a3b8;font-size:12px;">{{ $row['detail'] }}</td>
+                        @endif
                     </tr>
                     @endforeach
                 </tbody>

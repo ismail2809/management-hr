@@ -85,9 +85,14 @@ class GeneratePayroll extends Page implements HasForms
             try {
                 $payroll = $calculator->calculate($employee, $month, $year, $salaire);
                 $this->results[] = [
-                    'name'   => $employee->full_name,
-                    'status' => 'généré',
-                    'detail' => 'Net : ' . number_format($payroll->salaire_net, 2, ',', ' ') . ' MAD',
+                    'name'          => $employee->full_name,
+                    'status'        => 'généré',
+                    'detail'        => null,
+                    'salaire_brut'  => $payroll->salaire_brut,
+                    'cnss'          => $payroll->total_cnss_employee,
+                    'amo'           => $payroll->amo_employee,
+                    'ir'            => $payroll->ir,
+                    'salaire_net'   => $payroll->salaire_net,
                 ];
             } catch (\Throwable $e) {
                 $errors++;
