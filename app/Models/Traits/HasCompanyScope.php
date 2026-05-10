@@ -6,7 +6,7 @@ use App\Models\Scopes\CompanyScope;
 
 trait HasCompanyScope
 {
-    protected static function booted(): void
+    public static function bootHasCompanyScope(): void
     {
         static::addGlobalScope(new CompanyScope());
         static::creating(function ($model) {

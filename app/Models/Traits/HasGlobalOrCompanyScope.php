@@ -11,7 +11,7 @@ use App\Models\Scopes\GlobalOrCompanyScope;
  */
 trait HasGlobalOrCompanyScope
 {
-    protected static function booted(): void
+    public static function bootHasGlobalOrCompanyScope(): void
     {
         static::addGlobalScope(new GlobalOrCompanyScope());
         static::creating(function ($model) {

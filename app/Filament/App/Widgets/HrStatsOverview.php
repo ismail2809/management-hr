@@ -13,6 +13,11 @@ class HrStatsOverview extends StatsOverviewWidget
 {
     protected static ?int $sort = 1;
 
+    public static function canView(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     protected function getStats(): array
     {
         $moisCourant  = now()->month;

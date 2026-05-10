@@ -20,6 +20,7 @@ use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -64,7 +65,8 @@ class PayrollResource extends Resource
         $query = parent::getEloquentQuery();
 
         if (auth()->user()?->hasRole('employee')) {
-            $query->where('employee_id', auth()->user()->employee_id);
+            $query->where('employee_id', auth()->user()->employee_id)
+                  ->where('status', 'payé');
         }
 
         return $query;
@@ -336,7 +338,17 @@ class PayrollResource extends Resource
                         'payé'      => 'success',
                         default     => 'gray',
                     })
-                    ->description(fn (Payroll $record) => $record->isLocked() ? '🔒 Verrouillé' : null),
+                    ->description(fn (Payroll $record) => $record->isLocked() ? '🔒 Verrouillé' : null)
+                    ->visible(fn () => auth()->user()?->hasRole('employee')),
+
+                SelectColumn::make('status')
+                    ->label('Statut')
+                    ->options([
+                        'brouillon' => 'Brouillon',
+                        'validé'    => 'Validé',
+                        'payé'      => 'Payé',
+                    ])
+                    ->visible(fn () => ! auth()->user()?->hasRole('employee')),
             ])
             ->filters([
                 SelectFilter::make('status')

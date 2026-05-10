@@ -170,27 +170,28 @@ class DocumentRequestResource extends Resource
                     ->options(['digital' => 'Digitale (PDF)', 'papier' => 'Papier']),
             ])
             ->actions([
-                Action::make('approve_pdf')
-                    ->label('Télécharger PDF')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('primary')
-                    ->visible(fn (DocumentRequest $record) => $record->format === 'digital')
-                    ->url(fn (DocumentRequest $record) => route('documents.pdf', $record))
-                    ->openUrlInNewTab(),
-
-                Action::make('mark_printed')
-                    ->label('Marquer imprimé')
-                    ->icon('heroicon-o-printer')
-                    ->color('success')
-                    ->visible(fn (DocumentRequest $record) => $record->format === 'papier' && $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
-                    ->requiresConfirmation()
-                    ->action(fn (DocumentRequest $record) => $record->update([
-                        'status'       => 'traité',
-                        'processed_by' => auth()->id(),
-                        'processed_at' => now(),
-                    ])),
-
                 ActionGroup::make([
+
+                    Action::make('approve_pdf')
+                        ->label('Télécharger PDF')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('primary')
+                        ->visible(fn (DocumentRequest $record) => $record->format === 'digital')
+                        ->url(fn (DocumentRequest $record) => route('documents.pdf', $record))
+                        ->openUrlInNewTab(),
+
+                    Action::make('mark_printed')
+                        ->label('Marquer imprimé')
+                        ->icon('heroicon-o-printer')
+                        ->color('success')
+                        ->visible(fn (DocumentRequest $record) => $record->format === 'papier' && $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->requiresConfirmation()
+                        ->action(fn (DocumentRequest $record) => $record->update([
+                            'status'       => 'traité',
+                            'processed_by' => auth()->id(),
+                            'processed_at' => now(),
+                        ])),
+                
                     ViewAction::make()
                         ->label('Voir la demande'),
 
@@ -213,7 +214,8 @@ class DocumentRequestResource extends Resource
                             'processed_by' => auth()->id(),
                             'processed_at' => now(),
                         ])),
-                ])->icon('heroicon-m-ellipsis-horizontal'),
+                ])->icon('heroicon-m-ellipsis-horizontal')
+                  ->visible(fn (DocumentRequest $record) => ! auth()->user()?->hasRole('employee') || $record->status === 'traité'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

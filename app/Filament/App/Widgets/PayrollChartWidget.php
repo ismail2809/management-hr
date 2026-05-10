@@ -11,6 +11,11 @@ class PayrollChartWidget extends ChartWidget
     protected static ?int $sort = 2;
     protected int | string | array $columnSpan = 'full';
 
+    public static function canView(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     protected function getData(): array
     {
         $labels = [];

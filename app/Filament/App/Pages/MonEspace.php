@@ -32,7 +32,7 @@ class MonEspace extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        return auth()->user()?->employee_id !== null;
+        return auth()->user()?->hasRole('employee');
     }
 
     public function getTitle(): string|Htmlable
