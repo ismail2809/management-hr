@@ -6,10 +6,18 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    public function mount(): void
+    public static function shouldRegisterNavigation(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public function mountCanAuthorizeAccess(): void
     {
         if (auth()->user()?->hasRole('employee')) {
             $this->redirect(MonEspace::getUrl());
+            return;
         }
+
+        parent::mountCanAuthorizeAccess();
     }
 }
