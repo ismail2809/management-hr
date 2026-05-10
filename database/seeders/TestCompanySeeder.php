@@ -53,6 +53,17 @@ class TestCompanySeeder extends Seeder
         );
         $manager->syncRoles(['manager']);
 
+        // User employé de test
+        $employe = User::updateOrCreate(
+            ['email' => 'employe@test.com'],
+            [
+                'name'       => 'Employé Test',
+                'password'   => bcrypt('password'),
+                'company_id' => $company->id,
+            ]
+        );
+        $employe->syncRoles(['rh']);
+
         // Types de congé par défaut
         $leaveTypes = [
             ['name' => 'Congé annuel',  'legal_days_per_year' => 18],
