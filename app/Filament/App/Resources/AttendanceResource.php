@@ -30,6 +30,42 @@ class AttendanceResource extends Resource
     protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
     protected static ?int $navigationSort = 8;
 
+    public static function canViewAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canCreate(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->user()?->hasRole('employee')) {
+            $query->where('employee_id', auth()->user()->employee_id);
+        }
+
+        return $query;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([

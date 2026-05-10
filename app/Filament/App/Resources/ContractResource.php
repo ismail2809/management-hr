@@ -138,6 +138,11 @@ class ContractResource extends Resource
             ->defaultSort('start_date', 'desc');
     }
 
+    public static function canViewAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     public static function getPages(): array
     {
         return [

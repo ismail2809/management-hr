@@ -79,6 +79,11 @@ class DepartmentResource extends Resource
             ->defaultSort('name');
     }
 
+    public static function canViewAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     public static function getPages(): array
     {
         return [

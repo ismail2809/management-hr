@@ -114,6 +114,11 @@ class AuditLogResource extends Resource
             ->paginated([25, 50, 100]);
     }
 
+    public static function canViewAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     public static function getPages(): array
     {
         return [

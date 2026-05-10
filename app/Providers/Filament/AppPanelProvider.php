@@ -75,7 +75,7 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                \Spatie\Permission\Middleware\RoleMiddleware::using('admin|rh|manager|comptable'),
+                \Spatie\Permission\Middleware\RoleMiddleware::using('admin|rh|manager|comptable|employee'),
             ]);
     }
 }

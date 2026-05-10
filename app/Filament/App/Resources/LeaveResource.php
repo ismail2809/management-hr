@@ -5,6 +5,7 @@ namespace App\Filament\App\Resources;
 use App\Filament\App\Resources\LeaveResource\Pages;
 use App\Models\Employee;
 use App\Models\Leave;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -28,8 +29,46 @@ class LeaveResource extends Resource
     protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
     protected static ?int $navigationSort = 7;
 
+    public static function getNavigationLabel(): string
+    {
+        return auth()->user()?->hasRole('employee') ? 'Congés' : 'Demandes de congé';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Congés & Présence';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return auth()->user()?->hasRole('employee') ? 1 : 7;
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->user()?->hasRole('employee')) {
+            $query->where('employee_id', auth()->user()->employee_id);
+        }
+
+        return $query;
+    }
+
     public static function form(Schema $schema): Schema
     {
+        $isEmployee = auth()->user()?->hasRole('employee');
+
         return $schema->columns(1)->components([
             Section::make('Demandeur & Type')->schema([
                 Grid::make(2)->schema([
@@ -39,6 +78,8 @@ class LeaveResource extends Resource
                         ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
                         ->searchable()
                         ->default(fn () => auth()->user()?->employee_id)
+                        ->disabled($isEmployee)
+                        ->dehydrated()
                         ->required(),
 
                     Select::make('leave_type_id')
@@ -60,17 +101,21 @@ class LeaveResource extends Resource
                     ->nullable(),
             ]),
 
-            Section::make('Décision')->schema([
-                Select::make('status')
-                    ->label('Statut')
-                    ->options([
-                        'en_attente' => 'En attente',
-                        'approuvé'   => 'Approuvé',
-                        'refusé'     => 'Refusé',
-                    ])
-                    ->default('en_attente')
-                    ->required(),
-            ]),
+            Section::make('Décision')
+                ->schema([
+                    Select::make('status')
+                        ->label('Statut')
+                        ->options([
+                            'en_attente' => 'En attente',
+                            'approuvé'   => 'Approuvé',
+                            'refusé'     => 'Refusé',
+                        ])
+                        ->default('en_attente')
+                        ->disabled($isEmployee)
+                        ->dehydrated()
+                        ->required(),
+                ])
+                ->hidden($isEmployee),
         ]);
     }
 
@@ -131,7 +176,7 @@ class LeaveResource extends Resource
                     ->label('Approuver')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Leave $record) => $record->status === 'en_attente')
+                    ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
                     ->requiresConfirmation()
                     ->action(fn (Leave $record) => $record->update([
                         'status'      => 'approuvé',
@@ -143,7 +188,7 @@ class LeaveResource extends Resource
                     ->label('Refuser')
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
-                    ->visible(fn (Leave $record) => $record->status === 'en_attente')
+                    ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
                     ->requiresConfirmation()
                     ->action(fn (Leave $record) => $record->update([
                         'status'      => 'refusé',
@@ -153,7 +198,8 @@ class LeaveResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        ->visible(fn () => ! auth()->user()?->hasRole('employee')),
                 ]),
             ])
             ->defaultSort('start_date', 'desc');

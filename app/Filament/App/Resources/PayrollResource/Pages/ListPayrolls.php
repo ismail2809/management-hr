@@ -15,6 +15,10 @@ class ListPayrolls extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        if (auth()->user()?->hasRole('employee')) {
+            return [];
+        }
+
         return [
             Action::make('download_month')
                 ->label('Bulletins du mois (ZIP)')

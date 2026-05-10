@@ -183,6 +183,11 @@ class EmployeeResource extends Resource
             ]);
     }
 
+    public static function canViewAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     public static function getPages(): array
     {
         return [

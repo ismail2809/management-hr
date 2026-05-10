@@ -21,6 +21,11 @@ class GeneratePayroll extends Page implements HasForms
     protected static \UnitEnum|string|null $navigationGroup = 'Paie';
     protected static ?int $navigationSort = 6;
 
+    public static function canAccess(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
     protected string $view = 'filament.app.pages.generate-payroll';
 
     public ?array $data = [];

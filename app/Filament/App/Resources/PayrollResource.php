@@ -5,6 +5,7 @@ namespace App\Filament\App\Resources;
 use App\Filament\App\Resources\PayrollResource\Pages;
 use App\Models\Employee;
 use App\Models\Payroll;
+use Illuminate\Database\Eloquent\Builder;
 use App\Services\PayrollCalculator;
 use App\Models\Leave;
 use Filament\Schemas\Components\Grid;
@@ -29,9 +30,45 @@ class PayrollResource extends Resource
     protected static ?string $model = Payroll::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-banknotes';
     protected static ?string $navigationLabel = 'Fiches de paie';
+
+    public static function getNavigationLabel(): string
+    {
+        return auth()->user()?->hasRole('employee') ? 'Mes bulletins de paie' : 'Fiches de paie';
+    }
+
+    public static function getModelLabel(): string
+    {
+        return auth()->user()?->hasRole('employee') ? 'Bulletin de paie' : 'Fiche de paie';
+    }
     protected static ?string $modelLabel = 'Fiche de paie';
     protected static \UnitEnum|string|null $navigationGroup = 'Paie';
     protected static ?int $navigationSort = 5;
+
+    public static function canCreate(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->user()?->hasRole('employee')) {
+            $query->where('employee_id', auth()->user()->employee_id);
+        }
+
+        return $query;
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -315,11 +352,19 @@ class PayrollResource extends Resource
                     ]),
             ])
             ->actions([
+                Action::make('download_pdf_employee')
+                    ->label('Voir Bulletin PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('primary')
+                    ->visible(fn (Payroll $record) => auth()->user()?->hasRole('employee') && in_array($record->status, ['validé', 'payé']))
+                    ->url(fn (Payroll $record) => route('payrolls.pdf', $record))
+                    ->openUrlInNewTab(true),
+
                 Action::make('recalculate')
                     ->label('Recalculer')
                     ->icon('heroicon-o-calculator')
                     ->color('info')
-                    ->visible(fn (Payroll $record) => $record->status === 'brouillon')
+                    ->visible(fn (Payroll $record) => $record->status === 'brouillon' && ! auth()->user()?->hasRole('employee'))
                     ->requiresConfirmation()
                     ->modalHeading('Recalculer la fiche de paie')
                     ->modalDescription('Les montants CNSS, AMO et IR seront recalculés selon les taux en vigueur.')
@@ -344,7 +389,7 @@ class PayrollResource extends Resource
                     ->label('Valider')
                     ->icon('heroicon-o-check-badge')
                     ->color('warning')
-                    ->visible(fn (Payroll $record) => $record->status === 'brouillon')
+                    ->visible(fn (Payroll $record) => $record->status === 'brouillon' && ! auth()->user()?->hasRole('employee'))
                     ->requiresConfirmation()
                     ->action(fn (Payroll $record) => $record->update(['status' => 'validé'])),
 
@@ -352,7 +397,7 @@ class PayrollResource extends Resource
                     ->label('Marquer payé')
                     ->icon('heroicon-o-banknotes')
                     ->color('success')
-                    ->visible(fn (Payroll $record) => $record->status === 'validé')
+                    ->visible(fn (Payroll $record) => $record->status === 'validé' && ! auth()->user()?->hasRole('employee'))
                     ->requiresConfirmation()
                     ->action(fn (Payroll $record) => $record->update(['status' => 'payé'])),
 
@@ -363,7 +408,8 @@ class PayrollResource extends Resource
                         ->color('gray')
                         ->url(fn (Payroll $record) => route('payrolls.pdf', $record))
                         ->openUrlInNewTab(),
-                ])->icon('heroicon-m-ellipsis-horizontal'),
+                ])->icon('heroicon-m-ellipsis-horizontal')
+                  ->visible(fn () => ! auth()->user()?->hasRole('employee')),
             ])
             ->bulkActions([
                 BulkAction::make('bulk_pdf')

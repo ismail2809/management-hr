@@ -5,6 +5,7 @@ namespace App\Filament\App\Resources;
 use App\Filament\App\Resources\DocumentRequestResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\Employee;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
@@ -29,8 +30,51 @@ class DocumentRequestResource extends Resource
     protected static \UnitEnum|string|null $navigationGroup = 'Légal';
     protected static ?int $navigationSort = 11;
 
+    public static function getNavigationLabel(): string
+    {
+        return auth()->user()?->hasRole('employee') ? 'Documents' : 'Demandes de documents';
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Légal';
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return auth()->user()?->hasRole('employee') ? 2 : 11;
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->user()?->hasRole('employee')) {
+            $query->where('employee_id', auth()->user()->employee_id);
+        }
+
+        return $query;
+    }
+
     public static function form(Schema $schema): Schema
     {
+        $isEmployee = auth()->user()?->hasRole('employee');
+
         return $schema->columns(1)->components([
             Section::make('Demandeur & Document')->schema([
                 Select::make('employee_id')
@@ -39,6 +83,8 @@ class DocumentRequestResource extends Resource
                     ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
                     ->searchable()
                     ->default(fn () => auth()->user()?->employee_id)
+                    ->disabled($isEmployee)
+                    ->dehydrated()
                     ->required(),
 
                 Select::make('type')
@@ -71,6 +117,8 @@ class DocumentRequestResource extends Resource
                         'refusé'     => 'Refusé',
                     ])
                     ->default('en_attente')
+                    ->disabled($isEmployee)
+                    ->dehydrated()
                     ->required(),
             ]),
         ]);
@@ -134,7 +182,7 @@ class DocumentRequestResource extends Resource
                     ->label('Marquer imprimé')
                     ->icon('heroicon-o-printer')
                     ->color('success')
-                    ->visible(fn (DocumentRequest $record) => $record->format === 'papier' && $record->status === 'en_attente')
+                    ->visible(fn (DocumentRequest $record) => $record->format === 'papier' && $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
                     ->requiresConfirmation()
                     ->action(fn (DocumentRequest $record) => $record->update([
                         'status'       => 'traité',
@@ -158,7 +206,7 @@ class DocumentRequestResource extends Resource
                         ->label('Refuser')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente')
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
                             'status'       => 'refusé',
