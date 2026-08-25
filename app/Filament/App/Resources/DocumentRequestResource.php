@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Get;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,25 +28,20 @@ class DocumentRequestResource extends Resource
 {
     use HasCompanyField;
     protected static ?string $model = DocumentRequest::class;
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-arrow-down';
-    protected static ?string $navigationLabel = 'Demandes de documents';
-    protected static ?string $modelLabel = 'Demande de document';
-    protected static \UnitEnum|string|null $navigationGroup = 'Légal';
-    protected static ?int $navigationSort = 11;
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-inbox-arrow-down';
+    protected static ?string $navigationLabel = 'Demandes';
+    protected static ?string $modelLabel = 'Demande';
+    protected static \UnitEnum|string|null $navigationGroup = 'Demandes';
+    protected static ?int $navigationSort = 10;
 
     public static function getNavigationLabel(): string
     {
-        return auth()->user()?->hasRole('employee') ? 'Documents' : 'Demandes de documents';
+        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Demandes';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Légal';
-    }
-
-    public static function getNavigationSort(): ?int
-    {
-        return auth()->user()?->hasRole('employee') ? 2 : 11;
+        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Demandes';
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
@@ -78,7 +75,7 @@ class DocumentRequestResource extends Resource
         $isEmployee = auth()->user()?->hasRole('employee');
 
         return $schema->columns(1)->components([
-            Section::make('Demandeur & Document')->schema([
+            Section::make('Demandeur')->schema([
                 static::companyField(),
 
                 Select::make('employee_id')
@@ -86,44 +83,72 @@ class DocumentRequestResource extends Resource
                     ->relationship('employee', 'first_name')
                     ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
                     ->searchable()
+                    ->preload()
                     ->default(fn () => auth()->user()?->employee_id)
                     ->disabled($isEmployee)
                     ->dehydrated()
                     ->required(),
 
-                Select::make('type')
-                    ->label('Type de document')
-                    ->options(DocumentRequest::$typeLabels)
-                    ->required(),
-
-                Radio::make('format')
-                    ->label('Format souhaité')
-                    ->options([
-                        'digital' => 'Version digitale (PDF)',
-                        'papier'  => 'Version papier',
-                    ])
-                    ->default('digital')
+                Radio::make('categorie')
+                    ->label('Catégorie de demande')
+                    ->options(['document' => 'Document administratif', 'autre' => 'Autre demande'])
+                    ->default('document')
                     ->inline()
-                    ->required(),
+                    ->required()
+                    ->live(),
             ]),
 
-            Section::make('Détails & Statut')->schema([
-                Textarea::make('reason')
-                    ->label('Remarques / raison de la demande')
+            Section::make('Document administratif')
+                ->visible(fn (Get $get) => $get('categorie') === 'document')
+                ->schema([
+                    Select::make('type')
+                        ->label('Type de document')
+                        ->options(DocumentRequest::$documentTypes)
+                        ->required(fn (Get $get) => $get('categorie') === 'document'),
+
+                    Radio::make('format')
+                        ->label('Format souhaité')
+                        ->options(['digital' => 'Version digitale (PDF)', 'papier' => 'Version papier'])
+                        ->default('digital')
+                        ->inline(),
+                ]),
+
+            Section::make('Autre demande')
+                ->visible(fn (Get $get) => $get('categorie') === 'autre')
+                ->schema([
+                    Select::make('type')
+                        ->label('Type de demande')
+                        ->options(DocumentRequest::$autreTypes)
+                        ->required(fn (Get $get) => $get('categorie') === 'autre'),
+                ]),
+
+            Section::make('Détails')->schema([
+                Textarea::make('description')
+                    ->label('Description / détails')
                     ->rows(3)
+                    ->nullable(),
+
+                Textarea::make('reason')
+                    ->label('Remarques complémentaires')
+                    ->rows(2)
                     ->nullable(),
 
                 Select::make('status')
                     ->label('Statut')
-                    ->options([
-                        'en_attente' => 'En attente',
-                        'traité'     => 'Traité',
-                        'refusé'     => 'Refusé',
-                    ])
+                    ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
                     ->default('en_attente')
                     ->disabled($isEmployee)
                     ->dehydrated()
                     ->required(),
+
+                FileUpload::make('fichier_final')
+                    ->label('Fichier final (uploadé par l\'admin)')
+                    ->disk('public')
+                    ->directory('document-requests/finals')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->maxSize(10240)
+                    ->nullable()
+                    ->hidden($isEmployee),
             ]),
         ]);
     }
@@ -138,9 +163,15 @@ class DocumentRequestResource extends Resource
                     ->sortable()
                     ->weight('semibold'),
 
+                TextColumn::make('categorie')
+                    ->label('Catégorie')
+                    ->badge()
+                    ->color(fn ($state) => $state === 'document' ? 'primary' : 'warning')
+                    ->formatStateUsing(fn ($state) => $state === 'document' ? 'Document' : 'Autre'),
+
                 TextColumn::make('type')
-                    ->label('Document')
-                    ->formatStateUsing(fn ($state) => DocumentRequest::$typeLabels[$state] ?? $state)
+                    ->label('Type')
+                    ->formatStateUsing(fn ($state) => DocumentRequest::$documentTypes[$state] ?? DocumentRequest::$autreTypes[$state] ?? $state)
                     ->badge()
                     ->color('info'),
 
@@ -148,17 +179,24 @@ class DocumentRequestResource extends Resource
                     ->label('Format')
                     ->badge()
                     ->color(fn ($state) => $state === 'digital' ? 'primary' : 'gray')
-                    ->formatStateUsing(fn ($state) => $state === 'digital' ? 'PDF' : 'Papier'),
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'digital' => 'PDF', 'papier' => 'Papier', default => '—',
+                    }),
 
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
                         'en_attente' => 'warning',
-                        'traité'     => 'success',
+                        'approuvé'   => 'success',
                         'refusé'     => 'danger',
                         default      => 'gray',
                     }),
+
+                TextColumn::make('nb_telechargements')
+                    ->label('Téléchargements')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label('Demandé le')
@@ -166,46 +204,34 @@ class DocumentRequestResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')
-                    ->label('Statut')
-                    ->options(['en_attente' => 'En attente', 'traité' => 'Traité', 'refusé' => 'Refusé']),
-                SelectFilter::make('format')
-                    ->label('Format')
-                    ->options(['digital' => 'Digitale (PDF)', 'papier' => 'Papier']),
+                SelectFilter::make('categorie')->label('Catégorie')->options(['document' => 'Document', 'autre' => 'Autre']),
+                SelectFilter::make('status')->label('Statut')->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé']),
+                SelectFilter::make('format')->label('Format')->options(['digital' => 'Digitale', 'papier' => 'Papier']),
             ])
             ->actions([
                 ActionGroup::make([
+                    ViewAction::make()->label('Voir'),
 
-                    Action::make('approve_pdf')
-                        ->label('Télécharger PDF')
+                    Action::make('download_final')
+                        ->label('Télécharger document')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('primary')
-                        ->visible(fn (DocumentRequest $record) => $record->format === 'digital')
-                        ->url(fn (DocumentRequest $record) => route('documents.pdf', $record))
-                        ->openUrlInNewTab(),
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && $record->fichier_final)
+                        ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
+                        ->openUrlInNewTab()
+                        ->action(function (DocumentRequest $record) {
+                            $record->increment('nb_telechargements');
+                        }),
 
-                    Action::make('mark_printed')
-                        ->label('Marquer imprimé')
-                        ->icon('heroicon-o-printer')
+                    Action::make('approve')
+                        ->label('Approuver')
+                        ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn (DocumentRequest $record) => $record->format === 'papier' && $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
-                            'status'       => 'traité',
-                            'processed_by' => auth()->id(),
-                            'processed_at' => now(),
+                            'status' => 'approuvé', 'processed_by' => auth()->id(), 'processed_at' => now(),
                         ])),
-                
-                    ViewAction::make()
-                        ->label('Voir la demande'),
-
-                    Action::make('preview_pdf')
-                        ->label('Aperçu PDF')
-                        ->icon('heroicon-o-eye')
-                        ->color('info')
-                        ->visible(fn (DocumentRequest $record) => $record->format === 'digital')
-                        ->url(fn (DocumentRequest $record) => route('documents.preview', $record))
-                        ->openUrlInNewTab(),
 
                     Action::make('refuse')
                         ->label('Refuser')
@@ -214,18 +240,11 @@ class DocumentRequestResource extends Resource
                         ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
-                            'status'       => 'refusé',
-                            'processed_by' => auth()->id(),
-                            'processed_at' => now(),
+                            'status' => 'refusé', 'processed_by' => auth()->id(), 'processed_at' => now(),
                         ])),
-                ])->icon('heroicon-m-ellipsis-horizontal')
-                  ->visible(fn (DocumentRequest $record) => ! auth()->user()?->hasRole('employee') || $record->status === 'traité'),
+                ])->icon('heroicon-m-ellipsis-horizontal'),
             ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
             ->defaultSort('created_at', 'desc');
     }
 

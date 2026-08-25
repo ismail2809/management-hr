@@ -13,10 +13,17 @@ class Leave extends Model
     protected $fillable = [
         'company_id',
         'employee_id',
+        'categorie',
         'leave_type_id',
         'start_date',
         'end_date',
         'reason',
+        'justificatif',
+        'remplacant_id',
+        'type_cours',
+        'nb_pages',
+        'intitule_lecon',
+        'intitule_activite',
         'status',
         'approved_by',
         'approved_at',
@@ -30,7 +37,6 @@ class Leave extends Model
 
     protected static function booted(): void
     {
-        // Recalcule le solde de congés à chaque approbation/refus/modification
         static::saved(function (self $leave) {
             if ($leave->employee_id && $leave->leave_type_id && $leave->start_date) {
                 LeaveBalance::findOrInit(
@@ -53,23 +59,9 @@ class Leave extends Model
         return $this->start_date->diffInWeekdays($this->end_date) + 1;
     }
 
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
-
-    public function employee(): BelongsTo
-    {
-        return $this->belongsTo(Employee::class);
-    }
-
-    public function leaveType(): BelongsTo
-    {
-        return $this->belongsTo(LeaveType::class);
-    }
-
-    public function approver(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'approved_by');
-    }
+    public function company(): BelongsTo   { return $this->belongsTo(Company::class); }
+    public function employee(): BelongsTo  { return $this->belongsTo(Employee::class); }
+    public function leaveType(): BelongsTo { return $this->belongsTo(LeaveType::class); }
+    public function approver(): BelongsTo  { return $this->belongsTo(User::class, 'approved_by'); }
+    public function remplacant(): BelongsTo { return $this->belongsTo(Employee::class, 'remplacant_id'); }
 }

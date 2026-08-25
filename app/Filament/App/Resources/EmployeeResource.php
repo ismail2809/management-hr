@@ -4,14 +4,18 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\EmployeeResource\Pages;
+use App\Filament\App\Resources\EmployeeResource\RelationManagers\DocumentsRelationManager;
+use App\Filament\App\Resources\EmployeeResource\RelationManagers\GroupesRelationManager;
 use App\Models\Employee;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Get;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -57,16 +61,41 @@ class EmployeeResource extends Resource
                             ]),
                             Grid::make(2)->schema([
                                 TextInput::make('email')->label('Email')->email()->nullable(),
-                                TextInput::make('phone')->label('Téléphone')->nullable(),
+                                TextInput::make('phone')->label('Téléphone mobile')->nullable(),
                             ]),
                             Grid::make(2)->schema([
+                                TextInput::make('phone_fixed')->label('Téléphone fixe')->nullable(),
                                 TextInput::make('city')->label('Ville')->nullable(),
-                                TextInput::make('address')->label('Adresse')->nullable(),
                             ]),
+                            TextInput::make('address')->label('Adresse')->nullable(),
                             Grid::make(2)->schema([
                                 DatePicker::make('birth_date')->label('Date de naissance')->nullable(),
-                                DatePicker::make('hire_date')->label("Date d'embauche")->nullable(),
+                                TextInput::make('birth_place')->label('Lieu de naissance')->nullable(),
                             ]),
+                            Grid::make(2)->schema([
+                                TextInput::make('diploma')->label('Diplôme')->nullable(),
+                                TextInput::make('promotion')->label('Promotion')->nullable(),
+                            ]),
+                        ]),
+
+                    Section::make('Sortie')
+                        ->icon('heroicon-o-arrow-right-on-rectangle')
+                        ->collapsed()
+                        ->visible(fn (Get $get) => $get('status') === 'sorti')
+                        ->schema([
+                            Grid::make(2)->schema([
+                                DatePicker::make('exit_date')->label('Date de sortie')->nullable(),
+                                Select::make('exit_reason')
+                                    ->label('Motif de sortie')
+                                    ->options([
+                                        'demission' => 'Démission',
+                                        'decision'  => 'Décision',
+                                        'sanction'  => 'Sanction',
+                                        'autre'     => 'Autre',
+                                    ])
+                                    ->nullable(),
+                            ]),
+                            Textarea::make('exit_comment')->label('Commentaire')->rows(2)->nullable(),
                         ]),
 
                 ])->columnSpan(2),
@@ -91,37 +120,58 @@ class EmployeeResource extends Resource
                         ->icon('heroicon-o-heart')
                         ->schema([
                             Select::make('marital_status')
-                                ->label('Situation familiale')
+                                ->label('Situation matrimoniale')
                                 ->options([
                                     'celibataire' => 'Célibataire',
                                     'marie'       => 'Marié(e)',
                                     'divorce'     => 'Divorcé(e)',
                                     'veuf'        => 'Veuf/Veuve',
                                 ])
-                                ->required(),
+                                ->required()
+                                ->live(),
                             TextInput::make('number_of_children')
                                 ->label("Nombre d'enfants")
                                 ->numeric()
                                 ->minValue(0)
-                                ->default(0),
+                                ->default(0)
+                                ->visible(fn (Get $get) => $get('marital_status') === 'marie'),
                         ]),
 
                 ])->columnSpan(1),
 
             ]),
 
-            Section::make('Contrat')
+            Section::make('Poste & Contrat')
                 ->icon('heroicon-o-document-text')
                 ->schema([
                     Grid::make(3)->schema([
+                        Select::make('profession_id')
+                            ->label('Profession')
+                            ->relationship('profession', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->nullable()
+                            ->live(),
+                        Select::make('profession_type')
+                            ->label('Type de profession')
+                            ->options([
+                                'permanent'  => 'Permanent',
+                                'stagiaire'  => 'Stagiaire',
+                                'vacataire'  => 'Vacataire',
+                            ])
+                            ->nullable(),
                         Select::make('contract_type')
                             ->label('Type de contrat')
                             ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
                             ->required(),
+                    ]),
+                    Grid::make(3)->schema([
+                        DatePicker::make('hire_date')->label("Date d'embauche")->nullable(),
                         Select::make('status')
                             ->label('Statut')
-                            ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'suspendu' => 'Suspendu'])
-                            ->required(),
+                            ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'sorti' => 'Sorti'])
+                            ->required()
+                            ->live(),
                     ]),
                 ]),
         ]);
@@ -139,30 +189,45 @@ class EmployeeResource extends Resource
                     ->size(40),
                 TextColumn::make('matricule')->label('Matricule')->searchable()->sortable(),
                 TextColumn::make('full_name')->label('Nom complet')->searchable(['first_name', 'last_name'])->sortable('last_name'),
+                TextColumn::make('profession.name')->label('Profession')->badge()->color('primary')->default('—')->sortable(),
+                TextColumn::make('profession_type')->label('Type')->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'permanent'  => 'success',
+                        'stagiaire'  => 'info',
+                        'vacataire'  => 'warning',
+                        default      => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'permanent'  => 'Permanent',
+                        'stagiaire'  => 'Stagiaire',
+                        'vacataire'  => 'Vacataire',
+                        default      => '—',
+                    }),
                 TextColumn::make('contract_type')->label('Contrat')->badge()
                     ->color(fn ($state) => match ($state) {
                         'CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info', 'ANAPEC' => 'gray', default => 'gray',
                     }),
                 TextColumn::make('status')->label('Statut')->badge()
                     ->color(fn ($state) => match ($state) {
-                        'actif' => 'success', 'inactif' => 'danger', 'suspendu' => 'warning', default => 'gray',
+                        'actif'   => 'success',
+                        'inactif' => 'danger',
+                        'sorti'   => 'gray',
+                        default   => 'gray',
                     }),
                 TextColumn::make('hire_date')->label('Embauche')->date('d/m/Y')->sortable(),
             ])
             ->filters([
-                SelectFilter::make('status')->label('Statut')->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'suspendu' => 'Suspendu']),
-                SelectFilter::make('contract_type')->label('Type contrat')->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC']),
+                SelectFilter::make('status')->label('Statut')->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'sorti' => 'Sorti']),
+                SelectFilter::make('profession_id')->label('Profession')->relationship('profession', 'name'),
+                SelectFilter::make('profession_type')->label('Type')->options([
+                    'permanent' => 'Permanent', 'stagiaire' => 'Stagiaire', 'vacataire' => 'Vacataire',
+                ]),
+                SelectFilter::make('contract_type')->label('Contrat')->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC']),
             ])
             ->defaultSort('last_name')
             ->recordUrl(fn (Employee $record) => static::getUrl('view', ['record' => $record]))
-            ->actions([
-                ViewAction::make()->label('Profil'),
-            ])
-            ->bulkActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->actions([ViewAction::make()->label('Profil')])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 
     public static function canViewAny(): bool
@@ -172,7 +237,10 @@ class EmployeeResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            DocumentsRelationManager::class,
+            GroupesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
