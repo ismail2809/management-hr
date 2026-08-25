@@ -39,7 +39,7 @@ class AttendancePolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:Attendance') && $authUser->hasAnyRole(['admin', 'super-admin']);
+        return $authUser->can('DeleteAny:Attendance');
     }
 
     public function restore(AuthUser $authUser, Attendance $attendance): bool

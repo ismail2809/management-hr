@@ -39,7 +39,7 @@ class EmployeePolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:Employee') && $authUser->hasAnyRole(['admin', 'super-admin']);
+        return $authUser->can('DeleteAny:Employee');
     }
 
     public function restore(AuthUser $authUser, Employee $employee): bool

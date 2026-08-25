@@ -15,7 +15,6 @@ use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
 use App\Filament\App\Widgets\HrStatsOverview;
-use App\Filament\App\Widgets\PayrollChartWidget;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,6 +28,7 @@ class AppPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            ->default()
             ->id('app')
             ->path('app')
             ->login(\App\Filament\App\Pages\Auth\Login::class)
@@ -57,7 +57,6 @@ class AppPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 HrStatsOverview::class,
-                PayrollChartWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -75,7 +74,7 @@ class AppPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                \Spatie\Permission\Middleware\RoleMiddleware::using('admin|rh|manager|comptable|employee'),
+                \App\Http\Middleware\RequireAppRole::class,
             ]);
     }
 }

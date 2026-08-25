@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Resources;
 
+use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\DocumentRequestResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\Employee;
@@ -23,6 +24,7 @@ use Filament\Tables\Table;
 
 class DocumentRequestResource extends Resource
 {
+    use HasCompanyField;
     protected static ?string $model = DocumentRequest::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-arrow-down';
     protected static ?string $navigationLabel = 'Demandes de documents';
@@ -77,6 +79,8 @@ class DocumentRequestResource extends Resource
 
         return $schema->columns(1)->components([
             Section::make('Demandeur & Document')->schema([
+                static::companyField(),
+
                 Select::make('employee_id')
                     ->label('Employé')
                     ->relationship('employee', 'first_name')

@@ -26,8 +26,6 @@ return new class extends Migration
             $table->enum('contract_type', ['CDI', 'CDD', 'Stage', 'ANAPEC'])->default('CDI');
             $table->enum('marital_status', ['celibataire', 'marie', 'divorce', 'veuf'])->default('celibataire');
             $table->unsignedTinyInteger('number_of_children')->default(0);
-            $table->foreignId('department_id')->nullable()->constrained('departments')->nullOnDelete();
-            $table->foreignId('position_id')->nullable()->constrained('positions')->nullOnDelete();
             $table->string('rib')->nullable();
             $table->enum('status', ['actif', 'inactif', 'suspendu'])->default('actif');
             $table->timestamps();

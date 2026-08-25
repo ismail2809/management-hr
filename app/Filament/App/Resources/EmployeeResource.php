@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Resources;
 
+use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\EmployeeResource\Pages;
 use App\Models\Employee;
 use Filament\Actions\ViewAction;
@@ -23,16 +24,19 @@ use Filament\Tables\Table;
 
 class EmployeeResource extends Resource
 {
+    use HasCompanyField;
     protected static ?string $model = Employee::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Employés';
     protected static ?string $modelLabel = 'Employé';
     protected static \UnitEnum|string|null $navigationGroup = 'Employés';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
+            static::companyField(),
+
             Grid::make(3)->schema([
 
                 /* ── Colonne gauche (2/3) ── */
@@ -106,11 +110,10 @@ class EmployeeResource extends Resource
 
             ]),
 
-            /* ── Pleine largeur ── */
-            Section::make('Contrat & Affectation')
+            Section::make('Contrat')
                 ->icon('heroicon-o-document-text')
                 ->schema([
-                    Grid::make(4)->schema([
+                    Grid::make(3)->schema([
                         Select::make('contract_type')
                             ->label('Type de contrat')
                             ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
@@ -119,24 +122,6 @@ class EmployeeResource extends Resource
                             ->label('Statut')
                             ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'suspendu' => 'Suspendu'])
                             ->required(),
-                        Select::make('department_id')
-                            ->label('Département')
-                            ->relationship('department', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->nullable(),
-                        Select::make('position_id')
-                            ->label('Poste')
-                            ->relationship('position', 'title')
-                            ->getOptionLabelFromRecordUsing(fn (\App\Models\Position $record)
-                                => implode(' — ', array_filter([
-                                    $record->company?->name,
-                                    $record->title,
-                                    $record->category,
-                                ])))
-                            ->searchable()
-                            ->preload()
-                            ->nullable(),
                     ]),
                 ]),
         ]);
@@ -154,8 +139,6 @@ class EmployeeResource extends Resource
                     ->size(40),
                 TextColumn::make('matricule')->label('Matricule')->searchable()->sortable(),
                 TextColumn::make('full_name')->label('Nom complet')->searchable(['first_name', 'last_name'])->sortable('last_name'),
-                TextColumn::make('department.name')->label('Département')->sortable()->default('—'),
-                TextColumn::make('position.title')->label('Poste')->sortable()->default('—'),
                 TextColumn::make('contract_type')->label('Contrat')->badge()
                     ->color(fn ($state) => match ($state) {
                         'CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info', 'ANAPEC' => 'gray', default => 'gray',
@@ -169,7 +152,6 @@ class EmployeeResource extends Resource
             ->filters([
                 SelectFilter::make('status')->label('Statut')->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'suspendu' => 'Suspendu']),
                 SelectFilter::make('contract_type')->label('Type contrat')->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC']),
-                SelectFilter::make('department_id')->label('Département')->relationship('department', 'name'),
             ])
             ->defaultSort('last_name')
             ->recordUrl(fn (Employee $record) => static::getUrl('view', ['record' => $record]))
@@ -186,6 +168,11 @@ class EmployeeResource extends Resource
     public static function canViewAny(): bool
     {
         return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
     }
 
     public static function getPages(): array

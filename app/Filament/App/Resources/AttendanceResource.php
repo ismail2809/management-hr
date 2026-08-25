@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Resources;
 
+use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\AttendanceResource\Pages;
 use App\Models\Attendance;
 use App\Models\Employee;
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class AttendanceResource extends Resource
 {
+    use HasCompanyField;
     protected static ?string $model = Attendance::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
     protected static ?string $navigationLabel = 'Présences';
@@ -70,6 +72,8 @@ class AttendanceResource extends Resource
     {
         return $schema->columns(1)->components([
             Section::make('Employé & Date')->schema([
+                static::companyField(),
+
                 Grid::make(2)->schema([
                     Select::make('employee_id')
                         ->label('Employé')

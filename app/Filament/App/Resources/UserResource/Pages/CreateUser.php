@@ -4,9 +4,12 @@ namespace App\Filament\App\Resources\UserResource\Pages;
 
 use App\Filament\App\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
+use App\Filament\App\Concerns\InjectsCompanyId;
 
 class CreateUser extends CreateRecord
 {
+    use InjectsCompanyId;
+
     protected static string $resource = UserResource::class;
 
     // Injecter le company_id sauf si super-admin (qui le choisit manuellement)

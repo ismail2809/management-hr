@@ -39,7 +39,7 @@ class LeaveTypePolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:LeaveType') && $authUser->hasAnyRole(['admin', 'super-admin']);
+        return $authUser->can('DeleteAny:LeaveType');
     }
 
     public function restore(AuthUser $authUser, LeaveType $leaveType): bool

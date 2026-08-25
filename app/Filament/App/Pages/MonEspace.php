@@ -5,7 +5,6 @@ namespace App\Filament\App\Pages;
 use App\Models\Leave;
 use App\Models\LeaveBalance;
 use App\Models\LeaveType;
-use App\Models\Payroll;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -13,16 +12,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
-class MonEspace extends Page implements HasTable
+class MonEspace extends Page
 {
-    use InteractsWithTable;
-
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = 'Mon espace';
     protected static \UnitEnum|string|null $navigationGroup = null;
@@ -39,42 +32,6 @@ class MonEspace extends Page implements HasTable
     {
         return 'Mon espace employé';
     }
-
-    // ─── Bulletins de paie ───────────────────────────────────────────────────
-
-    public function table(Table $table): Table
-    {
-        $employeeId = auth()->user()?->employee_id;
-
-        return $table
-            ->query(
-                Payroll::withoutGlobalScopes()
-                    ->where('employee_id', $employeeId)
-                    ->whereIn('status', ['validé', 'payé'])
-                    ->orderBy('year', 'desc')
-                    ->orderBy('month', 'desc')
-            )
-            ->columns([
-                TextColumn::make('periode_label')->label('Période')->weight('semibold'),
-                TextColumn::make('salaire_brut')->label('Brut')->money('MAD'),
-                TextColumn::make('total_cnss_employee')->label('CNSS')->money('MAD'),
-                TextColumn::make('ir')->label('IR')->money('MAD'),
-                TextColumn::make('salaire_net')->label('Net')->money('MAD')->color('success')->weight('semibold'),
-                TextColumn::make('status')->label('Statut')->badge()
-                    ->color(fn ($state) => $state === 'payé' ? 'success' : 'warning'),
-            ])
-            ->actions([
-                \Filament\Actions\Action::make('download')
-                    ->label('Bulletin PDF')
-                    ->icon('heroicon-o-arrow-down-tray')
-                    ->color('gray')
-                    ->url(fn (Payroll $record) => route('payrolls.pdf', $record))
-                    ->openUrlInNewTab(),
-            ])
-            ->paginated([10, 25]);
-    }
-
-    // ─── Demande de congé ─────────────────────────────────────────────────────
 
     public ?array $leaveData = [];
 
@@ -123,8 +80,6 @@ class MonEspace extends Page implements HasTable
         ];
     }
 
-    // ─── Soldes de congés ─────────────────────────────────────────────────────
-
     public function getLeaveBalances(): array
     {
         $user = auth()->user();
@@ -138,15 +93,13 @@ class MonEspace extends Page implements HasTable
             ->with('leaveType')
             ->get()
             ->map(fn ($b) => [
-                'type'       => $b->leaveType?->name ?? '—',
-                'total'      => $b->total_days,
-                'used'       => $b->used_days,
-                'remaining'  => $b->remaining_days,
+                'type'      => $b->leaveType?->name ?? '—',
+                'total'     => $b->total_days,
+                'used'      => $b->used_days,
+                'remaining' => $b->remaining_days,
             ])
             ->toArray();
     }
-
-    // ─── Demandes en cours ────────────────────────────────────────────────────
 
     public function getPendingLeaves(): array
     {

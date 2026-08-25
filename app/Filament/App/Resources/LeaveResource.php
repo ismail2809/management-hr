@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Resources;
 
+use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\LeaveResource\Pages;
 use App\Models\Employee;
 use App\Models\Leave;
@@ -22,6 +23,7 @@ use Filament\Tables\Table;
 
 class LeaveResource extends Resource
 {
+    use HasCompanyField;
     protected static ?string $model = Leave::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationLabel = 'Demandes de congé';
@@ -71,6 +73,8 @@ class LeaveResource extends Resource
 
         return $schema->columns(1)->components([
             Section::make('Demandeur & Type')->schema([
+                static::companyField(),
+
                 Grid::make(2)->schema([
                     Select::make('employee_id')
                         ->label('Employé')

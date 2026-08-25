@@ -39,7 +39,7 @@ class DocumentRequestPolicy
 
     public function deleteAny(AuthUser $authUser): bool
     {
-        return $authUser->can('DeleteAny:DocumentRequest') && $authUser->hasAnyRole(['admin', 'super-admin']);
+        return $authUser->can('DeleteAny:DocumentRequest');
     }
 
     public function restore(AuthUser $authUser, DocumentRequest $documentRequest): bool

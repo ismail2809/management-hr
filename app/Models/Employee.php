@@ -6,7 +6,6 @@ use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -17,7 +16,7 @@ class Employee extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['first_name', 'last_name', 'status', 'department_id', 'position_id', 'contract_type'])
+            ->logOnly(['first_name', 'last_name', 'status', 'contract_type'])
             ->logOnlyDirty()
             ->useLogName('employee')
             ->dontSubmitEmptyLogs();
@@ -37,8 +36,6 @@ class Employee extends Model
         'contract_type',
         'marital_status',
         'number_of_children',
-        'department_id',
-        'position_id',
         'rib',
         'status',
         'photo',
@@ -61,17 +58,6 @@ class Employee extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
-    }
-
-    public function position(): BelongsTo
-    {
-        return $this->belongsTo(Position::class);
-    }
-
-    public function contracts(): HasMany { return $this->hasMany(Contract::class); }
     public function documents(): HasMany { return $this->hasMany(EmployeeDocument::class); }
     public function leaves(): HasMany { return $this->hasMany(Leave::class); }
 }
