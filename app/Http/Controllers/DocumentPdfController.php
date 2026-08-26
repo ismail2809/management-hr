@@ -25,7 +25,7 @@ class DocumentPdfController extends Controller
             403
         );
 
-        $documentRequest->load(['employee.position', 'employee.department', 'company']);
+        $documentRequest->load(['employee.profession', 'company']);
 
         if ($download) {
             $documentRequest->update([

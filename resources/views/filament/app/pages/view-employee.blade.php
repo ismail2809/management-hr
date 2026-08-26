@@ -227,7 +227,7 @@
 
                 <div class="ep-profile-info">
                     <div class="ep-profile-name">{{ $emp->full_name }}</div>
-                    <div class="ep-profile-role">{{ $emp->position?->title ?? 'Poste non défini' }} · {{ $emp->department?->name ?? 'Département non défini' }}</div>
+                    <div class="ep-profile-role">{{ $emp->profession?->name ?? 'Poste non défini' }}</div>
                     <div class="ep-profile-meta">
                         @if($emp->matricule)
                         <span class="ep-meta-item">

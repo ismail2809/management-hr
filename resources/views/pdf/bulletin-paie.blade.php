@@ -80,8 +80,8 @@
             <div class="info-row"><span class="info-label">CIN</span><span class="info-value">{{ $employee->cin }}</span></div>
             <div class="info-row"><span class="info-label">Nom complet</span><span class="info-value">{{ $employee->full_name }}</span></div>
             <div class="info-row"><span class="info-label">N° CNSS</span><span class="info-value">{{ $employee->cnss_number ?? '—' }}</span></div>
-            <div class="info-row"><span class="info-label">Poste</span><span class="info-value">{{ $employee->position?->title ?? '—' }}</span></div>
-            <div class="info-row"><span class="info-label">Département</span><span class="info-value">{{ $employee->department?->name ?? '—' }}</span></div>
+            <div class="info-row"><span class="info-label">Poste</span><span class="info-value">{{ $employee->profession?->name ?? '—' }}</span></div>
+            <div class="info-row"><span class="info-label">Département</span><span class="info-value">{{ — }}</span></div>
             <div class="info-row"><span class="info-label">Type de contrat</span><span class="info-value">{{ $employee->contract_type }}</span></div>
             <div class="info-row"><span class="info-label">Date d'embauche</span><span class="info-value">{{ $employee->hire_date?->format('d/m/Y') ?? '—' }}</span></div>
             <div class="info-row"><span class="info-label">Situation familiale</span><span class="info-value">{{ ucfirst($employee->marital_status) }} — {{ $employee->number_of_children }} enfant(s)</span></div>

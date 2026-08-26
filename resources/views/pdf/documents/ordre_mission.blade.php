@@ -55,8 +55,8 @@
     <div class="info-box">
         <div class="row"><span class="label">Nom et prénom :</span><span class="value">{{ $employee->full_name }}</span></div>
         <div class="row"><span class="label">CIN :</span><span class="value">{{ $employee->cin ?? '—' }}</span></div>
-        <div class="row"><span class="label">Fonction :</span><span class="value">{{ $employee->position->title ?? '—' }}</span></div>
-        <div class="row"><span class="label">Département :</span><span class="value">{{ $employee->department->name ?? '—' }}</span></div>
+        <div class="row"><span class="label">Fonction :</span><span class="value">{{ $employee->profession?->name ?? '—' }}</span></div>
+        <div class="row"><span class="label">Département :</span><span class="value">{{ — }}</span></div>
     </div>
 
     <div class="mission-box">

@@ -53,8 +53,8 @@
         <div class="row"><span class="label">Nom et prénom :</span><span class="value">{{ $employee->full_name }}</span></div>
         <div class="row"><span class="label">CIN :</span><span class="value">{{ $employee->cin ?? '—' }}</span></div>
         <div class="row"><span class="label">N° CNSS :</span><span class="value">{{ $employee->cnss_number ?? '—' }}</span></div>
-        <div class="row"><span class="label">Poste occupé :</span><span class="value">{{ $employee->position->title ?? '—' }}</span></div>
-        <div class="row"><span class="label">Département :</span><span class="value">{{ $employee->department->name ?? '—' }}</span></div>
+        <div class="row"><span class="label">Poste occupé :</span><span class="value">{{ $employee->profession?->name ?? '—' }}</span></div>
+        <div class="row"><span class="label">Département :</span><span class="value">{{ — }}</span></div>
         <div class="row"><span class="label">Type de contrat :</span><span class="value">{{ $employee->contract_type }}</span></div>
         @if($employee->hire_date)
         <div class="row"><span class="label">Date d'entrée :</span><span class="value">{{ \Carbon\Carbon::parse($employee->hire_date)->format('d/m/Y') }}</span></div>
@@ -71,7 +71,7 @@
             du <span class="highlight">{{ \Carbon\Carbon::parse($employee->hire_date)->format('d/m/Y') }}</span>
             au <span class="highlight">{{ now()->format('d/m/Y') }}</span>,
         @endif
-        en qualité de <span class="highlight">{{ $employee->position->title ?? 'collaborateur(trice)' }}</span>.
+        en qualité de <span class="highlight">{{ $employee->profession?->name ?? 'collaborateur(trice)' }}</span>.
     </div>
 
     <div class="body-text">

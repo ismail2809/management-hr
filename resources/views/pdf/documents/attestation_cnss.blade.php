@@ -53,7 +53,7 @@
         <div class="row"><span class="label">Nom et prénom :</span><span class="value">{{ $employee->full_name }}</span></div>
         <div class="row"><span class="label">CIN :</span><span class="value">{{ $employee->cin ?? '—' }}</span></div>
         <div class="row"><span class="label">N° CNSS salarié :</span><span class="value">{{ $employee->cnss_number ?? '—' }}</span></div>
-        <div class="row"><span class="label">Poste :</span><span class="value">{{ $employee->position->title ?? '—' }}</span></div>
+        <div class="row"><span class="label">Poste :</span><span class="value">{{ $employee->profession?->name ?? '—' }}</span></div>
         @if($employee->hire_date)
         <div class="row"><span class="label">Date d'affiliation :</span><span class="value">{{ \Carbon\Carbon::parse($employee->hire_date)->format('d/m/Y') }}</span></div>
         @endif
