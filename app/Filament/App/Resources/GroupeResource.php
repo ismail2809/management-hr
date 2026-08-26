@@ -12,7 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -33,7 +33,7 @@ class GroupeResource extends Resource
             static::companyField(),
             Select::make('niveau_scolaire_id')
                 ->label('Niveau scolaire')
-                ->relationship('niveauScolaire', 'name')
+                ->relationship('niveauScolaire', 'name', fn ($query) => $query->orderBy('order'))
                 ->searchable()
                 ->preload()
                 ->required(),
@@ -49,7 +49,8 @@ class GroupeResource extends Resource
                 TextColumn::make('name')->label('Groupe')->searchable()->sortable(),
                 TextColumn::make('employees_count')->label('Professeurs affectés')->counts('employees')->sortable(),
             ])
-            ->defaultSort('niveauScolaire.order')
+            ->modifyQueryUsing(fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*'))
+            ->defaultSort('niveaux_scolaires.order')
             ->filters([
                 SelectFilter::make('niveau_scolaire_id')
                     ->label('Niveau')

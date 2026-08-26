@@ -11,7 +11,6 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Get;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -99,12 +98,12 @@ class DocumentRequestResource extends Resource
             ]),
 
             Section::make('Document administratif')
-                ->visible(fn (Get $get) => $get('categorie') === 'document')
+                ->visible(fn ($get) => $get('categorie') === 'document')
                 ->schema([
                     Select::make('type')
                         ->label('Type de document')
                         ->options(DocumentRequest::$documentTypes)
-                        ->required(fn (Get $get) => $get('categorie') === 'document'),
+                        ->required(fn ($get) => $get('categorie') === 'document'),
 
                     Radio::make('format')
                         ->label('Format souhaité')
@@ -114,12 +113,12 @@ class DocumentRequestResource extends Resource
                 ]),
 
             Section::make('Autre demande')
-                ->visible(fn (Get $get) => $get('categorie') === 'autre')
+                ->visible(fn ($get) => $get('categorie') === 'autre')
                 ->schema([
                     Select::make('type')
                         ->label('Type de demande')
                         ->options(DocumentRequest::$autreTypes)
-                        ->required(fn (Get $get) => $get('categorie') === 'autre'),
+                        ->required(fn ($get) => $get('categorie') === 'autre'),
                 ]),
 
             Section::make('Détails')->schema([

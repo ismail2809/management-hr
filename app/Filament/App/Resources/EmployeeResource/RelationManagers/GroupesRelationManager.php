@@ -18,6 +18,11 @@ class GroupesRelationManager extends RelationManager
     protected static string $relationship = 'groupes';
     protected static ?string $title = 'Groupes affectés';
 
+    public static function canViewForRecord(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): bool
+    {
+        return $ownerRecord->profession?->name === 'Professeur';
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([

@@ -51,6 +51,7 @@ class Employee extends Model
         'photo',
         'address',
         'city',
+        'transport_id',
     ];
 
     protected $casts = [
@@ -70,6 +71,7 @@ class Employee extends Model
     }
 
     public function company(): BelongsTo   { return $this->belongsTo(Company::class); }
+    public function transport(): BelongsTo { return $this->belongsTo(Transport::class); }
     public function profession(): BelongsTo { return $this->belongsTo(Profession::class); }
     public function documents(): HasMany   { return $this->hasMany(EmployeeDocument::class); }
     public function leaves(): HasMany      { return $this->hasMany(Leave::class); }

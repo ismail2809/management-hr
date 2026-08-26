@@ -371,35 +371,6 @@
         {{-- ─ Colonne droite ─ --}}
         <div style="display:flex;flex-direction:column;gap:20px;">
 
-            {{-- Ajouter un document --}}
-            <div class="ep-card">
-                <div class="ep-card-header">
-                    <span class="ep-card-title">
-                        <span class="ep-card-title-bar" style="background:#f59e0b;"></span>
-                        Ajouter un document
-                    </span>
-                </div>
-                <div class="ep-card-body">
-                    <form wire:submit.prevent="uploadDocument">
-                        <div class="ep-upload-grid">
-                            <div>
-                                <label class="ep-label">Nom du document</label>
-                                <input wire:model="documentName" type="text" placeholder="Ex : Contrat CDI, CIN scan…" class="ep-input ep-input-name">
-                                @error('documentName') <span style="font-size:11px;color:#ef4444;margin-top:3px;display:block;">{{ $message }}</span> @enderror
-                            </div>
-                            <div>
-                                <label class="ep-label">Fichier</label>
-                                <input wire:model="uploadedFile" type="file" class="ep-input ep-input-file" style="padding:5px 10px;">
-                                @error('uploadedFile') <span style="font-size:11px;color:#ef4444;margin-top:3px;display:block;">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-                        <button type="submit" class="ep-submit">
-                            <span wire:loading.remove wire:target="uploadDocument">+ Ajouter le document</span>
-                            <span wire:loading wire:target="uploadDocument">Envoi en cours…</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
 
             {{-- Documents --}}
             <div class="ep-card">

@@ -4,15 +4,14 @@ namespace App\Filament\App\Resources\EmployeeResource\RelationManagers;
 
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Actions\CreateAction;
-use Filament\Actions\BulkActionGroup;
 
 class DocumentsRelationManager extends RelationManager
 {
@@ -37,15 +36,17 @@ class DocumentsRelationManager extends RelationManager
                 ->label('Type de document')
                 ->options(self::$typeLabels)
                 ->required(),
-            TextInput::make('name')
-                ->label('Nom du document')
-                ->required()
-                ->maxLength(200),
             FileUpload::make('file_path')
                 ->label('Fichier')
                 ->disk('public')
                 ->directory(fn ($livewire) => 'employees/' . $livewire->getOwnerRecord()->id . '/documents')
-                ->acceptedFileTypes(['application/pdf', 'image/*'])
+                ->preserveFilenames()
+                ->acceptedFileTypes([
+                    'application/pdf',
+                    'image/*',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                ])
                 ->maxSize(5120)
                 ->required(),
         ]);
@@ -64,7 +65,14 @@ class DocumentsRelationManager extends RelationManager
                 TextColumn::make('created_at')->label('Uploadé le')->date('d/m/Y')->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
-            ->headerActions([CreateAction::make()->label('Ajouter un document')])
+            ->headerActions([
+                CreateAction::make()
+                    ->label('Ajouter un document')
+                    ->mutateFormDataUsing(fn (array $data): array => array_merge($data, [
+                        'company_id' => $this->getOwnerRecord()->company_id,
+                        'name'       => basename($data['file_path']),
+                    ])),
+            ])
             ->actions([
                 DeleteAction::make(),
             ])

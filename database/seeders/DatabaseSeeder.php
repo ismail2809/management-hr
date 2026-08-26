@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,9 +15,17 @@ class DatabaseSeeder extends Seeder
             IrBracketSeeder::class,
             CnssRateSeeder::class,
             SuperAdminSeeder::class,
-            RolesPermissionsSeeder::class,
             TestCompanySeeder::class,
             DemoDataSeeder::class,
+        ]);
+
+        // Générer les permissions Shield avant d'assigner les rôles
+        $this->command->info('Generating Shield permissions...');
+        Artisan::call('shield:generate', ['--all' => true, '--panel' => 'app']);
+        $this->command->info(Artisan::output());
+
+        $this->call([
+            RolesPermissionsSeeder::class,
         ]);
     }
 }

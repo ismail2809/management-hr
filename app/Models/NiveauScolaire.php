@@ -10,6 +10,7 @@ class NiveauScolaire extends Model
 {
     use HasCompanyScope;
 
+    protected $table = 'niveaux_scolaires';
     protected $fillable = ['company_id', 'name', 'order'];
 
     public function groupes(): HasMany

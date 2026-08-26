@@ -13,6 +13,7 @@ class EmployeeDocument extends Model
     protected $fillable = [
         'company_id',
         'employee_id',
+        'type_document',
         'name',
         'file_path',
         'file_type',

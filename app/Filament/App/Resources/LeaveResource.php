@@ -9,7 +9,6 @@ use App\Models\Leave;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Get;
 use Filament\Forms\Components\Radio;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -101,7 +100,7 @@ class LeaveResource extends Resource
             ]),
 
             Section::make('Congé')
-                ->visible(fn (Get $get) => $get('categorie') === 'conge')
+                ->visible(fn ($get) => $get('categorie') === 'conge')
                 ->schema([
                     Select::make('leave_type_id')
                         ->label('Type de congé')
@@ -126,7 +125,7 @@ class LeaveResource extends Resource
 
             Section::make('Informations professeur (remplacement)')
                 ->icon('heroicon-o-academic-cap')
-                ->visible(fn (Get $get) => filled($get('employee_id')) && Employee::find($get('employee_id'))?->isProfesseur())
+                ->visible(fn ($get) => filled($get('employee_id')) && Employee::find($get('employee_id'))?->isProfesseur())
                 ->schema([
                     Grid::make(2)->schema([
                         Select::make('remplacant_id')
@@ -150,17 +149,17 @@ class LeaveResource extends Resource
                         ->label('Nombre de pages')
                         ->numeric()
                         ->nullable()
-                        ->visible(fn (Get $get) => $get('type_cours') === 'exercice'),
+                        ->visible(fn ($get) => $get('type_cours') === 'exercice'),
                     TextInput::make('intitule_lecon')
                         ->label('Intitulé de la leçon')
                         ->maxLength(200)
                         ->nullable()
-                        ->visible(fn (Get $get) => $get('type_cours') === 'lecon'),
+                        ->visible(fn ($get) => $get('type_cours') === 'lecon'),
                     TextInput::make('intitule_activite')
                         ->label('Intitulé de l\'activité')
                         ->maxLength(200)
                         ->nullable()
-                        ->visible(fn (Get $get) => $get('type_cours') === 'activite'),
+                        ->visible(fn ($get) => $get('type_cours') === 'activite'),
                 ]),
 
             Section::make('Décision')

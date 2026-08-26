@@ -7,10 +7,12 @@ use App\Filament\App\Resources\EmployeeResource\Pages;
 use App\Filament\App\Resources\EmployeeResource\RelationManagers\DocumentsRelationManager;
 use App\Filament\App\Resources\EmployeeResource\RelationManagers\GroupesRelationManager;
 use App\Models\Employee;
+use App\Models\Groupe;
+use App\Models\Profession;
+use App\Models\Transport;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Get;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
@@ -81,7 +83,7 @@ class EmployeeResource extends Resource
                     Section::make('Sortie')
                         ->icon('heroicon-o-arrow-right-on-rectangle')
                         ->collapsed()
-                        ->visible(fn (Get $get) => $get('status') === 'sorti')
+                        ->visible(fn ($get) => $get('status') === 'sorti')
                         ->schema([
                             Grid::make(2)->schema([
                                 DatePicker::make('exit_date')->label('Date de sortie')->nullable(),
@@ -134,7 +136,7 @@ class EmployeeResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->default(0)
-                                ->visible(fn (Get $get) => $get('marital_status') === 'marie'),
+                                ->visible(fn ($get) => $get('marital_status') === 'marie'),
                         ]),
 
                 ])->columnSpan(1),
@@ -173,6 +175,21 @@ class EmployeeResource extends Resource
                             ->required()
                             ->live(),
                     ]),
+                    Select::make('groupes')
+                        ->label('Groupes affectés')
+                        ->multiple()
+                        ->relationship('groupes', 'name', fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*', 'niveaux_scolaires.order as niveau_order')->orderBy('niveau_order'))
+                        ->getOptionLabelFromRecordUsing(fn (Groupe $record) => "{$record->niveauScolaire?->name} — {$record->name}")
+                        ->preload()
+                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Professeur'),
+                    Select::make('transport_id')
+                        ->label('Transport affecté')
+                        ->relationship('transport', 'name')
+                        ->getOptionLabelFromRecordUsing(fn (Transport $record) => "{$record->name}" . ($record->matricule ? " ({$record->matricule})" : ''))
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Chauffeur'),
                 ]),
         ]);
     }
