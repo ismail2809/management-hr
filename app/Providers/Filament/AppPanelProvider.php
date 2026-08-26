@@ -30,7 +30,7 @@ class AppPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('app')
-            ->path('app')
+            ->path('admin')
             ->login(\App\Filament\App\Pages\Auth\Login::class)
             ->colors([
                 'primary'  => Color::hex('#0da8b1'),
