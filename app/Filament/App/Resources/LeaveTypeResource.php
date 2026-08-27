@@ -21,7 +21,7 @@ class LeaveTypeResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationLabel = 'Types de congé';
     protected static ?string $modelLabel = 'Type de congé';
-    protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
+    protected static \UnitEnum|string|null $navigationGroup = 'Paramétrage';
     protected static ?int $navigationSort = 6;
 
     public static function form(Schema $schema): Schema
@@ -36,13 +36,6 @@ class LeaveTypeResource extends Resource
                     ->required()
                     ->maxLength(100),
 
-                TextInput::make('legal_days_per_year')
-                    ->label('Jours légaux par an')
-                    ->numeric()
-                    ->minValue(0)
-                    ->default(0)
-                    ->required()
-                    ->suffix('jours'),
             ]),
         ]);
     }
@@ -56,11 +49,7 @@ class LeaveTypeResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('semibold'),
-                TextColumn::make('legal_days_per_year')
-                    ->label('Jours / an')
-                    ->suffix(' j')
-                    ->sortable(),
-                TextColumn::make('leaves_count')
+TextColumn::make('leaves_count')
                     ->label('Demandes')
                     ->counts('leaves')
                     ->sortable()

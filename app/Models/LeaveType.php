@@ -11,7 +11,7 @@ class LeaveType extends Model
 {
     use HasCompanyScope;
 
-    protected $fillable = ['company_id', 'name', 'legal_days_per_year'];
+    protected $fillable = ['company_id', 'name'];
 
     public function company(): BelongsTo
     {
