@@ -28,7 +28,7 @@ class EditEmployee extends EditRecord
                     $replica->cnss_number = null;
                     $replica->rib         = null;
                 })
-                ->redirectTo(fn ($replica) => EmployeeResource::getUrl('edit', ['record' => $replica])),
+                ->after(fn ($replica) => redirect(EmployeeResource::getUrl('edit', ['record' => $replica]))),
 
             DeleteAction::make(),
         ];
