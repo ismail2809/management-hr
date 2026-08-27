@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             IrBracketSeeder::class,
             CnssRateSeeder::class,
+            DocumentTypeSeeder::class,
             SuperAdminSeeder::class,
             TestCompanySeeder::class,
             DemoDataSeeder::class,

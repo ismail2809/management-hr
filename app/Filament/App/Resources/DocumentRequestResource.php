@@ -5,6 +5,7 @@ namespace App\Filament\App\Resources;
 use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\DocumentRequestResource\Pages;
 use App\Models\DocumentRequest;
+use App\Models\DocumentType;
 use App\Models\Employee;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
@@ -102,7 +103,7 @@ class DocumentRequestResource extends Resource
                 ->schema([
                     Select::make('type')
                         ->label('Type de document')
-                        ->options(DocumentRequest::$documentTypes)
+                        ->options(fn () => DocumentType::where('active', true)->where('categorie', 'document')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$documentTypes)
                         ->required(fn ($get) => $get('categorie') === 'document'),
 
                     Radio::make('format')
@@ -117,7 +118,7 @@ class DocumentRequestResource extends Resource
                 ->schema([
                     Select::make('type')
                         ->label('Type de demande')
-                        ->options(DocumentRequest::$autreTypes)
+                        ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
                         ->required(fn ($get) => $get('categorie') === 'autre'),
                 ]),
 
