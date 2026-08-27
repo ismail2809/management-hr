@@ -66,13 +66,14 @@ class LeavesWidget extends BaseWidget
                 SelectFilter::make('periode')
                     ->label('Période')
                     ->options([
-                        'today'  => "Aujourd'hui",
-                        'week'   => 'Cette semaine',
-                        'recent' => 'Demandes récentes (7j)',
+                        'all'    => 'Toutes les demandes',
+                        'today'  => "Absents aujourd'hui",
+                        'week'   => 'Absents cette semaine',
+                        'recent' => 'En attente (7j)',
                     ])
-                    ->default('today')
+                    ->default('all')
                     ->query(function (Builder $query, array $data) {
-                        return match ($data['value'] ?? 'today') {
+                        return match ($data['value'] ?? 'all') {
                             'today' => $query
                                 ->where('status', 'approuvé')
                                 ->whereDate('start_date', '<=', today())
@@ -84,9 +85,7 @@ class LeavesWidget extends BaseWidget
                             'recent' => $query
                                 ->where('status', 'en_attente')
                                 ->where('created_at', '>=', now()->subDays(7)),
-                            default => $query
-                                ->whereDate('start_date', '<=', today())
-                                ->whereDate('end_date', '>=', today()),
+                            default => $query,
                         };
                     }),
             ])
