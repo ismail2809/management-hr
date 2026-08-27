@@ -8,6 +8,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Filament\App\Pages\Dashboard;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -48,6 +49,14 @@ class AppPanelProvider extends PanelProvider
                 PanelsRenderHook::HEAD_END,
                 fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=1">')
             )
+            ->navigationGroups([
+                NavigationGroup::make('Employés'),
+                NavigationGroup::make('Congés & Présence'),
+                NavigationGroup::make('Demandes'),
+                NavigationGroup::make('Administration'),
+                NavigationGroup::make('Paramétrage'),
+                NavigationGroup::make('Journal d\'audit'),
+            ])
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
             ->pages([

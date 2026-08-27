@@ -16,8 +16,8 @@ class AuditLogResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?string $navigationLabel = 'Journal d\'audit';
     protected static ?string $modelLabel = 'Entrée';
-    protected static \UnitEnum|string|null $navigationGroup = 'Administration';
-    protected static ?int $navigationSort = 99;
+    protected static \UnitEnum|string|null $navigationGroup = 'Journal d\'audit';
+    protected static ?int $navigationSort = 1;
 
     // Lecture seule — pas de create/edit
     public static function canCreate(): bool { return false; }
