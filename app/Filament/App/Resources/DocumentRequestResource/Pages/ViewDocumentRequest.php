@@ -19,7 +19,7 @@ class ViewDocumentRequest extends ViewRecord
                 ->label('Voir PDF')
                 ->icon('heroicon-o-eye')
                 ->color('info')
-                ->visible(fn () => $this->record->format === 'digital')
+                ->visible(fn () => $this->record->format === 'digital' && filled($this->record->generated_file_path))
                 ->url(fn () => route('documents.preview', $this->record))
                 ->openUrlInNewTab(),
 
@@ -27,7 +27,7 @@ class ViewDocumentRequest extends ViewRecord
                 ->label('Télécharger PDF')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('primary')
-                ->visible(fn () => $this->record->format === 'digital')
+                ->visible(fn () => $this->record->format === 'digital' && filled($this->record->generated_file_path))
                 ->url(fn () => route('documents.pdf', $this->record))
                 ->openUrlInNewTab(),
 
