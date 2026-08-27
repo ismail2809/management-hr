@@ -438,7 +438,10 @@
                             <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>
                         <div style="flex:1;">
-                            <div style="font-size:13px;font-weight:600;color:#0f172a;" class="dark:text-white">{{ $conge->leaveType?->name ?? 'Congé' }}</div>
+                            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:3px;">
+                                <span class="ep-pill" style="background:{{ $ls[0] }};color:{{ $ls[1] }};">{{ $conge->leaveType?->name ?? 'Congé' }}</span>
+                                <span class="ep-pill" style="background:{{ $ls[0] }};color:{{ $ls[1] }};opacity:.75;">{{ ucfirst($conge->status) }}</span>
+                            </div>
                             <div style="font-size:11px;color:#94a3b8;">
                                 {{ $conge->start_date?->format('d/m/Y') }} → {{ $conge->end_date?->format('d/m/Y') }}
                                 @if($conge->start_date && $conge->end_date)
@@ -446,7 +449,6 @@
                                 @endif
                             </div>
                         </div>
-                        <span class="ep-pill" style="background:{{ $ls[0] }};color:{{ $ls[1] }};">{{ ucfirst($conge->status) }}</span>
                     </div>
                     @endforeach
                 </div>
