@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Widgets;
 
+use App\Filament\App\Resources\EmployeeResource;
 use App\Filament\App\Resources\LeaveResource;
 use App\Models\Employee;
 use App\Models\Leave;
@@ -30,7 +31,8 @@ class HrStatsOverview extends StatsOverviewWidget
             Stat::make('Effectif actif', $totalEmployes)
                 ->description('Employés avec statut actif')
                 ->descriptionIcon('heroicon-o-users')
-                ->color('primary'),
+                ->color('primary')
+                ->url(EmployeeResource::getUrl('index') . '?tableFilters[status][value]=actif'),
 
             Stat::make('Congés en attente', $congesEnAttente)
                 ->description('À approuver ou refuser')
@@ -41,7 +43,8 @@ class HrStatsOverview extends StatsOverviewWidget
             Stat::make("Absents aujourd'hui", $absentsAujourdhui)
                 ->description('Congés/absences approuvés')
                 ->descriptionIcon('heroicon-o-user-minus')
-                ->color($absentsAujourdhui > 0 ? 'danger' : 'success'),
+                ->color($absentsAujourdhui > 0 ? 'danger' : 'success')
+                ->url(LeaveResource::getUrl('index') . '?tableFilters[status][value]=approuv%C3%A9'),
         ];
     }
 }
