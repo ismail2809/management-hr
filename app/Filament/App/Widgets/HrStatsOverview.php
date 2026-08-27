@@ -2,7 +2,6 @@
 
 namespace App\Filament\App\Widgets;
 
-use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Leave;
 use Filament\Widgets\StatsOverviewWidget;
@@ -19,9 +18,12 @@ class HrStatsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $totalEmployes   = Employee::where('status', 'actif')->count();
-        $congesEnAttente = Leave::where('status', 'en_attente')->count();
-        $presencesAujourd = Attendance::whereDate('date', today())->count();
+        $totalEmployes    = Employee::where('status', 'actif')->count();
+        $congesEnAttente  = Leave::where('status', 'en_attente')->count();
+        $absentsAujourdhui = Leave::where('status', 'approuvé')
+            ->whereDate('start_date', '<=', today())
+            ->whereDate('end_date', '>=', today())
+            ->count();
 
         return [
             Stat::make('Effectif actif', $totalEmployes)
@@ -34,10 +36,10 @@ class HrStatsOverview extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-o-clock')
                 ->color($congesEnAttente > 0 ? 'warning' : 'success'),
 
-            Stat::make("Présences aujourd'hui", $presencesAujourd)
-                ->description('Pointages enregistrés')
-                ->descriptionIcon('heroicon-o-check-circle')
-                ->color('info'),
+            Stat::make("Absents aujourd'hui", $absentsAujourdhui)
+                ->description('Congés/absences approuvés')
+                ->descriptionIcon('heroicon-o-user-minus')
+                ->color($absentsAujourdhui > 0 ? 'danger' : 'success'),
         ];
     }
 }
