@@ -131,7 +131,14 @@ class LeaveResource extends Resource
                     Grid::make(2)->schema([
                         Select::make('remplacant_id')
                             ->label('Professeur remplaçant')
-                            ->relationship('remplacant', 'first_name')
+                            ->relationship(
+                                'remplacant',
+                                'first_name',
+                                fn ($query, $get) => $query->when(
+                                    $get('employee_id'),
+                                    fn ($q, $id) => $q->where('id', '!=', $id)
+                                )
+                            )
                             ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
                             ->searchable()
                             ->preload()
