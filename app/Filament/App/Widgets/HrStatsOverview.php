@@ -2,6 +2,7 @@
 
 namespace App\Filament\App\Widgets;
 
+use App\Filament\App\Resources\LeaveResource;
 use App\Models\Employee;
 use App\Models\Leave;
 use Filament\Widgets\StatsOverviewWidget;
@@ -34,7 +35,8 @@ class HrStatsOverview extends StatsOverviewWidget
             Stat::make('Congés en attente', $congesEnAttente)
                 ->description('À approuver ou refuser')
                 ->descriptionIcon('heroicon-o-clock')
-                ->color($congesEnAttente > 0 ? 'warning' : 'success'),
+                ->color($congesEnAttente > 0 ? 'warning' : 'success')
+                ->url(LeaveResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
 
             Stat::make("Absents aujourd'hui", $absentsAujourdhui)
                 ->description('Congés/absences approuvés')
