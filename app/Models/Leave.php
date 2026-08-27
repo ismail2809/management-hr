@@ -27,12 +27,18 @@ class Leave extends Model
         'status',
         'approved_by',
         'approved_at',
+        'severity_level',
+        'communication_method',
+        'appointment_date',
+        'actions_taken',
+        'rh_notes',
     ];
 
     protected $casts = [
-        'start_date'  => 'date',
-        'end_date'    => 'date',
-        'approved_at' => 'datetime',
+        'start_date'       => 'date',
+        'end_date'         => 'date',
+        'approved_at'      => 'datetime',
+        'appointment_date' => 'datetime',
     ];
 
     protected static function booted(): void

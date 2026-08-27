@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Leave;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
 use Filament\Schemas\Components\Grid;
@@ -174,6 +175,52 @@ class LeaveResource extends Resource
                         ])
                         ->default('en_attente')
                         ->required(),
+                ]),
+
+            Section::make('Suivi RH')
+                ->icon('heroicon-o-shield-check')
+                ->hidden($isEmployee)
+                ->collapsible()
+                ->collapsed(fn ($record) => $record === null)
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('severity_level')
+                            ->label('Niveau de sévérité')
+                            ->options([
+                                'faible' => 'Faible',
+                                'moyen'  => 'Moyen',
+                                'eleve'  => 'Élevé',
+                            ])
+                            ->nullable()
+                            ->native(false),
+
+                        Select::make('communication_method')
+                            ->label('Mode de communication')
+                            ->options([
+                                'telephone' => 'Téléphone',
+                                'email'     => 'Email',
+                                'whatsapp'  => 'WhatsApp',
+                                'courrier'  => 'Courrier',
+                                'autre'     => 'Autre',
+                            ])
+                            ->nullable()
+                            ->native(false),
+                    ]),
+
+                    DateTimePicker::make('appointment_date')
+                        ->label('Date de rendez-vous')
+                        ->seconds(false)
+                        ->nullable(),
+
+                    Textarea::make('actions_taken')
+                        ->label('Mesures prises')
+                        ->rows(3)
+                        ->nullable(),
+
+                    Textarea::make('rh_notes')
+                        ->label('Notes RH')
+                        ->rows(3)
+                        ->nullable(),
                 ]),
         ]);
     }
