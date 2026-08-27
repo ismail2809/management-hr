@@ -65,11 +65,9 @@ class LeaveBalance extends Model
      */
     public static function findOrInit(int $companyId, int $employeeId, int $leaveTypeId, int $year): self
     {
-        $leaveType = LeaveType::withoutGlobalScopes()->find($leaveTypeId);
-
         return self::withoutGlobalScopes()->firstOrCreate(
             ['company_id' => $companyId, 'employee_id' => $employeeId, 'leave_type_id' => $leaveTypeId, 'year' => $year],
-            ['entitled_days' => $leaveType?->legal_days_per_year ?? 0, 'used_days' => 0]
+            ['entitled_days' => 0, 'used_days' => 0]
         );
     }
 }
