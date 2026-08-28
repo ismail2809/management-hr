@@ -14,7 +14,7 @@ class EditUser extends EditRecord
     {
         return [
             DeleteAction::make()
-                ->visible(fn (EditRecord $livewire) => ! $livewire->record->hasRole('admin')),
+                ->visible(fn (EditRecord $livewire) => ! $livewire->record->hasRole('super-admin')),
         ];
     }
 

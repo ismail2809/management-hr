@@ -33,6 +33,7 @@ class AuditLogResource extends Resource
             ->query(
                 Activity::query()
                     ->whereIn('log_name', ['payroll', 'employee', 'declaration', 'cnss_rate'])
+                    ->with(['causer.employee'])
                     ->latest()
             )
             ->columns([
@@ -68,8 +69,15 @@ class AuditLogResource extends Resource
                         'deleted' => 'Supprimé',
                         default   => $state,
                     }),
-                TextColumn::make('causer.name')
-                    ->label('Par')
+                TextColumn::make('causer_employee')
+                    ->label('Employé associé')
+                    ->state(function ($record) {
+                        $employee = $record->causer?->employee;
+                        if ($employee) {
+                            return "{$employee->first_name} {$employee->last_name}";
+                        }
+                        return $record->causer?->name ?? '—';
+                    })
                     ->default('—'),
                 TextColumn::make('subject_type')
                     ->label('Objet')
@@ -82,9 +90,11 @@ class AuditLogResource extends Resource
                     ->label('Champs modifiés')
                     ->formatStateUsing(function ($state) {
                         if (! $state) return '—';
-                        $props = is_array($state) ? $state : json_decode($state, true);
-                        $keys  = array_keys($props['attributes'] ?? $props ?? []);
-                        return implode(', ', $keys) ?: '—';
+                        $props  = is_array($state) ? $state : json_decode($state, true);
+                        $keys   = array_keys($props['attributes'] ?? $props ?? []);
+                        $labels = config('audit_labels.fields', []);
+                        $readable = array_map(fn ($k) => $labels[$k] ?? $k, $keys);
+                        return implode(', ', $readable) ?: '—';
                     })
                     ->wrap()
                     ->limit(80),

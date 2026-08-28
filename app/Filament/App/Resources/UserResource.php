@@ -49,10 +49,8 @@ class UserResource extends Resource
 
         $labels = [
             'super-admin' => 'Super Admin',
-            'admin'       => 'Admin (company)',
-            'rh'          => 'Responsable RH',
-            'manager'     => 'Manager',
-            'comptable'   => 'Comptable',
+            'secretaire'  => 'Secrétaire',
+            'employee'    => 'Employé',
         ];
 
         $roles = Role::whereNotIn('name', $excludes)
@@ -102,10 +100,8 @@ class UserResource extends Resource
                     ->required()
                     ->helperText(implode(' · ', [
                         'Super Admin : plateforme complète',
-                        'Admin : company complète',
-                        'RH : employés & congés',
-                        'Manager : validation congés',
-                        'Comptable : paie & déclarations',
+                        'Secrétaire : gestion complète de la company',
+                        'Employé : accès limité à son espace personnel',
                     ])),
 
                 Select::make('employee_id')
@@ -145,18 +141,16 @@ class UserResource extends Resource
                     ->label('Rôle(s)')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'rh'        => 'primary',
-                        'manager'   => 'warning',
-                        'comptable' => 'success',
-                        'admin'     => 'danger',
-                        default     => 'gray',
+                        'super-admin' => 'danger',
+                        'secretaire'  => 'primary',
+                        'employee'    => 'gray',
+                        default       => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'rh'        => 'Responsable RH',
-                        'manager'   => 'Manager',
-                        'comptable' => 'Comptable',
-                        'admin'     => 'Admin',
-                        default     => $state,
+                        'super-admin' => 'Super Admin',
+                        'secretaire'  => 'Secrétaire',
+                        'employee'    => 'Employé',
+                        default       => $state,
                     }),
 
                 TextColumn::make('employee.full_name')
