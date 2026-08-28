@@ -17,8 +17,9 @@ class DocumentTypeResource extends Resource
     protected static ?string $model = DocumentType::class;
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationLabel = 'Types de documents';
-    protected static ?string $modelLabel = 'Type de document';
+    protected static ?string $slug = 'types-de-demande';
+    protected static ?string $navigationLabel = 'Types de demande';
+    protected static ?string $modelLabel = 'Type de demande';
     protected static \UnitEnum|string|null $navigationGroup = 'Paramétrage';
     protected static ?int $navigationSort = 25;
 

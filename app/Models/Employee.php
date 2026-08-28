@@ -49,8 +49,10 @@ class Employee extends Model
         'rib',
         'status',
         'photo',
+        'gender',
         'address',
         'city',
+        'nationality',
         'transport_id',
     ];
 
