@@ -58,8 +58,7 @@ class UserResource extends Resource
             ->mapWithKeys(fn ($name) => [$name => $labels[$name] ?? $name]);
 
         return $schema->columns(1)->components([
-            Section::make('Informations de connexion')->schema([
-                Grid::make(2)->schema([
+            Section::make('Informations de connexion')->columns(3)->schema([
                     TextInput::make('name')
                         ->label('Nom complet')
                         ->required()
@@ -70,7 +69,6 @@ class UserResource extends Resource
                         ->email()
                         ->required()
                         ->unique(table: 'users', column: 'email', ignoreRecord: true),
-                ]),
 
                 TextInput::make('password')
                     ->label('Mot de passe')
@@ -82,7 +80,7 @@ class UserResource extends Resource
                     ->helperText('Laisser vide pour conserver le mot de passe actuel'),
             ]),
 
-            Section::make('Rôle & Employé associé')->schema([
+            Section::make('Rôle & Employé associé')->columns(3)->schema([
                 Select::make('company_id')
                     ->label('Company')
                     ->options(\App\Models\Company::pluck('name', 'id'))
@@ -117,7 +115,21 @@ class UserResource extends Resource
                     })
                     ->searchable()
                     ->nullable()
-                    ->helperText('Lie cet utilisateur à son dossier employé (accès "Mon espace")'),
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if (! $state) {
+                            $set('email', null);
+                            $set('name', null);
+                            return;
+                        }
+                        $employee = Employee::withoutGlobalScopes()->find($state);
+                        if (! $employee) {
+                            return;
+                        }
+                        $set('email', $employee->email ?? null);
+                        $set('name', $employee->full_name);
+                    })
+                    ->helperText('Sélectionner un employé remplit automatiquement le nom et l\'email.'),
             ]),
         ]);
     }
