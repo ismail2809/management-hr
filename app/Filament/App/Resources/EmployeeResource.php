@@ -39,6 +39,18 @@ class EmployeeResource extends Resource
     protected static \UnitEnum|string|null $navigationGroup = 'Employés';
     protected static ?int $navigationSort = 1;
 
+    /** Disabled for employee if the field already has a value in DB. */
+    private static function d(string $field): \Closure
+    {
+        return fn ($record) => auth()->user()?->hasRole('employee') && filled($record?->{$field});
+    }
+
+    /** Always disabled for employees (admin-only fields). */
+    private static function dAdmin(): \Closure
+    {
+        return fn () => (bool) auth()->user()?->hasRole('employee');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
@@ -53,31 +65,31 @@ class EmployeeResource extends Resource
                         ->icon('heroicon-o-identification')
                         ->schema([
                             Grid::make(3)->schema([
-                                TextInput::make('matricule')->label('Matricule')->maxLength(50),
-                                TextInput::make('first_name')->label('Prénom')->required()->maxLength(100),
-                                TextInput::make('last_name')->label('Nom')->required()->maxLength(100),
+                                TextInput::make('matricule')->label('Matricule')->maxLength(50)->disabled(static::dAdmin()),
+                                TextInput::make('first_name')->label('Prénom')->required()->maxLength(100)->disabled(static::d('first_name')),
+                                TextInput::make('last_name')->label('Nom')->required()->maxLength(100)->disabled(static::d('last_name')),
                             ]),
                             Grid::make(3)->schema([
-                                TextInput::make('cin')->label('CIN')->maxLength(20),
-                                TextInput::make('cnss_number')->label('N° CNSS')->maxLength(30),
-                                TextInput::make('rib')->label('RIB')->maxLength(30),
+                                TextInput::make('cin')->label('CIN')->maxLength(20)->disabled(static::d('cin')),
+                                TextInput::make('cnss_number')->label('N° CNSS')->maxLength(30)->disabled(static::d('cnss_number')),
+                                TextInput::make('rib')->label('RIB')->maxLength(30)->disabled(static::d('rib')),
                             ]),
                             Grid::make(2)->schema([
-                                TextInput::make('email')->label('Email')->email()->nullable(),
-                                TextInput::make('phone')->label('Téléphone mobile')->nullable(),
+                                TextInput::make('email')->label('Email')->email()->nullable()->disabled(static::d('email')),
+                                TextInput::make('phone')->label('Téléphone mobile')->nullable()->disabled(static::d('phone')),
                             ]),
                             Grid::make(2)->schema([
-                                TextInput::make('phone_fixed')->label('Téléphone fixe')->nullable(),
-                                TextInput::make('city')->label('Ville')->nullable(),
+                                TextInput::make('phone_fixed')->label('Téléphone fixe')->nullable()->disabled(static::d('phone_fixed')),
+                                TextInput::make('city')->label('Ville')->nullable()->disabled(static::d('city')),
                             ]),
-                            TextInput::make('address')->label('Adresse')->nullable(),
+                            TextInput::make('address')->label('Adresse')->nullable()->disabled(static::d('address')),
                             Grid::make(2)->schema([
-                                DatePicker::make('birth_date')->label('Date de naissance')->nullable(),
-                                TextInput::make('birth_place')->label('Lieu de naissance')->nullable(),
+                                DatePicker::make('birth_date')->label('Date de naissance')->nullable()->disabled(static::d('birth_date')),
+                                TextInput::make('birth_place')->label('Lieu de naissance')->nullable()->disabled(static::d('birth_place')),
                             ]),
                             Grid::make(2)->schema([
-                                TextInput::make('diploma')->label('Diplôme')->nullable(),
-                                TextInput::make('promotion')->label('Promotion')->nullable(),
+                                TextInput::make('diploma')->label('Diplôme')->nullable()->disabled(static::d('diploma')),
+                                TextInput::make('promotion')->label('Promotion')->nullable()->disabled(static::d('promotion')),
                             ]),
                         ]),
 
@@ -87,7 +99,7 @@ class EmployeeResource extends Resource
                         ->visible(fn ($get) => $get('status') === 'sorti')
                         ->schema([
                             Grid::make(2)->schema([
-                                DatePicker::make('exit_date')->label('Date de sortie')->nullable(),
+                                DatePicker::make('exit_date')->label('Date de sortie')->nullable()->disabled(static::dAdmin()),
                                 Select::make('exit_reason')
                                     ->label('Motif de sortie')
                                     ->options([
@@ -96,9 +108,10 @@ class EmployeeResource extends Resource
                                         'sanction'  => 'Sanction',
                                         'autre'     => 'Autre',
                                     ])
-                                    ->nullable(),
+                                    ->nullable()
+                                    ->disabled(static::dAdmin()),
                             ]),
-                            Textarea::make('exit_comment')->label('Commentaire')->rows(2)->nullable(),
+                            Textarea::make('exit_comment')->label('Commentaire')->rows(2)->nullable()->disabled(static::dAdmin()),
                         ]),
 
                 ])->columnSpan(2),
@@ -131,13 +144,15 @@ class EmployeeResource extends Resource
                                     'veuf'        => 'Veuf/Veuve',
                                 ])
                                 ->required()
-                                ->live(),
+                                ->live()
+                                ->disabled(static::d('marital_status')),
                             TextInput::make('number_of_children')
                                 ->label("Nombre d'enfants")
                                 ->numeric()
                                 ->minValue(0)
                                 ->default(0)
-                                ->visible(fn ($get) => $get('marital_status') === 'marie'),
+                                ->visible(fn ($get) => $get('marital_status') === 'marie')
+                                ->disabled(static::d('number_of_children')),
                         ]),
 
                 ])->columnSpan(1),
@@ -154,7 +169,8 @@ class EmployeeResource extends Resource
                             ->searchable()
                             ->preload()
                             ->nullable()
-                            ->live(),
+                            ->live()
+                            ->disabled(static::dAdmin()),
                         Select::make('profession_type')
                             ->label('Type de profession')
                             ->options([
@@ -162,19 +178,22 @@ class EmployeeResource extends Resource
                                 'stagiaire'  => 'Stagiaire',
                                 'vacataire'  => 'Vacataire',
                             ])
-                            ->nullable(),
+                            ->nullable()
+                            ->disabled(static::dAdmin()),
                         Select::make('contract_type')
                             ->label('Type de contrat')
                             ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
-                            ->required(),
+                            ->required()
+                            ->disabled(static::dAdmin()),
                     ]),
                     Grid::make(3)->schema([
-                        DatePicker::make('hire_date')->label("Date d'embauche")->nullable(),
+                        DatePicker::make('hire_date')->label("Date d'embauche")->nullable()->disabled(static::dAdmin()),
                         Select::make('status')
                             ->label('Statut')
                             ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'sorti' => 'Sorti'])
                             ->required()
-                            ->live(),
+                            ->live()
+                            ->disabled(static::dAdmin()),
                     ]),
                     Select::make('groupes')
                         ->label('Groupes affectés')
@@ -182,7 +201,8 @@ class EmployeeResource extends Resource
                         ->relationship('groupes', 'name', fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*', 'niveaux_scolaires.order as niveau_order')->orderBy('niveau_order'))
                         ->getOptionLabelFromRecordUsing(fn (Groupe $record) => "{$record->niveauScolaire?->name} — {$record->name}")
                         ->preload()
-                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Professeur'),
+                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Professeur')
+                        ->disabled(static::dAdmin()),
                     Select::make('transport_id')
                         ->label('Transport affecté')
                         ->relationship('transport', 'name')
@@ -190,7 +210,8 @@ class EmployeeResource extends Resource
                         ->searchable()
                         ->preload()
                         ->nullable()
-                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Chauffeur'),
+                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Chauffeur')
+                        ->disabled(static::dAdmin()),
                 ]),
         ]);
     }
