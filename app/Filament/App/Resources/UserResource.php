@@ -95,6 +95,7 @@ class UserResource extends Resource
                     ->options($roles)
                     ->multiple()
                     ->preload()
+                    ->default(['employee'])
                     ->required()
                     ->helperText(implode(' · ', [
                         'Super Admin : plateforme complète',

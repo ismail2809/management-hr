@@ -18,6 +18,18 @@ class EditUser extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['roles'] = $this->record->roles->pluck('name')->toArray();
+        return $data;
+    }
+
+    protected function afterSave(): void
+    {
+        $roles = $this->data['roles'] ?? [];
+        $this->record->syncRoles($roles);
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
