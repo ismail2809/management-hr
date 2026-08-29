@@ -9,6 +9,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Filament\App\Pages\Dashboard;
 use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -34,6 +35,7 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('admin')
             ->login(\App\Filament\App\Pages\Auth\Login::class)
+            ->profile(isSimple: false)
             ->colors([
                 'primary'  => Color::hex('#0da8b1'),
                 'warning'  => Color::hex('#fda31a'),
@@ -57,6 +59,15 @@ class AppPanelProvider extends PanelProvider
                 NavigationGroup::make('Administration'),
                 NavigationGroup::make('Paramétrage'),
                 NavigationGroup::make('Journal d\'audit'),
+            ])
+            ->navigationItems([
+                NavigationItem::make('Mon profil')
+                    ->icon('heroicon-o-user-circle')
+                    ->sort(2)
+                    ->url(fn () => auth()->user()?->employee_id
+                        ? \App\Filament\App\Resources\EmployeeResource::getUrl('view', ['record' => auth()->user()->employee_id])
+                        : '#')
+                    ->visible(fn () => auth()->user()?->hasRole('employee') && auth()->user()?->employee_id),
             ])
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')

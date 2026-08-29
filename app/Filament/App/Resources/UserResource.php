@@ -9,6 +9,7 @@ use App\Models\User;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -62,13 +63,17 @@ class UserResource extends Resource
                     TextInput::make('name')
                         ->label('Nom complet')
                         ->required()
-                        ->maxLength(255),
+                        ->maxLength(255)
+                        ->disabled(fn (Get $get) => filled($get('employee_id')) && filled(Employee::withoutGlobalScopes()->find($get('employee_id'))?->full_name))
+                        ->dehydrated(),
 
                     TextInput::make('email')
                         ->label('Adresse email')
                         ->email()
                         ->required()
-                        ->unique(table: 'users', column: 'email', ignoreRecord: true),
+                        ->unique(table: 'users', column: 'email', ignoreRecord: true)
+                        ->disabled(fn (Get $get) => filled($get('employee_id')) && filled(Employee::withoutGlobalScopes()->find($get('employee_id'))?->email))
+                        ->dehydrated(),
 
                 TextInput::make('password')
                     ->label('Mot de passe')

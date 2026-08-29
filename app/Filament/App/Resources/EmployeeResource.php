@@ -11,6 +11,7 @@ use App\Models\Groupe;
 use App\Models\Profession;
 use App\Models\Transport;
 use Filament\Actions\ViewAction;
+use Filament\Navigation\NavigationItem;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
@@ -251,6 +252,35 @@ class EmployeeResource extends Resource
     {
         return ! auth()->user()?->hasRole('employee');
     }
+
+    public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        $user = auth()->user();
+        if ($user?->hasRole('employee')) {
+            return $record->id === $user->employee_id;
+        }
+        return true;
+    }
+
+    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        $user = auth()->user();
+        if ($user?->hasRole('employee')) {
+            return $record->id === $user->employee_id;
+        }
+        return true;
+    }
+
+    public static function canCreate(): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return ! auth()->user()?->hasRole('employee');
+    }
+
 
     public static function getRelations(): array
     {

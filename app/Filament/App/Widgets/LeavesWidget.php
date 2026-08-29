@@ -18,22 +18,26 @@ class LeavesWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return true;
     }
 
     public function table(Table $table): Table
     {
+        $user = auth()->user();
+        $isEmployee = $user?->hasRole('employee');
+
+        $query = $isEmployee
+            ? Leave::query()->where('employee_id', $user->employee_id)->orderByDesc('start_date')
+            : Leave::query()->with('employee')->orderByDesc('start_date');
+
         return $table
-            ->query(
-                Leave::query()
-                    ->with('employee')
-                    ->orderByDesc('start_date')
-            )
+            ->query($query)
             ->columns([
                 TextColumn::make('employee.full_name')
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
-                    ->weight('semibold'),
+                    ->weight('semibold')
+                    ->hidden(fn () => auth()->user()?->hasRole('employee')),
                 TextColumn::make('categorie')
                     ->label('Type')
                     ->badge()

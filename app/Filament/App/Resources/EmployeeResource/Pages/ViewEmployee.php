@@ -20,6 +20,21 @@ class ViewEmployee extends ViewRecord
     public $uploadedFile = null;
     public string $documentName = '';
 
+    public function mountCanAuthorizeAccess(): void
+    {
+        $user = auth()->user();
+
+        if ($user?->hasRole('employee')) {
+            abort_unless(
+                $user->employee_id && (int) ($this->record?->id ?? $this->record) === (int) $user->employee_id,
+                403
+            );
+            return;
+        }
+
+        parent::mountCanAuthorizeAccess();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
