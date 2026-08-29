@@ -5,10 +5,21 @@ namespace App\Models;
 use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class DocumentRequest extends Model
 {
-    use HasCompanyScope;
+    use HasCompanyScope, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'type', 'format', 'processed_by', 'processed_at', 'fichier_final'])
+            ->logOnlyDirty()
+            ->useLogName('document_request')
+            ->dontSubmitEmptyLogs();
+    }
 
     protected $fillable = [
         'company_id',

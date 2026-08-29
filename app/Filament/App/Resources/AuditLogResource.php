@@ -32,7 +32,6 @@ class AuditLogResource extends Resource
         return $table
             ->query(
                 Activity::query()
-                    ->whereIn('log_name', ['payroll', 'employee', 'declaration', 'cnss_rate'])
                     ->with(['causer.employee'])
                     ->latest()
             )
@@ -45,15 +44,12 @@ class AuditLogResource extends Resource
                         'employee'    => 'primary',
                         'declaration' => 'warning',
                         'cnss_rate'   => 'danger',
+                        'leave'       => 'info',
+                        'attendance'  => 'info',
+                        'contract'    => 'primary',
                         default       => 'gray',
                     })
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'payroll'     => 'Paie',
-                        'employee'    => 'Employé',
-                        'declaration' => 'Déclaration',
-                        'cnss_rate'   => 'Taux CNSS',
-                        default       => $state,
-                    }),
+                    ->formatStateUsing(fn ($state) => config('audit_labels.modules.' . $state, ucfirst($state))),
                 TextColumn::make('event')
                     ->label('Action')
                     ->badge()
@@ -106,12 +102,13 @@ class AuditLogResource extends Resource
             ->filters([
                 SelectFilter::make('log_name')
                     ->label('Module')
-                    ->options([
-                        'payroll'     => 'Paie',
-                        'employee'    => 'Employé',
-                        'declaration' => 'Déclaration',
-                        'cnss_rate'   => 'Taux CNSS',
-                    ]),
+                    ->options(fn () => Activity::query()
+                        ->distinct()
+                        ->orderBy('log_name')
+                        ->pluck('log_name', 'log_name')
+                        ->map(fn ($v) => config('audit_labels.modules.' . $v, ucfirst($v)))
+                        ->all()
+                    ),
                 SelectFilter::make('event')
                     ->label('Action')
                     ->options([

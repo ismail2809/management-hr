@@ -5,10 +5,21 @@ namespace App\Models;
 use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Leave extends Model
 {
-    use HasCompanyScope;
+    use HasCompanyScope, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['status', 'approved_by', 'approved_at', 'rh_notes'])
+            ->logOnlyDirty()
+            ->useLogName('leave')
+            ->dontSubmitEmptyLogs();
+    }
 
     protected $fillable = [
         'company_id',
@@ -40,25 +51,6 @@ class Leave extends Model
         'approved_at'      => 'datetime',
         'appointment_date' => 'datetime',
     ];
-
-    protected static function booted(): void
-    {
-        static::saved(function (self $leave) {
-            if ($leave->employee_id && $leave->leave_type_id && $leave->start_date) {
-                LeaveBalance::findOrInit(
-                    $leave->company_id,
-                    $leave->employee_id,
-                    $leave->leave_type_id,
-                    $leave->start_date->year
-                );
-                LeaveBalance::recalculate(
-                    $leave->employee_id,
-                    $leave->leave_type_id,
-                    $leave->start_date->year
-                );
-            }
-        });
-    }
 
     public function getDurationDaysAttribute(): int
     {

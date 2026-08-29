@@ -6,10 +6,21 @@ use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Groupe extends Model
 {
-    use HasCompanyScope;
+    use HasCompanyScope, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logFillable()
+            ->logOnlyDirty()
+            ->useLogName('groupe')
+            ->dontSubmitEmptyLogs();
+    }
 
     protected $fillable = ['company_id', 'niveau_scolaire_id', 'name'];
 
