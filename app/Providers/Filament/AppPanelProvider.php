@@ -64,8 +64,8 @@ class AppPanelProvider extends PanelProvider
                 NavigationItem::make('Mon profil')
                     ->icon('heroicon-o-user-circle')
                     ->sort(2)
-                    ->url(fn () => auth()->user()?->employee_id
-                        ? \App\Filament\App\Resources\EmployeeResource::getUrl('view', ['record' => auth()->user()->employee_id])
+                    ->url(fn () => ($emp = auth()->user()?->employee)
+                        ? \App\Filament\App\Resources\EmployeeResource::getUrl('view', ['record' => $emp])
                         : '#')
                     ->visible(fn () => auth()->user()?->hasRole('employee') && auth()->user()?->employee_id),
             ])

@@ -19,9 +19,8 @@ class EmployeePolicy
 
     public function view(AuthUser $authUser, Employee $employee): bool
     {
-        // Un employé peut toujours voir son propre profil
-        if ($authUser->employee_id === $employee->id) {
-            return true;
+        if ($authUser->hasRole('employee')) {
+            return (int) $authUser->employee_id === (int) $employee->id;
         }
         return $authUser->can('View:Employee');
     }
@@ -33,9 +32,8 @@ class EmployeePolicy
 
     public function update(AuthUser $authUser, Employee $employee): bool
     {
-        // Un employé peut modifier son propre profil (ex: documents)
-        if ($authUser->employee_id === $employee->id) {
-            return true;
+        if ($authUser->hasRole('employee')) {
+            return (int) $authUser->employee_id === (int) $employee->id;
         }
         return $authUser->can('Update:Employee');
     }

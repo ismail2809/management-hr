@@ -38,8 +38,9 @@ class RolesPermissionsSeeder extends Seeder
         $employeePerms = [
             'View:Dashboard',
             'View:MonEspace',
-            'ViewAny:Leave',            'View:Leave',            'Create:Leave',
-            'ViewAny:DocumentRequest',  'View:DocumentRequest',  'Create:DocumentRequest',
+            'ViewAny:Leave',           'View:Leave',           'Create:Leave',
+            'ViewAny:DocumentRequest', 'View:DocumentRequest', 'Create:DocumentRequest',
+            'View:Employee',           'Update:Employee',
         ];
 
         $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'web']);
