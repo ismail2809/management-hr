@@ -13,9 +13,7 @@ use App\Models\Transport;
 use Filament\Actions\ViewAction;
 use Filament\Navigation\NavigationItem;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -54,103 +52,27 @@ class EmployeeResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->columns(1)->components([
-            static::companyField(),
 
-            Grid::make(3)->schema([
+            /* ── Entreprise + Situation familiale (même ligne) ── */
+            Grid::make(2)->schema([
+                static::companyField(),
 
-                /* ── Colonne gauche (2/3) ── */
-                Group::make([
-
-                    Section::make('Identité')
-                        ->icon('heroicon-o-identification')
-                        ->schema([
-                            Grid::make(4)->schema([
-                                TextInput::make('matricule')->label('Matricule')->maxLength(50)->disabled(static::dAdmin()),
-                                TextInput::make('first_name')->label('Prénom')->required()->maxLength(100)->disabled(static::d('first_name')),
-                                TextInput::make('last_name')->label('Nom')->required()->maxLength(100)->disabled(static::d('last_name')),
-                                Select::make('gender')
-                                    ->label('Sexe')
-                                    ->options(['M' => 'Masculin', 'F' => 'Féminin'])
-                                    ->nullable()
-                                    ->disabled(static::d('gender')),
-                            ]),
-                            Grid::make(2)->schema([
-                                TextInput::make('cin')->label('CIN')->maxLength(20)->disabled(static::d('cin')),
-                                TextInput::make('cnss_number')->label('N° CNSS')->maxLength(30)->disabled(static::d('cnss_number')),
-                            ]),
-                            TextInput::make('rib')->label('RIB')->maxLength(30)->disabled(static::d('rib')),
-                            Grid::make(2)->schema([
-                                TextInput::make('email')->label('Email')->email()->nullable()->disabled(static::d('email')),
-                                TextInput::make('phone')->label('Téléphone mobile')->nullable()->disabled(static::d('phone')),
-                            ]),
-                            Grid::make(2)->schema([
-                                TextInput::make('phone_fixed')->label('Téléphone fixe')->nullable()->disabled(static::d('phone_fixed')),
-                                TextInput::make('city')->label('Ville')->nullable()->disabled(static::d('city')),
-                            ]),
-                            TextInput::make('address')->label('Adresse')->nullable()->disabled(static::d('address')),
-                            Grid::make(2)->schema([
-                                DatePicker::make('birth_date')->label('Date de naissance')->nullable()->disabled(static::d('birth_date')),
-                                TextInput::make('birth_place')->label('Lieu de naissance')->nullable()->disabled(static::d('birth_place')),
-                            ]),
-                            Grid::make(3)->schema([
-                                TextInput::make('diploma')->label('Diplôme')->nullable()->disabled(static::d('diploma')),
-                                TextInput::make('promotion')->label('Promotion')->nullable()->disabled(static::d('promotion')),
-                                TextInput::make('nationality')->label('Nationalité')->nullable()->disabled(static::d('nationality')),
-                            ]),
-                        ]),
-
-                    Section::make('Sortie')
-                        ->icon('heroicon-o-arrow-right-on-rectangle')
-                        ->collapsed()
-                        ->visible(fn ($get) => $get('status') === 'sorti')
-                        ->schema([
-                            Grid::make(2)->schema([
-                                DatePicker::make('exit_date')->label('Date de sortie')->nullable()->disabled(static::dAdmin()),
-                                Select::make('exit_reason')
-                                    ->label('Motif de sortie')
-                                    ->options([
-                                        'demission' => 'Démission',
-                                        'decision'  => 'Décision',
-                                        'sanction'  => 'Sanction',
-                                        'autre'     => 'Autre',
-                                    ])
-                                    ->nullable()
-                                    ->disabled(static::dAdmin()),
-                            ]),
-                            Textarea::make('exit_comment')->label('Commentaire')->rows(2)->nullable()->disabled(static::dAdmin()),
-                        ]),
-
-                ])->columnSpan(2),
-
-                /* ── Colonne droite (1/3) ── */
-                Group::make([
-
-                    Section::make('Photo')
-                        ->icon('heroicon-o-camera')
-                        ->schema([
-                            FileUpload::make('photo')
-                                ->label('Photo de profil')
-                                ->image()
-                                ->disk('public')
-                                ->directory('employees/photos')
-                                ->imageEditor()
-                                ->circleCropper()
-                                ->maxSize(2048),
-                        ]),
-
-                    Section::make('Situation familiale')
-                        ->icon('heroicon-o-heart')
-                        ->visible(fn () => ! auth()->user()?->hasRole('employee'))
-                        ->schema([
+                /* ══ 4. Situation familiale ════════════════ */
+                Section::make('Situation familiale')
+                    ->icon('heroicon-o-heart')
+                    ->visible(fn () => ! auth()->user()?->hasRole('employee'))
+                    ->compact()
+                    ->schema([
+                        Grid::make(2)->schema([
                             Select::make('marital_status')
-                                ->label('Situation matrimoniale')
+                                ->label('État matrimonial')
                                 ->options([
                                     'celibataire' => 'Célibataire',
                                     'marie'       => 'Marié(e)',
                                     'divorce'     => 'Divorcé(e)',
                                     'veuf'        => 'Veuf/Veuve',
                                 ])
-                                ->required()
+                                ->nullable()
                                 ->live()
                                 ->disabled(static::d('marital_status')),
                             TextInput::make('number_of_children')
@@ -160,15 +82,65 @@ class EmployeeResource extends Resource
                                 ->default(0)
                                 ->disabled(static::d('number_of_children')),
                         ]),
-
-                ])->columnSpan(1),
-
+                    ]),
             ]),
 
-            Section::make('Poste & Contrat')
-                ->icon('heroicon-o-document-text')
+            /* ══ 1. Identité ══════════════════════════════ */
+            Section::make('Identité')
+                ->icon('heroicon-o-identification')
                 ->schema([
                     Grid::make(3)->schema([
+                        TextInput::make('matricule')->label('Matricule')->maxLength(50)->disabled(static::dAdmin()),
+                        TextInput::make('first_name')->label('Prénom')->required()->maxLength(100)->disabled(static::d('first_name')),
+                        TextInput::make('last_name')->label('Nom')->required()->maxLength(100)->disabled(static::d('last_name')),
+                    ]),
+                    Grid::make(3)->schema([
+                        Select::make('gender')
+                            ->label('Sexe')
+                            ->options(['M' => 'Masculin', 'F' => 'Féminin'])
+                            ->nullable()
+                            ->disabled(static::d('gender')),
+                        TextInput::make('cin')->label('CIN')->maxLength(20)->disabled(static::d('cin')),
+                        TextInput::make('cnss_number')->label('N° CNSS')->maxLength(30)->disabled(static::d('cnss_number')),
+                    ]),
+                    TextInput::make('rib')->label('RIB')->maxLength(30)->disabled(static::d('rib'))->columnSpanFull(),
+                ]),
+
+            /* ══ 2. Coordonnées ═══════════════════════════ */
+            Section::make('Coordonnées')
+                ->icon('heroicon-o-map-pin')
+                ->schema([
+                    Grid::make(3)->schema([
+                        TextInput::make('email')->label('Email')->email()->nullable()->disabled(static::d('email')),
+                        TextInput::make('phone')->label('Téléphone mobile')->nullable()->disabled(static::d('phone')),
+                        TextInput::make('phone_fixed')->label('Téléphone fixe')->nullable()->disabled(static::d('phone_fixed')),
+                    ]),
+                    Grid::make(3)->schema([
+                        TextInput::make('city')->label('Ville')->nullable()->disabled(static::d('city')),
+                        TextInput::make('address')->label('Adresse')->nullable()->disabled(static::d('address'))->columnSpan(2),
+                    ]),
+                ]),
+
+            /* ══ 3. Informations personnelles ════════════ */
+            Section::make('Informations personnelles')
+                ->icon('heroicon-o-user-circle')
+                ->schema([
+                    Grid::make(3)->schema([
+                        DatePicker::make('birth_date')->label('Date de naissance')->nullable()->disabled(static::d('birth_date')),
+                        TextInput::make('birth_place')->label('Lieu de naissance')->nullable()->disabled(static::d('birth_place')),
+                        TextInput::make('nationality')->label('Nationalité')->nullable()->disabled(static::d('nationality')),
+                    ]),
+                    Grid::make(3)->schema([
+                        TextInput::make('diploma')->label('Diplôme')->nullable()->disabled(static::d('diploma')),
+                        TextInput::make('promotion')->label('Promotion')->nullable()->disabled(static::d('promotion')),
+                    ]),
+                ]),
+
+            /* ══ 5. Poste & Contrat ═══════════════════════ */
+            Section::make('Poste & Contrat')
+                ->icon('heroicon-o-briefcase')
+                ->schema([
+                    Grid::make(4)->schema([
                         Select::make('profession_id')
                             ->label('Profession')
                             ->relationship('profession', 'name')
@@ -176,7 +148,8 @@ class EmployeeResource extends Resource
                             ->preload()
                             ->nullable()
                             ->live()
-                            ->disabled(static::dAdmin()),
+                            ->disabled(static::dAdmin())
+                            ->columnSpan(2),
                         Select::make('profession_type')
                             ->label('Type de profession')
                             ->options([
@@ -189,11 +162,11 @@ class EmployeeResource extends Resource
                         Select::make('contract_type')
                             ->label('Type de contrat')
                             ->options(['CDI' => 'CDI', 'CDD' => 'CDD', 'Stage' => 'Stage', 'ANAPEC' => 'ANAPEC'])
-                            ->required()
+                            ->nullable()
                             ->disabled(static::dAdmin()),
                     ]),
-                    Grid::make(3)->schema([
-                        DatePicker::make('hire_date')->label("Date d'embauche")->nullable()->disabled(static::dAdmin()),
+                    Grid::make(4)->schema([
+                        DatePicker::make('hire_date')->label("Date d'embauche")->nullable()->disabled(static::dAdmin())->columnSpan(2),
                         Select::make('status')
                             ->label('Statut')
                             ->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'sorti' => 'Sorti'])
@@ -201,6 +174,16 @@ class EmployeeResource extends Resource
                             ->live()
                             ->disabled(static::dAdmin()),
                     ]),
+                ]),
+
+            /* ══ 6. Affectations (conditionnel) ══════════ */
+            Section::make('Affectations')
+                ->icon('heroicon-o-squares-plus')
+                ->visible(fn ($get) => in_array(
+                    Profession::find($get('profession_id'))?->name,
+                    ['Professeur', 'Chauffeur']
+                ))
+                ->schema([
                     Select::make('groupes')
                         ->label('Groupes affectés')
                         ->multiple()
@@ -219,6 +202,29 @@ class EmployeeResource extends Resource
                         ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Chauffeur')
                         ->disabled(static::dAdmin()),
                 ]),
+
+            /* ══ 7. Sortie (visible si statut = sorti) ═══ */
+            Section::make('Informations de sortie')
+                ->icon('heroicon-o-arrow-right-on-rectangle')
+                ->collapsed()
+                ->visible(fn ($get) => $get('status') === 'sorti')
+                ->schema([
+                    Grid::make(3)->schema([
+                        DatePicker::make('exit_date')->label('Date de sortie')->nullable()->disabled(static::dAdmin()),
+                        Select::make('exit_reason')
+                            ->label('Motif de sortie')
+                            ->options([
+                                'demission' => 'Démission',
+                                'decision'  => 'Décision',
+                                'sanction'  => 'Sanction',
+                                'autre'     => 'Autre',
+                            ])
+                            ->nullable()
+                            ->disabled(static::dAdmin()),
+                    ]),
+                    Textarea::make('exit_comment')->label('Commentaire')->rows(2)->nullable()->disabled(static::dAdmin()),
+                ]),
+
         ]);
     }
 
