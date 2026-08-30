@@ -45,8 +45,9 @@ class UserResource extends Resource
     {
         $isSuperAdmin = auth()->user()?->hasRole('super-admin');
 
-        // super-admin voit tous les rôles, admin voit tout sauf super-admin
-        $excludes = $isSuperAdmin ? [] : ['super-admin'];
+        $allowed = $isSuperAdmin
+            ? ['super-admin', 'secretaire', 'employee']
+            : ['secretaire', 'employee'];
 
         $labels = [
             'super-admin' => 'Super Admin',
@@ -54,7 +55,7 @@ class UserResource extends Resource
             'employee'    => 'Employé',
         ];
 
-        $roles = Role::whereNotIn('name', $excludes)
+        $roles = Role::whereIn('name', $allowed)
             ->pluck('name', 'name')
             ->mapWithKeys(fn ($name) => [$name => $labels[$name] ?? $name]);
 

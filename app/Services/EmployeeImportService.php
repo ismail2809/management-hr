@@ -142,6 +142,11 @@ class EmployeeImportService
                 continue;
             }
 
+            // Skip text fields if value looks like a date (prevents hire_date bleeding into diploma, etc.)
+            if ($field === 'diploma' && $this->looksLikeDate($raw)) {
+                continue;
+            }
+
             $data[$field] = match (true) {
                 in_array($field, ['birth_date', 'hire_date', 'exit_date']) => $this->parseDate($raw, $sheet, $rowIndex, $colIndex),
                 $field === 'gender'                                         => $this->parseGender($raw),
@@ -151,6 +156,19 @@ class EmployeeImportService
             };
         }
         return $data;
+    }
+
+    private function looksLikeDate(mixed $raw): bool
+    {
+        // Excel serial date (numbers > 1000 that represent dates)
+        if (is_numeric($raw) && $raw > 10000) {
+            return true;
+        }
+        // String matching date patterns dd/mm/yyyy or yyyy-mm-dd
+        if (is_string($raw) && preg_match('/^\d{1,2}[\/\-]\d{1,2}[\/\-]\d{4}$|^\d{4}-\d{2}-\d{2}$/', trim($raw))) {
+            return true;
+        }
+        return false;
     }
 
     private function isTitleRow(string $value): bool
