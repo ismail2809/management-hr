@@ -91,6 +91,11 @@ class EmployeeImportService
                         ['company_id' => $companyId, 'cin' => $data['cin']],
                         $data
                     );
+                } elseif (! empty($data['matricule'])) {
+                    Employee::withoutGlobalScopes()->updateOrCreate(
+                        ['company_id' => $companyId, 'matricule' => $data['matricule']],
+                        $data
+                    );
                 } else {
                     Employee::withoutGlobalScopes()->create($data);
                 }
