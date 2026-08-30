@@ -16,7 +16,6 @@ class RolesPermissionsSeeder extends Seeder
         $employees   = $this->crudPerms('Employee');
         $leaveTypes  = $this->crudPerms('LeaveType');
         $leaves      = $this->crudPerms('Leave');
-        $attendances = $this->crudPerms('Attendance');
         $documents   = $this->crudPerms('DocumentRequest');
         $users       = $this->crudPerms('User');
         $roles       = $this->crudPerms('Role');
@@ -25,7 +24,7 @@ class RolesPermissionsSeeder extends Seeder
         // ─── secretaire ────────────────────────────────────────────────────
         // Accès complet à la company (tout sauf gestion des rôles Spatie)
         $secretairePerms = array_merge(
-            $employees, $leaveTypes, $leaves, $attendances,
+            $employees, $leaveTypes, $leaves,
             $documents, $users, $auditLogs,
             ['ApproveLeave', 'View:HrStatsOverview', 'View:MonEspace'],
         );

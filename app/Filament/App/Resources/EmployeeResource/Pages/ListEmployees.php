@@ -3,11 +3,12 @@
 namespace App\Filament\App\Resources\EmployeeResource\Pages;
 
 use App\Filament\App\Resources\EmployeeResource;
+use App\Models\Company;
 use App\Services\EmployeeImportService;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +24,14 @@ class ListEmployees extends ListRecords
                 ->label('Importer Excel')
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('gray')
-                ->form([
+                ->form(array_filter([
+                    auth()->user()->company_id === null
+                        ? Select::make('company_id')
+                            ->label('Company')
+                            ->options(Company::pluck('name', 'id'))
+                            ->required()
+                            ->searchable()
+                        : null,
                     FileUpload::make('file')
                         ->label('Fichier Excel (XLS / XLSX)')
                         ->disk('local')
@@ -36,12 +44,23 @@ class ListEmployees extends ListRecords
                         ->maxSize(10240)
                         ->required()
                         ->helperText('Colonnes reconnues : Matricule, Nom, Prénom, CIN, CNSS, Sexe, Date naissance, Date recrutement, Diplôme, Nationalité, Adresse'),
-                ])
+                ]))
                 ->action(function (array $data): void {
+                    $companyId = auth()->user()->company_id ?? $data['company_id'] ?? null;
+
+                    if (! $companyId) {
+                        Notification::make()
+                            ->title('Erreur')
+                            ->body('Aucune company sélectionnée.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+
                     $path = Storage::disk('local')->path($data['file']);
 
                     $service = new EmployeeImportService();
-                    $result  = $service->import($path, auth()->user()->company_id);
+                    $result  = $service->import($path, $companyId);
 
                     // Supprimer le fichier temporaire
                     Storage::disk('local')->delete($data['file']);

@@ -19,9 +19,6 @@ class EmployeePolicy
 
     public function view(AuthUser $authUser, Employee $employee): bool
     {
-        if ($authUser->hasRole('employee')) {
-            return (int) $authUser->employee_id === (int) $employee->id;
-        }
         return $authUser->can('View:Employee');
     }
 
@@ -32,9 +29,6 @@ class EmployeePolicy
 
     public function update(AuthUser $authUser, Employee $employee): bool
     {
-        if ($authUser->hasRole('employee')) {
-            return (int) $authUser->employee_id === (int) $employee->id;
-        }
         return $authUser->can('Update:Employee');
     }
 

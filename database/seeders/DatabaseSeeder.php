@@ -7,17 +7,17 @@ use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
-    use \Illuminate\Database\Console\Seeds\WithoutModelEvents;
-
     public function run(): void
     {
         $this->call([
-            IrBracketSeeder::class,
-            CnssRateSeeder::class,
             DocumentTypeSeeder::class,
+            CommunicationMethodSeeder::class,
             SuperAdminSeeder::class,
             TestCompanySeeder::class,
-            DemoDataSeeder::class,
+            LeaveTypeSeeder::class,
+            ProfessionSeeder::class,
+            NiveauScolaireSeeder::class,
+            GroupeSeeder::class,
         ]);
 
         // Générer les permissions Shield avant d'assigner les rôles
