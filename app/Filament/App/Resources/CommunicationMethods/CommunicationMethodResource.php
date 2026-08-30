@@ -8,12 +8,15 @@ use App\Filament\App\Resources\CommunicationMethods\Pages\ListCommunicationMetho
 use App\Filament\App\Resources\CommunicationMethods\Schemas\CommunicationMethodForm;
 use App\Filament\App\Resources\CommunicationMethods\Tables\CommunicationMethodsTable;
 use App\Models\CommunicationMethod;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class CommunicationMethodResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     protected static ?string $model = CommunicationMethod::class;
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';

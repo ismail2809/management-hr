@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -21,6 +22,8 @@ use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     protected static ?string $model = User::class;
     protected static ?string $slug = 'team';
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
@@ -46,13 +49,15 @@ class UserResource extends Resource
         $isSuperAdmin = auth()->user()?->hasRole('super-admin');
 
         $allowed = $isSuperAdmin
-            ? ['super-admin', 'secretaire', 'employee']
-            : ['secretaire', 'employee'];
+            ? ['super-admin', 'directeur', 'secretaire', 'surveillante', 'employee']
+            : ['directeur', 'secretaire', 'surveillante', 'employee'];
 
         $labels = [
-            'super-admin' => 'Super Admin',
-            'secretaire'  => 'Secrétaire',
-            'employee'    => 'Employé',
+            'super-admin'  => 'Super Admin',
+            'directeur'    => 'Directeur',
+            'secretaire'   => 'Secrétaire',
+            'surveillante' => 'Surveillante',
+            'employee'     => 'Employé',
         ];
 
         $roles = Role::whereIn('name', $allowed)

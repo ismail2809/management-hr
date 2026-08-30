@@ -7,11 +7,14 @@ use App\Filament\App\Resources\LeaveResource\Pages;
 use App\Models\CommunicationMethod;
 use App\Models\Employee;
 use App\Models\Leave;
+use App\Models\LeaveType;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -54,12 +57,22 @@ class LeaveResource extends Resource
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
     }
 
     public static function canDeleteAny(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
+    }
+
+    public static function canForceDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canForceDeleteAny(): bool
+    {
+        return false;
     }
 
     public static function getEloquentQuery(): Builder
@@ -78,55 +91,137 @@ class LeaveResource extends Resource
         $isEmployee = auth()->user()?->hasRole('employee');
 
         return $schema->columns(1)->components([
-            Section::make('Demandeur')->schema([
-                static::companyField(),
-                Grid::make(2)->schema([
-                    Select::make('employee_id')
-                        ->label('Employé')
-                        ->relationship('employee', 'first_name')
-                        ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                        ->searchable()
-                        ->preload()
-                        ->default(fn () => auth()->user()?->employee_id)
-                        ->disabled($isEmployee)
-                        ->dehydrated()
-                        ->required()
-                        ->live(),
-                    Radio::make('categorie')
-                        ->label('Type de demande')
-                        ->options(['conge' => 'Congé', 'absence' => 'Absence'])
-                        ->default('conge')
-                        ->inline()
-                        ->required()
-                        ->live(),
-                ]),
-            ]),
 
-            Section::make('Congé')
-                ->visible(fn ($get) => $get('categorie') === 'conge')
+            // ── Section 1 : Demandeur ─────────────────────────────────────────
+            Section::make('Demandeur')
+                ->description('Sélectionnez l\'employé concerné par cette demande.')
+                ->icon('heroicon-o-user-circle')
                 ->schema([
+                    static::companyField(),
+                    Grid::make(3)->schema([
+                        Select::make('employee_id')
+                            ->label('Employé')
+                            ->relationship('employee', 'first_name')
+                            ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                            ->searchable()
+                            ->preload()
+                            ->default(fn () => auth()->user()?->employee_id)
+                            ->disabled($isEmployee)
+                            ->dehydrated()
+                            ->required()
+                            ->live()
+                            ->columnSpan(2),
+
+                        Placeholder::make('solde_info')
+                            ->label('Solde de congés')
+                            ->content(function ($get) {
+                                $empId = $get('employee_id');
+                                if (! $empId) {
+                                    return '—';
+                                }
+                                if (! class_exists(\App\Models\LeaveBalance::class)) {
+                                    return '—';
+                                }
+                                $balance = \App\Models\LeaveBalance::where('employee_id', $empId)
+                                    ->whereYear('year', now()->year)
+                                    ->first();
+                                if (! $balance) {
+                                    return 'Aucun solde enregistré';
+                                }
+                                $used      = $balance->used_days ?? 0;
+                                $allocated = $balance->allocated_days ?? 0;
+                                $remaining = $allocated - $used;
+                                return "{$remaining} j restants / {$allocated} j alloués";
+                            })
+                            ->columnSpan(1),
+                    ]),
+                ]),
+
+            // ── Section 2 : Type de demande ──────────────────────────────────
+            Section::make('Type de demande')
+                ->description('Choisissez s\'il s\'agit d\'un congé planifié ou d\'une absence.')
+                ->icon('heroicon-o-tag')
+                ->schema([
+                    ToggleButtons::make('categorie')
+                        ->label('Catégorie')
+                        ->options(['conge' => 'Congé', 'absence' => 'Absence'])
+                        ->icons(['conge' => 'heroicon-o-sun', 'absence' => 'heroicon-o-exclamation-triangle'])
+                        ->colors(['conge' => 'info', 'absence' => 'warning'])
+                        ->default('conge')
+                        ->grouped()
+                        ->required()
+                        ->live(),
+
                     Select::make('leave_type_id')
                         ->label('Type de congé')
-                        ->relationship('leaveType', 'name')
+                        ->options(fn () => LeaveType::orderBy('name')->pluck('name', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Sélectionner un type…')
+                        ->nullable()
+                        ->visible(fn ($get) => $get('categorie') === 'conge')
+                        ->helperText('Laissez vide si le type n\'est pas applicable.'),
+                ]),
+
+            // ── Section 3 : Période ───────────────────────────────────────────
+            Section::make('Période')
+                ->description('Définissez les dates et ajoutez un motif ou un justificatif.')
+                ->icon('heroicon-o-calendar-days')
+                ->schema([
+                    Grid::make(3)->schema([
+                        DatePicker::make('start_date')
+                            ->label('Date de début')
+                            ->required()
+                            ->live()
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->columnSpan(1),
+
+                        DatePicker::make('end_date')
+                            ->label('Date de fin')
+                            ->required()
+                            ->live()
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->minDate(fn ($get) => $get('start_date'))
+                            ->columnSpan(1),
+
+                        Placeholder::make('duree_calculee')
+                            ->label('Durée estimée')
+                            ->content(function ($get): string {
+                                $start = $get('start_date');
+                                $end   = $get('end_date');
+                                if (! $start || ! $end) {
+                                    return '—';
+                                }
+                                try {
+                                    $days = Carbon::parse($start)->diffInWeekdays(Carbon::parse($end)) + 1;
+                                    return $days . ' jour' . ($days > 1 ? 's' : '') . ' ouvrable' . ($days > 1 ? 's' : '');
+                                } catch (\Exception) {
+                                    return '—';
+                                }
+                            })
+                            ->columnSpan(1),
+                    ]),
+
+                    Textarea::make('reason')
+                        ->label('Motif')
+                        ->placeholder('Décrivez brièvement la raison de cette demande…')
+                        ->rows(3)
                         ->nullable(),
+
+                    FileUpload::make('justificatif')
+                        ->label('Justificatif')
+                        ->disk('public')
+                        ->directory('leaves/justificatifs')
+                        ->acceptedFileTypes(['application/pdf', 'image/*'])
+                        ->maxSize(5120)
+                        ->nullable()
+                        ->helperText('PDF ou image — max 5 Mo. Optionnel.'),
                 ]),
 
-            Section::make('Période')->schema([
-                Grid::make(2)->schema([
-                    DatePicker::make('start_date')->label('Date de début')->required(),
-                    DatePicker::make('end_date')->label('Date de fin')->required(),
-                ]),
-                Textarea::make('reason')->label('Motif')->rows(2)->nullable(),
-                FileUpload::make('justificatif')
-                    ->label('Justificatif (optionnel)')
-                    ->disk('public')
-                    ->directory('leaves/justificatifs')
-                    ->acceptedFileTypes(['application/pdf', 'image/*'])
-                    ->maxSize(5120)
-                    ->nullable(),
-            ]),
-
-            Section::make('Informations professeur (remplacement)')
+            // ── Section 4 : Remplacement (professeurs) ────────────────────────
+            Section::make('Remplacement')
+                ->description('Désignez un remplaçant et précisez le contenu prévu.')
                 ->icon('heroicon-o-academic-cap')
                 ->visible(fn ($get) => filled($get('employee_id')) && Employee::find($get('employee_id'))?->isProfesseur())
                 ->schema([
@@ -144,7 +239,9 @@ class LeaveResource extends Resource
                             ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
                             ->searchable()
                             ->preload()
+                            ->placeholder('Choisir un remplaçant…')
                             ->nullable(),
+
                         Select::make('type_cours')
                             ->label('Type de cours prévu')
                             ->options([
@@ -152,19 +249,24 @@ class LeaveResource extends Resource
                                 'lecon'    => 'Leçon',
                                 'activite' => 'Activité',
                             ])
+                            ->placeholder('Sélectionner…')
                             ->nullable()
                             ->live(),
                     ]),
+
                     TextInput::make('nb_pages')
                         ->label('Nombre de pages')
                         ->numeric()
+                        ->minValue(1)
                         ->nullable()
                         ->visible(fn ($get) => $get('type_cours') === 'exercice'),
+
                     TextInput::make('intitule_lecon')
                         ->label('Intitulé de la leçon')
                         ->maxLength(200)
                         ->nullable()
                         ->visible(fn ($get) => $get('type_cours') === 'lecon'),
+
                     TextInput::make('intitule_activite')
                         ->label('Intitulé de l\'activité')
                         ->maxLength(200)
@@ -172,21 +274,37 @@ class LeaveResource extends Resource
                         ->visible(fn ($get) => $get('type_cours') === 'activite'),
                 ]),
 
+            // ── Section 5 : Décision ──────────────────────────────────────────
             Section::make('Décision')
+                ->description('Définissez le statut de cette demande.')
+                ->icon('heroicon-o-clipboard-document-check')
                 ->hidden($isEmployee)
                 ->schema([
-                    Select::make('status')
+                    ToggleButtons::make('status')
                         ->label('Statut')
                         ->options([
                             'en_attente' => 'En attente',
                             'approuvé'   => 'Approuvé',
                             'refusé'     => 'Refusé',
                         ])
+                        ->icons([
+                            'en_attente' => 'heroicon-o-clock',
+                            'approuvé'   => 'heroicon-o-check-circle',
+                            'refusé'     => 'heroicon-o-x-circle',
+                        ])
+                        ->colors([
+                            'en_attente' => 'warning',
+                            'approuvé'   => 'success',
+                            'refusé'     => 'danger',
+                        ])
                         ->default('en_attente')
+                        ->grouped()
                         ->required(),
                 ]),
 
+            // ── Section 6 : Suivi RH ──────────────────────────────────────────
             Section::make('Suivi RH')
+                ->description('Informations internes à l\'équipe RH.')
                 ->icon('heroicon-o-shield-check')
                 ->hidden($isEmployee)
                 ->collapsible()
@@ -196,24 +314,28 @@ class LeaveResource extends Resource
                         Select::make('communication_method')
                             ->label('Mode de communication')
                             ->options(fn () => CommunicationMethod::where('active', true)->orderBy('sort_order')->pluck('name', 'code')->toArray())
+                            ->placeholder('Choisir un mode…')
                             ->nullable()
                             ->native(false),
+
+                        DateTimePicker::make('appointment_date')
+                            ->label('Date de rendez-vous')
+                            ->seconds(false)
+                            ->native(false)
+                            ->nullable(),
                     ]),
 
-                    DateTimePicker::make('appointment_date')
-                        ->label('Date de rendez-vous')
-                        ->seconds(false)
-                        ->nullable(),
+                    Grid::make(2)->schema([
+                        Textarea::make('actions_taken')
+                            ->label('Mesures prises')
+                            ->rows(3)
+                            ->nullable(),
 
-                    Textarea::make('actions_taken')
-                        ->label('Mesures prises')
-                        ->rows(3)
-                        ->nullable(),
-
-                    Textarea::make('rh_notes')
-                        ->label('Notes RH')
-                        ->rows(3)
-                        ->nullable(),
+                        Textarea::make('rh_notes')
+                            ->label('Notes RH')
+                            ->rows(3)
+                            ->nullable(),
+                    ]),
                 ]),
         ]);
     }

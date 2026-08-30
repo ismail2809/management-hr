@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class RequireAppRole
 {
-    private const ALLOWED_ROLES = ['secretaire', 'employee'];
+    private const ALLOWED_ROLES = ['directeur', 'secretaire', 'surveillante', 'employee'];
 
     public function handle(Request $request, Closure $next)
     {

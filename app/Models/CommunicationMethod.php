@@ -4,10 +4,13 @@ namespace App\Models;
 
 use App\Models\Traits\HasGlobalOrCompanyScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CommunicationMethod extends Model
 {
+    use SoftDeletes;
+
     use HasGlobalOrCompanyScope;
 
     protected $fillable = ['company_id', 'name', 'code', 'active', 'sort_order'];

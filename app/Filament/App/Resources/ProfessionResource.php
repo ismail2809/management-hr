@@ -6,6 +6,7 @@ use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\ProfessionResource\Pages;
 use App\Models\Profession;
 use Filament\Forms\Components\TextInput;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -17,6 +18,8 @@ use Filament\Tables\Table;
 
 class ProfessionResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     use HasCompanyField;
     protected static ?string $model = Profession::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-briefcase';

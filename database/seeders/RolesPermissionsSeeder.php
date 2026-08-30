@@ -13,6 +13,21 @@ class RolesPermissionsSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // ── Créer toutes les permissions ───────────────────────────────────
+        $allPerms = array_merge(
+            $this->crudPerms('Employee'),
+            $this->crudPerms('LeaveType'),
+            $this->crudPerms('Leave'),
+            $this->crudPerms('DocumentRequest'),
+            $this->crudPerms('User'),
+            $this->crudPerms('Role'),
+            $this->viewOnlyPerms('AuditLog'),
+            ['ApproveLeave', 'View:HrStatsOverview', 'View:MonEspace', 'View:Dashboard'],
+        );
+        foreach ($allPerms as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
+
         $employees   = $this->crudPerms('Employee');
         $leaveTypes  = $this->crudPerms('LeaveType');
         $leaves      = $this->crudPerms('Leave');
@@ -21,19 +36,36 @@ class RolesPermissionsSeeder extends Seeder
         $roles       = $this->crudPerms('Role');
         $auditLogs   = $this->viewOnlyPerms('AuditLog');
 
-        // ─── secretaire ────────────────────────────────────────────────────
-        // Accès complet à la company (tout sauf gestion des rôles Spatie)
-        $secretairePerms = array_merge(
+        // Permissions sans suppression (secretaire / surveillante)
+        $noCrudDelete = fn(array $perms) => array_filter($perms, fn($p) => ! str_starts_with($p, 'Delete'));
+
+        $secretairePerms = array_values(array_filter(array_merge(
             $employees, $leaveTypes, $leaves,
             $documents, $users, $auditLogs,
             ['ApproveLeave', 'View:HrStatsOverview', 'View:MonEspace'],
-        );
+        ), fn($p) => ! str_starts_with($p, 'Delete')));
 
+        // ─── secretaire ────────────────────────────────────────────────────
         $secretaireRole = Role::firstOrCreate(['name' => 'secretaire', 'guard_name' => 'web']);
         $secretaireRole->syncPermissions(Permission::whereIn('name', $secretairePerms)->get());
 
+        // ─── surveillante (mêmes droits que secretaire) ────────────────────
+        $surveillanteRole = Role::firstOrCreate(['name' => 'surveillante', 'guard_name' => 'web']);
+        $surveillanteRole->syncPermissions(Permission::whereIn('name', $secretairePerms)->get());
+
+        // ─── directeur (secretaire + suppression soft) ─────────────────────
+        $directeurPerms = array_merge(
+            $secretairePerms,
+            ["Delete:Employee", "DeleteAny:Employee",
+             "Delete:Leave",    "DeleteAny:Leave",
+             "Delete:DocumentRequest", "DeleteAny:DocumentRequest",
+             "Delete:User",    "DeleteAny:User",
+             "Delete:LeaveType", "DeleteAny:LeaveType"],
+        );
+        $directeurRole = Role::firstOrCreate(['name' => 'directeur', 'guard_name' => 'web']);
+        $directeurRole->syncPermissions(Permission::whereIn('name', $directeurPerms)->get());
+
         // ─── employee ──────────────────────────────────────────────────────
-        // Accès limité : son espace, ses congés, ses demandes de documents
         $employeePerms = [
             'View:Dashboard',
             'View:MonEspace',
@@ -52,9 +84,11 @@ class RolesPermissionsSeeder extends Seeder
         $this->command->table(
             ['Rôle', '# Permissions', 'Accès'],
             [
-                ['super-admin', 'Toutes',                              'Plateforme complète'],
-                ['secretaire',  $secretaireRole->permissions()->count(), 'Gestion complète de la company'],
-                ['employee',    $employeeRole->permissions()->count(),   'Espace perso, congés, demandes'],
+                ['super-admin',  'Toutes',                                 'Plateforme complète + suppression'],
+                ['directeur',    $directeurRole->permissions()->count(),    'Gestion complète + suppression soft'],
+                ['secretaire',   $secretaireRole->permissions()->count(),   'Gestion complète sans suppression'],
+                ['surveillante', $surveillanteRole->permissions()->count(),  'Gestion complète sans suppression'],
+                ['employee',     $employeeRole->permissions()->count(),     'Espace perso, congés, demandes'],
             ]
         );
     }

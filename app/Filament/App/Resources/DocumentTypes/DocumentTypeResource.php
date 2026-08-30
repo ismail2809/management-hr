@@ -8,12 +8,15 @@ use App\Filament\App\Resources\DocumentTypes\Pages\ListDocumentTypes;
 use App\Filament\App\Resources\DocumentTypes\Schemas\DocumentTypeForm;
 use App\Filament\App\Resources\DocumentTypes\Tables\DocumentTypesTable;
 use App\Models\DocumentType;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 
 class DocumentTypeResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     protected static ?string $model = DocumentType::class;
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';

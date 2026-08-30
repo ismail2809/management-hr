@@ -51,12 +51,22 @@ class DocumentRequestResource extends Resource
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
     }
 
     public static function canDeleteAny(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
+    }
+
+    public static function canForceDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canForceDeleteAny(): bool
+    {
+        return false;
     }
 
     public static function getEloquentQuery(): Builder

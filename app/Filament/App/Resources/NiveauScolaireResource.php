@@ -6,6 +6,7 @@ use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\NiveauScolaireResource\Pages;
 use App\Models\NiveauScolaire;
 use Filament\Forms\Components\TextInput;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -17,6 +18,8 @@ use Filament\Tables\Table;
 
 class NiveauScolaireResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     use HasCompanyField;
     protected static ?string $model = NiveauScolaire::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-academic-cap';

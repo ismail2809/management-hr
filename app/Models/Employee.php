@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,7 +14,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Employee extends Model
 {
-    use HasCompanyScope, LogsActivity;
+    use SoftDeletes, HasCompanyScope, LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {

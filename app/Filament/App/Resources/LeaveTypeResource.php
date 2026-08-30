@@ -6,6 +6,7 @@ use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\LeaveTypeResource\Pages;
 use App\Models\LeaveType;
 use Filament\Forms\Components\TextInput;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 
 class LeaveTypeResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     use HasCompanyField;
     protected static ?string $model = LeaveType::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';

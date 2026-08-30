@@ -4,12 +4,15 @@ namespace App\Models;
 
 use App\Models\Traits\HasGlobalOrCompanyScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class DocumentType extends Model
 {
+    use SoftDeletes;
+
     use HasGlobalOrCompanyScope, LogsActivity;
 
     public function getActivitylogOptions(): LogOptions

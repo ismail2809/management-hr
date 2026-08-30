@@ -10,6 +10,7 @@ use App\Filament\App\Resources\Transports\Tables\TransportsTable;
 use App\Filament\App\Concerns\HasCompanyField;
 use App\Models\Transport;
 use BackedEnum;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -17,6 +18,8 @@ use Filament\Tables\Table;
 
 class TransportResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     use HasCompanyField;
     protected static ?string $model = Transport::class;
 

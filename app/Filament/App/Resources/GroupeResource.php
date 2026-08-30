@@ -8,6 +8,7 @@ use App\Models\Groupe;
 use App\Models\NiveauScolaire;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -20,6 +21,8 @@ use Filament\Tables\Table;
 
 class GroupeResource extends Resource
 {
+    use HasRoleBasedDelete;
+
     use HasCompanyField;
     protected static ?string $model = Groupe::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-group';
