@@ -74,11 +74,11 @@ class EmployeeResource extends Resource
                                     ->nullable()
                                     ->disabled(static::d('gender')),
                             ]),
-                            Grid::make(3)->schema([
+                            Grid::make(2)->schema([
                                 TextInput::make('cin')->label('CIN')->maxLength(20)->disabled(static::d('cin')),
                                 TextInput::make('cnss_number')->label('N° CNSS')->maxLength(30)->disabled(static::d('cnss_number')),
-                                TextInput::make('rib')->label('RIB')->maxLength(30)->disabled(static::d('rib')),
                             ]),
+                            TextInput::make('rib')->label('RIB')->maxLength(30)->disabled(static::d('rib')),
                             Grid::make(2)->schema([
                                 TextInput::make('email')->label('Email')->email()->nullable()->disabled(static::d('email')),
                                 TextInput::make('phone')->label('Téléphone mobile')->nullable()->disabled(static::d('phone')),
@@ -92,9 +92,10 @@ class EmployeeResource extends Resource
                                 DatePicker::make('birth_date')->label('Date de naissance')->nullable()->disabled(static::d('birth_date')),
                                 TextInput::make('birth_place')->label('Lieu de naissance')->nullable()->disabled(static::d('birth_place')),
                             ]),
-                            Grid::make(2)->schema([
+                            Grid::make(3)->schema([
                                 TextInput::make('diploma')->label('Diplôme')->nullable()->disabled(static::d('diploma')),
                                 TextInput::make('promotion')->label('Promotion')->nullable()->disabled(static::d('promotion')),
+                                TextInput::make('nationality')->label('Nationalité')->nullable()->disabled(static::d('nationality')),
                             ]),
                         ]),
 
