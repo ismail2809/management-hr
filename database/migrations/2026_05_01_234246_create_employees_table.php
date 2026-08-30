@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->date('birth_date')->nullable();
             $table->date('hire_date')->nullable();
-            $table->enum('contract_type', ['CDI', 'CDD', 'Stage', 'ANAPEC'])->default('CDI');
+            $table->enum('contract_type', ['CDI', 'CDD', 'Stage', 'ANAPEC'])->nullable();
             $table->enum('marital_status', ['celibataire', 'marie', 'divorce', 'veuf'])->nullable();
             $table->unsignedTinyInteger('number_of_children')->default(0);
             $table->string('rib')->nullable();
