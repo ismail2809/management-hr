@@ -64,10 +64,15 @@ class EmployeeResource extends Resource
                     Section::make('Identité')
                         ->icon('heroicon-o-identification')
                         ->schema([
-                            Grid::make(3)->schema([
+                            Grid::make(4)->schema([
                                 TextInput::make('matricule')->label('Matricule')->maxLength(50)->disabled(static::dAdmin()),
                                 TextInput::make('first_name')->label('Prénom')->required()->maxLength(100)->disabled(static::d('first_name')),
                                 TextInput::make('last_name')->label('Nom')->required()->maxLength(100)->disabled(static::d('last_name')),
+                                Select::make('gender')
+                                    ->label('Sexe')
+                                    ->options(['M' => 'Masculin', 'F' => 'Féminin'])
+                                    ->nullable()
+                                    ->disabled(static::d('gender')),
                             ]),
                             Grid::make(3)->schema([
                                 TextInput::make('cin')->label('CIN')->maxLength(20)->disabled(static::d('cin')),
@@ -134,6 +139,7 @@ class EmployeeResource extends Resource
 
                     Section::make('Situation familiale')
                         ->icon('heroicon-o-heart')
+                        ->visible(fn () => ! auth()->user()?->hasRole('employee'))
                         ->schema([
                             Select::make('marital_status')
                                 ->label('Situation matrimoniale')
@@ -151,7 +157,6 @@ class EmployeeResource extends Resource
                                 ->numeric()
                                 ->minValue(0)
                                 ->default(0)
-                                ->visible(fn ($get) => $get('marital_status') === 'marie')
                                 ->disabled(static::d('number_of_children')),
                         ]),
 
