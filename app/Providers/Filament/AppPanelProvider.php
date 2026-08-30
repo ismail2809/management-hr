@@ -50,7 +50,7 @@ class AppPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=1">')
+                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=2">')
             )
             ->navigationGroups([
                 NavigationGroup::make('Employés'),

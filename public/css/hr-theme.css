@@ -1,16 +1,45 @@
 /* ============================================================
-   GestionHR — Dark Theme
-   Primary: #0da8b1 (teal)  |  Background: #0d1117 (dark navy)
+   GestionHR — Adaptive Theme (Light + Dark)
+   Primary: #0da8b1 (teal)
    ============================================================ */
 
 @import url('https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800|dm-sans:300,400,500,600');
 
-/* ── Variables ── */
+/* ── Light mode variables (default) ── */
 :root {
   --hr-primary:        #0da8b1;
   --hr-primary-dark:   #0b8f97;
-  --hr-primary-glow:   rgba(13,168,177,0.2);
+  --hr-primary-glow:   rgba(13,168,177,0.15);
   --hr-secondary:      #fda31a;
+  --hr-radius:         10px;
+
+  /* Light palette */
+  --hr-bg:             #f1f5f9;
+  --hr-bg-card:        #ffffff;
+  --hr-bg-elevated:    #f8fafc;
+  --hr-bg-input:       #ffffff;
+  --hr-border:         rgba(0,0,0,0.08);
+  --hr-border-hover:   rgba(13,168,177,0.35);
+  --hr-text:           #1e293b;
+  --hr-text-muted:     #64748b;
+  --hr-sidebar:        #ffffff;
+
+  /* Mode-specific tokens */
+  --hr-heading:        #0f172a;
+  --hr-nav-text:       #475569;
+  --hr-hover-bg:       rgba(0,0,0,0.04);
+  --hr-hover-bg-md:    rgba(0,0,0,0.06);
+  --hr-logo-color:     #0f172a;
+  --hr-placeholder:    rgba(100,116,139,0.5);
+  --hr-shadow-card:    0 1px 4px rgba(0,0,0,0.08);
+  --hr-shadow-modal:   0 24px 64px rgba(0,0,0,0.15), 0 0 0 1px rgba(13,168,177,0.1);
+  --hr-shadow-drop:    0 8px 24px rgba(0,0,0,0.12);
+  --hr-row-hover:      rgba(13,168,177,0.04);
+  --hr-row-border:     rgba(0,0,0,0.04);
+}
+
+/* ── Dark mode variables ── */
+.dark {
   --hr-bg:             #0d1117;
   --hr-bg-card:        #161d2d;
   --hr-bg-elevated:    #1e2638;
@@ -20,11 +49,22 @@
   --hr-text:           #e2e8f0;
   --hr-text-muted:     rgba(148,163,184,0.7);
   --hr-sidebar:        #111827;
-  --hr-radius:         10px;
+
+  --hr-heading:        #f1f5f9;
+  --hr-nav-text:       rgba(203,213,225,0.8);
+  --hr-hover-bg:       rgba(255,255,255,0.06);
+  --hr-hover-bg-md:    rgba(255,255,255,0.08);
+  --hr-logo-color:     #ffffff;
+  --hr-placeholder:    rgba(148,163,184,0.4);
+  --hr-shadow-card:    0 1px 8px rgba(0,0,0,0.25);
+  --hr-shadow-modal:   0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(13,168,177,0.08);
+  --hr-shadow-drop:    0 8px 32px rgba(0,0,0,0.4);
+  --hr-row-hover:      rgba(13,168,177,0.06);
+  --hr-row-border:     rgba(255,255,255,0.04);
 }
 
 /* ════════════════════════════════
-   FORCE DARK — GLOBAL BACKGROUNDS
+   GLOBAL
    ════════════════════════════════ */
 html, body, .fi-body {
   background-color: var(--hr-bg) !important;
@@ -32,7 +72,6 @@ html, body, .fi-body {
   font-family: 'DM Sans', sans-serif !important;
 }
 
-/* Main content area */
 .fi-main,
 .fi-main-ctn,
 .fi-page {
@@ -71,7 +110,7 @@ html, body, .fi-body {
 /* Logo / Brand */
 .fi-logo,
 .fi-brand-name {
-  color: #ffffff !important;
+  color: var(--hr-logo-color) !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 800 !important;
   font-size: 1rem !important;
@@ -91,7 +130,7 @@ html, body, .fi-body {
 
 /* Nav items */
 .fi-sidebar-item-button {
-  color: rgba(203,213,225,0.8) !important;
+  color: var(--hr-nav-text) !important;
   border-radius: 8px !important;
   margin-inline: 8px !important;
   padding-block: 7px !important;
@@ -103,14 +142,14 @@ html, body, .fi-body {
 }
 
 .fi-sidebar-item-button:hover {
-  background-color: rgba(255,255,255,0.06) !important;
-  color: #ffffff !important;
+  background-color: var(--hr-hover-bg) !important;
+  color: var(--hr-text) !important;
 }
 
 /* Active nav item */
 .fi-sidebar-item-button[aria-current="page"],
 .fi-sidebar-item-button.fi-active {
-  background: linear-gradient(90deg, rgba(13,168,177,0.25), rgba(13,168,177,0.1)) !important;
+  background: linear-gradient(90deg, rgba(13,168,177,0.15), rgba(13,168,177,0.06)) !important;
   color: var(--hr-primary) !important;
   border-left: 3px solid var(--hr-primary) !important;
   padding-left: 7px !important;
@@ -137,7 +176,7 @@ html, body, .fi-body {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 700 !important;
   font-size: 1.5rem !important;
-  color: #f1f5f9 !important;
+  color: var(--hr-heading) !important;
 }
 
 /* Breadcrumbs */
@@ -163,7 +202,7 @@ html, body, .fi-body {
   background-color: var(--hr-bg-card) !important;
   border: 1px solid var(--hr-border) !important;
   border-radius: var(--hr-radius) !important;
-  box-shadow: 0 1px 8px rgba(0,0,0,0.25) !important;
+  box-shadow: var(--hr-shadow-card) !important;
 }
 
 .fi-section-header {
@@ -175,7 +214,7 @@ html, body, .fi-body {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 600 !important;
   font-size: 0.9rem !important;
-  color: #f1f5f9 !important;
+  color: var(--hr-heading) !important;
 }
 
 .fi-section-content {
@@ -187,7 +226,7 @@ html, body, .fi-body {
    ════════════════════════════════ */
 .fi-fo-field-wrp-label label,
 .fi-fo-field-wrp-label .fi-fo-field-wrp-label-text {
-  color: rgba(203,213,225,0.85) !important;
+  color: var(--hr-text) !important;
   font-size: 0.8rem !important;
   font-weight: 500 !important;
 }
@@ -204,9 +243,9 @@ input[type="time"],
 select,
 textarea {
   background-color: var(--hr-bg-input) !important;
-  border-color: rgba(255,255,255,0.1) !important;
+  border-color: var(--hr-border) !important;
   border-radius: 8px !important;
-  color: #e2e8f0 !important;
+  color: var(--hr-text) !important;
   font-size: 0.85rem !important;
 }
 
@@ -220,7 +259,7 @@ textarea {
 
 .fi-input-wrp {
   background-color: var(--hr-bg-input) !important;
-  border-color: rgba(255,255,255,0.1) !important;
+  border-color: var(--hr-border) !important;
   border-radius: 8px !important;
 }
 
@@ -234,14 +273,14 @@ textarea {
 .fi-input-wrp-prefix {
   color: var(--hr-text-muted) !important;
   background-color: var(--hr-bg-elevated) !important;
-  border-color: rgba(255,255,255,0.1) !important;
+  border-color: var(--hr-border) !important;
 }
 
 /* Placeholder */
 .fi-input::placeholder,
 input::placeholder,
 textarea::placeholder {
-  color: rgba(148,163,184,0.4) !important;
+  color: var(--hr-placeholder) !important;
 }
 
 /* Helper text */
@@ -287,7 +326,7 @@ textarea::placeholder {
 }
 
 .fi-btn-color-gray:hover {
-  background-color: rgba(255,255,255,0.08) !important;
+  background-color: var(--hr-hover-bg-md) !important;
 }
 
 .fi-btn-color-warning {
@@ -297,13 +336,19 @@ textarea::placeholder {
 }
 
 .fi-btn-color-danger {
+  background-color: rgba(239,68,68,0.1) !important;
+  border-color: rgba(239,68,68,0.25) !important;
+  color: #dc2626 !important;
+}
+
+.dark .fi-btn-color-danger {
   background-color: rgba(239,68,68,0.15) !important;
   border-color: rgba(239,68,68,0.3) !important;
   color: #fca5a5 !important;
 }
 
 .fi-btn-color-danger:hover {
-  background-color: rgba(239,68,68,0.25) !important;
+  background-color: rgba(239,68,68,0.18) !important;
 }
 
 /* ════════════════════════════════
@@ -330,13 +375,13 @@ textarea::placeholder {
 .fi-ta-cell {
   background-color: var(--hr-bg-card) !important;
   color: var(--hr-text) !important;
-  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+  border-bottom: 1px solid var(--hr-row-border) !important;
   font-size: 0.83rem !important;
   padding-block: 11px !important;
 }
 
 .fi-ta-row:hover .fi-ta-cell {
-  background-color: rgba(13,168,177,0.06) !important;
+  background-color: var(--hr-row-hover) !important;
 }
 
 /* Table empty state */
@@ -389,7 +434,7 @@ textarea::placeholder {
 .fi-modal-heading {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 700 !important;
-  color: #f1f5f9 !important;
+  color: var(--hr-heading) !important;
 }
 
 .fi-modal-content {
@@ -404,18 +449,22 @@ textarea::placeholder {
 
 /* Backdrop */
 .fi-modal-close-overlay {
-  background-color: rgba(0,0,0,0.6) !important;
+  background-color: rgba(0,0,0,0.4) !important;
   backdrop-filter: blur(4px) !important;
+}
+
+.dark .fi-modal-close-overlay {
+  background-color: rgba(0,0,0,0.6) !important;
 }
 
 /* ════════════════════════════════
    DROPDOWN MENUS
    ════════════════════════════════ */
 .fi-dropdown-panel {
-  background-color: var(--hr-bg-elevated) !important;
+  background-color: var(--hr-bg-card) !important;
   border: 1px solid var(--hr-border) !important;
   border-radius: 10px !important;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+  box-shadow: var(--hr-shadow-drop) !important;
 }
 
 .fi-dropdown-list-item-button {
@@ -426,8 +475,8 @@ textarea::placeholder {
 }
 
 .fi-dropdown-list-item-button:hover {
-  background-color: rgba(255,255,255,0.07) !important;
-  color: #fff !important;
+  background-color: var(--hr-hover-bg) !important;
+  color: var(--hr-text) !important;
 }
 
 /* ════════════════════════════════
@@ -460,7 +509,7 @@ textarea::placeholder {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-weight: 800 !important;
   font-size: 1.65rem !important;
-  color: #f1f5f9 !important;
+  color: var(--hr-heading) !important;
 }
 
 .fi-wi-stats-overview-stat-label {
@@ -522,12 +571,16 @@ textarea::placeholder {
    LOGIN PAGE
    ════════════════════════════════ */
 .fi-simple-layout {
-  background: linear-gradient(135deg, #070d18 0%, #0d1a2e 60%, #060e1a 100%) !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 60%, #f0f9ff 100%) !important;
   min-height: 100vh !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   padding: 24px !important;
+}
+
+.dark .fi-simple-layout {
+  background: linear-gradient(135deg, #070d18 0%, #0d1a2e 60%, #060e1a 100%) !important;
 }
 
 .fi-simple-main {
@@ -542,7 +595,7 @@ textarea::placeholder {
   background-color: var(--hr-bg-card) !important;
   border: 1px solid var(--hr-border) !important;
   border-radius: 18px !important;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(13,168,177,0.08) !important;
+  box-shadow: var(--hr-shadow-modal) !important;
   padding: 36px 32px !important;
   width: 100% !important;
 }
@@ -559,7 +612,7 @@ textarea::placeholder {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
   font-size: 1.6rem !important;
   font-weight: 800 !important;
-  color: #ffffff !important;
+  color: var(--hr-logo-color) !important;
   letter-spacing: -0.5px !important;
   display: block !important;
   margin-bottom: 4px !important;
@@ -598,7 +651,7 @@ textarea::placeholder {
 }
 
 .fi-user-menu-button:hover {
-  background-color: rgba(255,255,255,0.07) !important;
+  background-color: var(--hr-hover-bg) !important;
 }
 
 /* ════════════════════════════════
@@ -617,7 +670,7 @@ textarea::placeholder {
 
 .fi-ta-col-action .fi-icon-btn:hover,
 .fi-btn-icon-only:hover {
-  background-color: rgba(255,255,255,0.08) !important;
+  background-color: var(--hr-hover-bg-md) !important;
   color: var(--hr-text) !important;
 }
 
@@ -638,7 +691,7 @@ textarea::placeholder {
 }
 
 .fi-pagination-item-btn:hover {
-  background-color: rgba(255,255,255,0.07) !important;
+  background-color: var(--hr-hover-bg-md) !important;
   color: var(--hr-text) !important;
 }
 
@@ -694,29 +747,25 @@ html body.fi-body .fi-main,
 /* ════════════════════════════════
    MISC OVERRIDES
    ════════════════════════════════ */
-/* Dividers */
 hr, .fi-hr {
   border-color: var(--hr-border) !important;
 }
 
-/* Text colors */
 .fi-page-heading,
 h1, h2, h3, h4 {
-  color: #f1f5f9 !important;
+  color: var(--hr-heading) !important;
 }
 
 p, span, label {
   color: inherit;
 }
 
-/* Remove white backgrounds from wrappers */
 .fi-layout,
 .fi-layout-sidebar-layout,
 .fi-layout-simple {
   background-color: var(--hr-bg) !important;
 }
 
-/* Fix select options background */
 option {
   background-color: var(--hr-bg-elevated) !important;
   color: var(--hr-text) !important;
