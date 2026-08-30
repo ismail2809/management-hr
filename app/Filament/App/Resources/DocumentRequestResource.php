@@ -85,28 +85,43 @@ class DocumentRequestResource extends Resource
         $isEmployee = auth()->user()?->hasRole('employee');
 
         return $schema->columns(1)->components([
-            Section::make('Demandeur')->schema([
-                static::companyField(),
+            Section::make('Demandeur')
+                ->description('Sélectionnez l\'employé concerné par cette demande.')
+                ->icon('heroicon-o-user-circle')
+                ->columns(2)
+                ->schema([
+                    static::companyField(),
 
-                Select::make('employee_id')
-                    ->label('Employé')
-                    ->relationship('employee', 'first_name')
-                    ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                    ->searchable()
-                    ->preload()
-                    ->default(fn () => auth()->user()?->employee_id)
-                    ->disabled($isEmployee)
-                    ->dehydrated()
-                    ->required(),
+                    Section::make('Employé(e)s')
+                        ->icon('heroicon-o-user')
+                        ->compact()
+                        ->schema([
+                            Select::make('employee_id')
+                                ->label('Employé(e)')
+                                ->relationship('employee', 'first_name')
+                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                                ->searchable()
+                                ->preload()
+                                ->default(fn () => auth()->user()?->employee_id)
+                                ->disabled($isEmployee)
+                                ->dehydrated()
+                                ->required()
+                                ->columnSpanFull(),
+                        ]),
+                ]),
 
-                Radio::make('categorie')
-                    ->label('Catégorie de demande')
-                    ->options(['document' => 'Document administratif', 'autre' => 'Autre demande'])
-                    ->default('document')
-                    ->inline()
-                    ->required()
-                    ->live(),
-            ]),
+            Section::make('Type de demande')
+                ->description('Choisissez la catégorie de votre demande.')
+                ->icon('heroicon-o-tag')
+                ->schema([
+                    Radio::make('categorie')
+                        ->label('Catégorie de demande')
+                        ->options(['document' => 'Document administratif', 'autre' => 'Autre demande'])
+                        ->default('document')
+                        ->inline()
+                        ->required()
+                        ->live(),
+                ]),
 
             Section::make('Document administratif')
                 ->visible(fn ($get) => $get('categorie') === 'document')

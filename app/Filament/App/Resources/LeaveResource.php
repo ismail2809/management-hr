@@ -96,51 +96,33 @@ class LeaveResource extends Resource
             Section::make('Demandeur')
                 ->description('Sélectionnez l\'employé concerné par cette demande.')
                 ->icon('heroicon-o-user-circle')
+                ->columns(2)
                 ->schema([
                     static::companyField(),
-                    Grid::make(3)->schema([
-                        Select::make('employee_id')
-                            ->label('Employé')
-                            ->relationship('employee', 'first_name')
-                            ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                            ->searchable()
-                            ->preload()
-                            ->default(fn () => auth()->user()?->employee_id)
-                            ->disabled($isEmployee)
-                            ->dehydrated()
-                            ->required()
-                            ->live()
-                            ->columnSpan(2),
-
-                        Placeholder::make('solde_info')
-                            ->label('Solde de congés')
-                            ->content(function ($get) {
-                                $empId = $get('employee_id');
-                                if (! $empId) {
-                                    return '—';
-                                }
-                                if (! class_exists(\App\Models\LeaveBalance::class)) {
-                                    return '—';
-                                }
-                                $balance = \App\Models\LeaveBalance::where('employee_id', $empId)
-                                    ->whereYear('year', now()->year)
-                                    ->first();
-                                if (! $balance) {
-                                    return 'Aucun solde enregistré';
-                                }
-                                $used      = $balance->used_days ?? 0;
-                                $allocated = $balance->allocated_days ?? 0;
-                                $remaining = $allocated - $used;
-                                return "{$remaining} j restants / {$allocated} j alloués";
-                            })
-                            ->columnSpan(1),
-                    ]),
+                    Section::make('Employé(e)s')
+                        ->icon('heroicon-o-user')
+                        ->compact()
+                        ->schema([
+                            Select::make('employee_id')
+                                ->label('Employé(e)')
+                                ->relationship('employee', 'first_name')
+                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                                ->searchable()
+                                ->preload()
+                                ->default(fn () => auth()->user()?->employee_id)
+                                ->disabled($isEmployee)
+                                ->dehydrated()
+                                ->required()
+                                ->live()
+                                ->columnSpanFull(),
+                        ]),
                 ]),
 
             // ── Section 2 : Type de demande ──────────────────────────────────
             Section::make('Type de demande')
                 ->description('Choisissez s\'il s\'agit d\'un congé planifié ou d\'une absence.')
                 ->icon('heroicon-o-tag')
+                ->columns(2)
                 ->schema([
                     ToggleButtons::make('categorie')
                         ->label('Catégorie')
@@ -307,8 +289,6 @@ class LeaveResource extends Resource
                 ->description('Informations internes à l\'équipe RH.')
                 ->icon('heroicon-o-shield-check')
                 ->hidden($isEmployee)
-                ->collapsible()
-                ->collapsed(fn ($record) => $record === null)
                 ->schema([
                     Grid::make(2)->schema([
                         Select::make('communication_method')
