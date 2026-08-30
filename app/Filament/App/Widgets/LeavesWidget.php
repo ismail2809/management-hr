@@ -41,8 +41,17 @@ class LeavesWidget extends BaseWidget
                 TextColumn::make('categorie')
                     ->label('Type')
                     ->badge()
-                    ->color(fn ($state) => $state === 'conge' ? 'info' : 'warning')
-                    ->formatStateUsing(fn ($state) => $state === 'conge' ? 'Congé' : 'Absence'),
+                    ->color(fn ($state, $record) => match (true) {
+                        $record->status === 'en_attente' => 'warning',
+                        $state === 'conge'               => 'info',
+                        default                          => 'warning',
+                    })
+                    ->formatStateUsing(fn ($state, $record) => match (true) {
+                        $record->status === 'en_attente' && $state === 'conge'    => 'Congé en attente',
+                        $record->status === 'en_attente' && $state === 'absence'  => 'Absence en attente',
+                        $state === 'conge'                                        => 'Congé',
+                        default                                                   => 'Absence',
+                    }),
                 TextColumn::make('start_date')
                     ->label('Début')
                     ->date('d/m/Y'),
@@ -79,7 +88,7 @@ class LeavesWidget extends BaseWidget
                     ->query(function (Builder $query, array $data) {
                         return match ($data['value'] ?? 'all') {
                             'today' => $query
-                                ->where('status', 'approuvé')
+                                ->whereIn('status', ['approuvé', 'en_attente'])
                                 ->whereDate('start_date', '<=', today())
                                 ->whereDate('end_date', '>=', today()),
                             'week' => $query
