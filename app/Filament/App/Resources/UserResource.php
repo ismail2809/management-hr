@@ -99,9 +99,7 @@ class UserResource extends Resource
                 Select::make('roles')
                     ->label('Rôle')
                     ->options($roles)
-                    ->multiple()
-                    ->preload()
-                    ->default(['employee'])
+                    ->default('employee')
                     ->required()
                     ->helperText(implode(' · ', [
                         'Super Admin : plateforme complète',

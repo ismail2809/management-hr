@@ -10,8 +10,11 @@ class TestCompanySeeder extends Seeder
 {
     public function run(): void
     {
-        // Créer les rôles RH
-        foreach (['admin', 'rh', 'manager', 'comptable'] as $roleName) {
+        // Supprimer les anciens rôles inutilisés
+        Role::whereIn('name', ['admin', 'rh', 'manager', 'comptable'])->delete();
+
+        // Créer les 3 rôles valides
+        foreach (['super-admin', 'secretaire', 'employee'] as $roleName) {
             Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
         }
 

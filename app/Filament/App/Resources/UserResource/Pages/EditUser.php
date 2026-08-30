@@ -20,14 +20,14 @@ class EditUser extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        $data['roles'] = $this->record->roles->pluck('name')->toArray();
+        $data['roles'] = $this->record->roles->first()?->name;
         return $data;
     }
 
     protected function afterSave(): void
     {
-        $roles = $this->data['roles'] ?? [];
-        $this->record->syncRoles($roles);
+        $role = $this->data['roles'] ?? null;
+        $this->record->syncRoles($role ? [$role] : []);
     }
 
     protected function getRedirectUrl(): string
