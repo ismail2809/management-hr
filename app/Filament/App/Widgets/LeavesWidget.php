@@ -88,7 +88,7 @@ class LeavesWidget extends BaseWidget
                     ->query(function (Builder $query, array $data) {
                         return match ($data['value'] ?? 'all') {
                             'today' => $query
-                                ->whereIn('status', ['approuvé', 'en_attente'])
+                                ->where('status', 'approuvé')
                                 ->whereDate('start_date', '<=', today())
                                 ->whereDate('end_date', '>=', today()),
                             'week' => $query
