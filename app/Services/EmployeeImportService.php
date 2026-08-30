@@ -140,17 +140,22 @@ class EmployeeImportService
     {
         $data = [];
         foreach ($columnMap as $field => $colIndex) {
-            // Gestion cellules fusionnées : chercher à gauche uniquement (pas à droite pour éviter les faux positifs)
+            // Pour les champs texte simples, lire uniquement la colonne exacte
+            // (le fallback gauche ne s'applique qu'aux champs date où les fusions sont courantes)
             $raw = null;
-            foreach ([$colIndex, $colIndex - 1, $colIndex - 2] as $tryCol) {
-                if ($tryCol < 0) {
-                    continue;
+            if (in_array($field, ['birth_date', 'hire_date', 'exit_date'])) {
+                foreach ([$colIndex, $colIndex - 1, $colIndex - 2] as $tryCol) {
+                    if ($tryCol < 0) {
+                        continue;
+                    }
+                    $val = $row[$tryCol] ?? null;
+                    if ($val !== null && $val !== '') {
+                        $raw = $val;
+                        break;
+                    }
                 }
-                $val = $row[$tryCol] ?? null;
-                if ($val !== null && $val !== '') {
-                    $raw = $val;
-                    break;
-                }
+            } else {
+                $raw = $row[$colIndex] ?? null;
             }
 
             if ($raw === null || $raw === '') {
