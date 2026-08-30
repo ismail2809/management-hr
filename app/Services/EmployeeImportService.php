@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Employee;
+use App\Models\Profession;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
@@ -30,6 +31,9 @@ class EmployeeImportService
         'adresse'            => 'address',
         'téléphone'          => 'phone',
         'telephone'          => 'phone',
+        'profession'         => 'profession_name',
+        'métier'             => 'profession_name',
+        'metier'             => 'profession_name',
     ];
 
     public function import(string $filePath, int $companyId): array
@@ -54,6 +58,17 @@ class EmployeeImportService
             $row = $rows[$i];
 
             $data = $this->mapRow($row, $columnMap, $sheet, $i);
+
+            // Résoudre profession_name → profession_id
+            if (! empty($data['profession_name'])) {
+                $profession = Profession::withoutGlobalScopes()
+                    ->firstOrCreate(
+                        ['company_id' => $companyId, 'name' => $data['profession_name']],
+                        ['company_id' => $companyId, 'name' => $data['profession_name']]
+                    );
+                $data['profession_id'] = $profession->id;
+            }
+            unset($data['profession_name']);
 
             // Ignorer les lignes sans nom ou qui ressemblent à des titres/totaux
             if (empty($data['last_name']) && empty($data['first_name'])) {
