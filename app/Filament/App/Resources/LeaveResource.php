@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources;
 
 use App\Filament\App\Concerns\HasCompanyField;
 use App\Filament\App\Resources\LeaveResource\Pages;
+use App\Models\CommunicationMethod;
 use App\Models\Employee;
 use App\Models\Leave;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,13 +32,14 @@ class LeaveResource extends Resource
     protected static ?string $model = Leave::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationLabel = 'Absences / Congés';
-    protected static ?string $modelLabel = 'Demande';
+    protected static ?string $modelLabel = 'Demande d\'absence';
+    protected static ?string $pluralModelLabel = 'Demandes d\'absences';
     protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
     protected static ?int $navigationSort = 7;
 
     public static function getNavigationLabel(): string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes absences / congés' : 'Absences / Congés';
+        return auth()->user()?->hasRole('employee') ? 'Demandes d\'absences' : 'Absences / Congés';
     }
 
     public static function getNavigationGroup(): ?string
@@ -191,25 +193,9 @@ class LeaveResource extends Resource
                 ->collapsed(fn ($record) => $record === null)
                 ->schema([
                     Grid::make(2)->schema([
-                        Select::make('severity_level')
-                            ->label('Niveau de sévérité')
-                            ->options([
-                                'faible' => 'Faible',
-                                'moyen'  => 'Moyen',
-                                'eleve'  => 'Élevé',
-                            ])
-                            ->nullable()
-                            ->native(false),
-
                         Select::make('communication_method')
                             ->label('Mode de communication')
-                            ->options([
-                                'telephone' => 'Téléphone',
-                                'email'     => 'Email',
-                                'whatsapp'  => 'WhatsApp',
-                                'courrier'  => 'Courrier',
-                                'autre'     => 'Autre',
-                            ])
+                            ->options(fn () => CommunicationMethod::where('active', true)->orderBy('sort_order')->pluck('name', 'code')->toArray())
                             ->nullable()
                             ->native(false),
                     ]),

@@ -145,7 +145,14 @@ class DocumentRequestResource extends Resource
                     ->label('Fichier final (uploadé par l\'admin)')
                     ->disk('public')
                     ->directory('document-requests/finals')
-                    ->acceptedFileTypes(['application/pdf'])
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'image/jpeg',
+                        'image/png',
+                        'image/webp',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
                     ->maxSize(10240)
                     ->nullable()
                     ->hidden($isEmployee),

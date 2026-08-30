@@ -38,7 +38,6 @@ class Leave extends Model
         'status',
         'approved_by',
         'approved_at',
-        'severity_level',
         'communication_method',
         'appointment_date',
         'actions_taken',
