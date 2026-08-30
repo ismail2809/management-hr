@@ -7,6 +7,7 @@ use App\Filament\App\Resources\NiveauScolaireResource\Pages;
 use App\Models\NiveauScolaire;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -28,10 +29,12 @@ class NiveauScolaireResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            static::companyField(),
-            TextInput::make('name')->label('Nom')->required()->maxLength(100),
-            TextInput::make('order')->label('Ordre d\'affichage')->numeric()->default(0),
+        return $schema->columns(1)->components([
+            Section::make('Niveau scolaire')->schema([
+                static::companyField(),
+                TextInput::make('name')->label('Nom')->required()->maxLength(100),
+                TextInput::make('order')->label('Ordre d\'affichage')->numeric()->default(0),
+            ]),
         ]);
     }
 

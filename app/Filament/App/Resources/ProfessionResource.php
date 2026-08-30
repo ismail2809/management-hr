@@ -7,6 +7,7 @@ use App\Filament\App\Resources\ProfessionResource\Pages;
 use App\Models\Profession;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -28,9 +29,11 @@ class ProfessionResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            static::companyField(),
-            TextInput::make('name')->label('Nom')->required()->maxLength(100),
+        return $schema->columns(1)->components([
+            Section::make('Profession')->schema([
+                static::companyField(),
+                TextInput::make('name')->label('Nom')->required()->maxLength(100),
+            ]),
         ]);
     }
 

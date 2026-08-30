@@ -6,6 +6,7 @@ use App\Filament\App\Concerns\HasCompanyField;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class DocumentTypeForm
@@ -14,8 +15,8 @@ class DocumentTypeForm
 
     public static function configure(Schema $schema): Schema
     {
-        return $schema
-            ->components([
+        return $schema->columns(1)->components([
+            Section::make('Type de demande')->schema([
                 static::companyField(),
 
                 TextInput::make('name')
@@ -45,6 +46,7 @@ class DocumentTypeForm
                 Toggle::make('active')
                     ->label('Actif')
                     ->default(true),
-            ]);
+            ]),
+        ]);
     }
 }

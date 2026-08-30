@@ -9,6 +9,7 @@ use App\Models\NiveauScolaire;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -31,15 +32,17 @@ class GroupeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            static::companyField(),
-            Select::make('niveau_scolaire_id')
-                ->label('Niveau scolaire')
-                ->relationship('niveauScolaire', 'name', fn ($query) => $query->orderBy('order'))
-                ->searchable()
-                ->preload()
-                ->required(),
-            TextInput::make('name')->label('Nom du groupe')->required()->maxLength(100),
+        return $schema->columns(1)->components([
+            Section::make('Groupe')->schema([
+                static::companyField(),
+                Select::make('niveau_scolaire_id')
+                    ->label('Niveau scolaire')
+                    ->relationship('niveauScolaire', 'name', fn ($query) => $query->orderBy('order'))
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                TextInput::make('name')->label('Nom du groupe')->required()->maxLength(100),
+            ]),
         ]);
     }
 
