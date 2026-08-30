@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/diso2055/sites/management-hr
+    - /bin/cp -R . $DEPLOYPATH
+    - cd $DEPLOYPATH && composer2 install --no-dev --optimize-autoloader --no-interaction
+    - cd $DEPLOYPATH && php artisan migrate --force
+    - cd $DEPLOYPATH && php artisan config:cache
+    - cd $DEPLOYPATH && php artisan route:cache
+    - cd $DEPLOYPATH && php artisan view:cache
+    - cd $DEPLOYPATH && php artisan storage:link
