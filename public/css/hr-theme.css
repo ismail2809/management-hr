@@ -306,8 +306,12 @@ html body.fi-body .fi-main,
   border: 1px solid var(--hr-border) !important;
   border-radius: var(--hr-radius-md) !important;
   box-shadow: var(--hr-shadow-sm) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   transition: box-shadow 0.2s ease !important;
+}
+.fi-section-header {
+  border-top-left-radius: var(--hr-radius-md) !important;
+  border-top-right-radius: var(--hr-radius-md) !important;
 }
 
 .fi-section:hover {
@@ -549,9 +553,12 @@ textarea::placeholder {
   background-color: var(--hr-bg-card) !important;
   border: 1px solid var(--hr-border) !important;
   border-radius: var(--hr-radius-md) !important;
-  overflow: hidden !important;
+  overflow: visible !important;
   box-shadow: var(--hr-shadow-sm) !important;
 }
+/* Keep rounded corners on table header/footer without clipping dropdowns */
+.fi-ta-header { border-top-left-radius: var(--hr-radius-md) !important; border-top-right-radius: var(--hr-radius-md) !important; overflow: hidden !important; }
+.fi-ta-footer { border-bottom-left-radius: var(--hr-radius-md) !important; border-bottom-right-radius: var(--hr-radius-md) !important; overflow: hidden !important; }
 
 /* Header row */
 .fi-ta-header-cell {
@@ -1326,4 +1333,37 @@ input[type="time"] {
 }
 .fi-fo-field-wrp-disabled label {
   opacity: 0.6 !important;
+}
+
+/* ════════════════════════════════
+   SELECT DROPDOWN — Z-INDEX FIX
+   Prevents dropdowns from being clipped or hidden
+   behind other positioned elements
+   ════════════════════════════════ */
+
+/* Tom Select / Choices.js floating list */
+.ts-dropdown,
+.choices__list--dropdown,
+[role="listbox"],
+.fi-select-option-list {
+  z-index: 9999 !important;
+  position: absolute !important;
+}
+
+/* Alpine x-float panels (Filament v4 selects) */
+[x-float],
+[data-headlessui-state],
+[popover],
+.fi-fo-select [role="listbox"] {
+  z-index: 9999 !important;
+}
+
+/* Flatpickr / date picker calendar */
+.flatpickr-calendar {
+  z-index: 9999 !important;
+}
+
+/* Filament dropdown panels inside forms */
+.fi-dropdown-panel {
+  z-index: 9999 !important;
 }
