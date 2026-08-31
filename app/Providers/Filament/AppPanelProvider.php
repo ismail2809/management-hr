@@ -51,7 +51,47 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('images/logo.svg'))
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
-                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=8">')
+                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=9">')
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn () => new HtmlString('<style>
+/* ── Sidebar override — BODY_END — highest priority ── */
+.fi-sidebar, .fi-main-sidebar { background-color: #0f1c3f !important; }
+.fi-sidebar-nav { background-color: transparent !important; }
+.fi-sidebar-item-btn {
+    color: rgba(255,255,255,0.82) !important;
+    border-radius: 6px !important;
+    margin-inline: 8px !important;
+    padding: 8px 10px !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    transition: all 0.15s !important;
+}
+.fi-sidebar-item-btn:hover {
+    background-color: rgba(96,165,250,0.15) !important;
+    color: #93c5fd !important;
+}
+li.fi-active > .fi-sidebar-item-btn,
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background-color: rgba(96,165,250,0.20) !important;
+    color: #60a5fa !important;
+    font-weight: 600 !important;
+}
+.fi-sidebar-item-label { color: inherit !important; }
+.fi-sidebar-item-icon svg { color: inherit !important; width:16px !important; height:16px !important; }
+.fi-sidebar-group-label {
+    color: rgba(148,163,184,0.6) !important;
+    font-size: 0.6rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.4px !important;
+    text-transform: uppercase !important;
+}
+.fi-sidebar-group-btn { color: rgba(255,255,255,0.6) !important; }
+</style>')
             )
             ->navigationGroups([
                 NavigationGroup::make('Personnel')
