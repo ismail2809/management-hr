@@ -611,18 +611,85 @@ textarea::placeholder {
   overflow: hidden !important;
 }
 
+/* Dropdown header (user name / email zone) */
+.fi-dropdown-header {
+  background-color: var(--hr-bg-elevated) !important;
+  border-bottom: 1px solid var(--hr-border) !important;
+  padding: 12px 14px !important;
+}
+
+.fi-dropdown-header-label,
+.fi-dropdown-header-description,
+.fi-dropdown-header * {
+  color: var(--hr-text) !important;
+}
+
+.fi-dropdown-header-description {
+  color: var(--hr-text-muted) !important;
+  font-size: 0.75rem !important;
+}
+
+/* Dropdown divider */
+.fi-dropdown-list-separator,
+.fi-dropdown-divider {
+  border-color: var(--hr-border) !important;
+  margin-block: 4px !important;
+}
+
+/* Dropdown items */
 .fi-dropdown-list-item-button {
   color: var(--hr-text) !important;
   font-size: 0.82rem !important;
   border-radius: var(--hr-radius-sm) !important;
   margin: 2px 4px !important;
   padding-block: 7px !important;
+  padding-inline: 10px !important;
   transition: background-color 0.1s !important;
+  width: calc(100% - 8px) !important;
 }
 
 .fi-dropdown-list-item-button:hover {
   background-color: var(--hr-primary-light) !important;
   color: var(--hr-primary) !important;
+}
+
+/* Danger item (logout) */
+.fi-dropdown-list-item-button.fi-color-danger,
+.fi-dropdown-list-item-button[class*="danger"] {
+  color: var(--hr-danger) !important;
+}
+
+.fi-dropdown-list-item-button.fi-color-danger:hover,
+.fi-dropdown-list-item-button[class*="danger"]:hover {
+  background-color: var(--hr-danger-bg) !important;
+  color: var(--hr-danger) !important;
+}
+
+/* Dropdown item icon */
+.fi-dropdown-list-item-icon {
+  color: inherit !important;
+  width: 15px !important;
+  height: 15px !important;
+  opacity: 0.75 !important;
+}
+
+/* Dark mode dropdown */
+.dark .fi-dropdown-panel {
+  background-color: var(--hr-bg-elevated) !important;
+  border-color: var(--hr-border) !important;
+}
+
+.dark .fi-dropdown-header {
+  background-color: var(--hr-bg-card) !important;
+}
+
+.dark .fi-dropdown-list-item-button {
+  color: var(--hr-text) !important;
+}
+
+.dark .fi-dropdown-list-item-button:hover {
+  background-color: var(--hr-sidebar-hover) !important;
+  color: #ffffff !important;
 }
 
 /* ════════════════════════════════
@@ -816,6 +883,45 @@ textarea::placeholder {
 
 .fi-user-menu-button:hover {
   background-color: var(--hr-bg-elevated) !important;
+}
+
+/* User name + email next to avatar */
+.fi-user-menu-button-label,
+.fi-user-menu-button-description,
+[class*="fi-user-menu-button"] span,
+[class*="fi-account"] .fi-user-menu-button-label {
+  color: var(--hr-text) !important;
+}
+
+.fi-user-menu-button-description {
+  color: var(--hr-text-muted) !important;
+  font-size: 0.73rem !important;
+}
+
+/* Account switcher panel / tenant menu */
+.fi-tenant-menu-panel,
+.fi-account-panel {
+  background-color: var(--hr-bg-card) !important;
+  border: 1px solid var(--hr-border) !important;
+  border-radius: var(--hr-radius-md) !important;
+  box-shadow: var(--hr-shadow-lg) !important;
+  color: var(--hr-text) !important;
+}
+
+.fi-tenant-menu-item-button,
+.fi-account-panel-item {
+  color: var(--hr-text) !important;
+  font-size: 0.82rem !important;
+  padding: 8px 12px !important;
+  border-radius: var(--hr-radius-sm) !important;
+  margin: 2px 4px !important;
+  transition: background-color 0.1s !important;
+}
+
+.fi-tenant-menu-item-button:hover,
+.fi-account-panel-item:hover {
+  background-color: var(--hr-primary-light) !important;
+  color: var(--hr-primary) !important;
 }
 
 /* ════════════════════════════════
