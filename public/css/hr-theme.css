@@ -701,8 +701,8 @@ textarea::placeholder {
   margin-block: 4px !important;
 }
 
-/* Dropdown items */
-.fi-dropdown-list-item-button {
+/* Dropdown items — vraie classe Filament v4 */
+.fi-dropdown-list-item {
   color: var(--hr-text) !important;
   font-size: 0.82rem !important;
   border-radius: var(--hr-radius-sm) !important;
@@ -711,31 +711,48 @@ textarea::placeholder {
   padding-inline: 10px !important;
   transition: background-color 0.1s !important;
   width: calc(100% - 8px) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
 }
 
-.fi-dropdown-list-item-button:hover {
+.fi-dropdown-list-item:hover {
   background-color: var(--hr-primary-light) !important;
   color: var(--hr-primary) !important;
 }
 
-/* Danger item (logout) */
-.fi-dropdown-list-item-button.fi-color-danger,
-.fi-dropdown-list-item-button[class*="danger"] {
+/* Label du dropdown item */
+.fi-dropdown-list-item-label {
+  color: inherit !important;
+  font-size: 0.82rem !important;
+}
+
+/* Danger item (déconnexion) */
+.fi-dropdown-list-item[class*="danger"],
+.fi-dropdown-list-item[style*="--c-"] {
+  /* géré par Filament color system */
+}
+
+/* Override explicite logout/danger */
+.fi-user-menu .fi-dropdown-list-item:last-child,
+.fi-dropdown-list-item.fi-color-danger {
   color: var(--hr-danger) !important;
 }
 
-.fi-dropdown-list-item-button.fi-color-danger:hover,
-.fi-dropdown-list-item-button[class*="danger"]:hover {
+.fi-user-menu .fi-dropdown-list-item:last-child:hover,
+.fi-dropdown-list-item.fi-color-danger:hover {
   background-color: var(--hr-danger-bg) !important;
   color: var(--hr-danger) !important;
 }
 
-/* Dropdown item icon */
+/* Icônes dropdown */
+.fi-dropdown-list-item svg,
 .fi-dropdown-list-item-icon {
-  color: inherit !important;
   width: 15px !important;
   height: 15px !important;
-  opacity: 0.75 !important;
+  flex-shrink: 0 !important;
+  opacity: 0.7 !important;
+  color: inherit !important;
 }
 
 /* Dark mode dropdown */
@@ -748,11 +765,11 @@ textarea::placeholder {
   background-color: var(--hr-bg-card) !important;
 }
 
-.dark .fi-dropdown-list-item-button {
+.dark .fi-dropdown-list-item {
   color: var(--hr-text) !important;
 }
 
-.dark .fi-dropdown-list-item-button:hover {
+.dark .fi-dropdown-list-item:hover {
   background-color: var(--hr-sidebar-hover) !important;
   color: #ffffff !important;
 }
@@ -940,27 +957,33 @@ textarea::placeholder {
   box-shadow: 0 0 0 2px var(--hr-primary), 0 0 0 4px var(--hr-primary-light) !important;
 }
 
-.fi-user-menu-button {
+/* Trigger bouton du menu utilisateur (vraie classe Filament v4) */
+.fi-user-menu-trigger {
   border-radius: var(--hr-radius-sm) !important;
-  padding: 5px 8px !important;
+  padding: 4px 8px !important;
   transition: background-color 0.12s !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
 }
 
-.fi-user-menu-button:hover {
+.fi-user-menu-trigger:hover {
   background-color: var(--hr-bg-elevated) !important;
 }
 
-/* User name + email next to avatar */
-.fi-user-menu-button-label,
-.fi-user-menu-button-description,
-[class*="fi-user-menu-button"] span,
-[class*="fi-account"] .fi-user-menu-button-label {
+/* Texte nom utilisateur dans le trigger */
+.fi-user-menu-trigger-text {
   color: var(--hr-text) !important;
+  font-size: 0.82rem !important;
+  font-weight: 500 !important;
 }
 
-.fi-user-menu-button-description {
+/* Chevron icon dans le trigger */
+.fi-user-menu-trigger svg {
   color: var(--hr-text-muted) !important;
-  font-size: 0.73rem !important;
+  width: 14px !important;
+  height: 14px !important;
 }
 
 /* Account switcher panel / tenant menu */
