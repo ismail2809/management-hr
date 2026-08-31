@@ -14,7 +14,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\ToggleButtons;
+use Filament\Forms\Components\Radio;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -23,6 +23,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -37,7 +38,7 @@ class LeaveResource extends Resource
     protected static ?string $navigationLabel = 'Absences / Congés';
     protected static ?string $modelLabel = 'Demande d\'absence';
     protected static ?string $pluralModelLabel = 'Demandes d\'absences';
-    protected static \UnitEnum|string|null $navigationGroup = 'Congés & Présence';
+    protected static \UnitEnum|string|null $navigationGroup = 'Congés & Absences';
     protected static ?int $navigationSort = 7;
 
     public static function getNavigationLabel(): string
@@ -92,16 +93,16 @@ class LeaveResource extends Resource
 
         return $schema->columns(1)->components([
 
-            // ── Section 1 : Demandeur ─────────────────────────────────────────
-            Section::make('Demandeur')
-                ->description('Sélectionnez l\'employé concerné par cette demande.')
-                ->icon('heroicon-o-user-circle')
+            // ── Section principale ────────────────────────────────────────────
+            Section::make('Demande d\'absence')
+                ->description('Renseignez les informations pour soumettre une nouvelle demande.')
+                ->icon('heroicon-o-calendar-days')
                 ->columns(2)
                 ->schema([
-                    static::companyField(),
-                    Section::make('Employé(e)s')
-                        ->icon('heroicon-o-user')
+                    Section::make('Demandeur')
+                        ->icon('heroicon-o-user-circle')
                         ->compact()
+                        ->columns(2)
                         ->schema([
                             Select::make('employee_id')
                                 ->label('Employé(e)')
@@ -115,81 +116,156 @@ class LeaveResource extends Resource
                                 ->required()
                                 ->live()
                                 ->columnSpanFull(),
+
+                            Radio::make('categorie')
+                                ->label('Catégorie')
+                                ->options(['conge' => 'Congé', 'absence' => 'Absence'])
+                                ->default('conge')
+                                ->required()
+                                ->inline()
+                                ->live(),
+
+                            Select::make('leave_type_id')
+                                ->label('Type de congé')
+                                ->options(fn () => LeaveType::orderBy('name')->pluck('name', 'id')->toArray())
+                                ->searchable()
+                                ->placeholder('Sélectionner…')
+                                ->nullable()
+                                ->visible(fn ($get) => $get('categorie') === 'conge'),
+                        ]),
+
+                    static::companyField()->columns(2),
+
+                    Section::make('Période')
+                        ->icon('heroicon-o-clock')
+                        ->compact()
+                        ->columns(2)
+                        ->columnSpanFull()
+                        ->schema([
+                            Grid::make(3)->schema([
+                                DatePicker::make('start_date')
+                                    ->label('Date de début')
+                                    ->required()
+                                    ->live()
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y'),
+
+                                DatePicker::make('end_date')
+                                    ->label('Date de fin')
+                                    ->required()
+                                    ->live()
+                                    ->native(false)
+                                    ->displayFormat('d/m/Y')
+                                    ->minDate(fn ($get) => $get('start_date')),
+
+                                Placeholder::make('duree_calculee')
+                                    ->label('Durée estimée')
+                                    ->content(function ($get): string {
+                                        $start = $get('start_date');
+                                        $end   = $get('end_date');
+                                        if (! $start || ! $end) return '—';
+                                        try {
+                                            $days = Carbon::parse($start)->diffInWeekdays(Carbon::parse($end)) + 1;
+                                            return $days . ' jour' . ($days > 1 ? 's' : '') . ' ouvrable' . ($days > 1 ? 's' : '');
+                                        } catch (\Exception) {
+                                            return '—';
+                                        }
+                                    }),
+                            ]),
+
+                            Textarea::make('reason')
+                                ->label('Motif')
+                                ->placeholder('Raison de la demande…')
+                                ->rows(2)
+                                ->nullable(),
                         ]),
                 ]),
 
-            // ── Section 2 : Type de demande ──────────────────────────────────
-            Section::make('Type de demande')
-                ->description('Choisissez s\'il s\'agit d\'un congé planifié ou d\'une absence.')
-                ->icon('heroicon-o-tag')
-                ->columns(2)
+            // ── Options avancées (repliées) ───────────────────────────────────
+            Section::make('Options')
+                ->icon('heroicon-o-adjustments-horizontal')
                 ->schema([
-                    ToggleButtons::make('categorie')
-                        ->label('Catégorie')
-                        ->options(['conge' => 'Congé', 'absence' => 'Absence'])
-                        ->icons(['conge' => 'heroicon-o-sun', 'absence' => 'heroicon-o-exclamation-triangle'])
-                        ->colors(['conge' => 'info', 'absence' => 'warning'])
-                        ->default('conge')
-                        ->grouped()
-                        ->required()
-                        ->live(),
+                    Grid::make(3)
+                        ->hidden($isEmployee)
+                        ->schema([
+                            Select::make('status')
+                                ->label('Statut')
+                                ->options([
+                                    'en_attente' => 'En attente',
+                                    'approuvé'   => 'Approuvé',
+                                    'refusé'     => 'Refusé',
+                                ])
+                                ->default('en_attente')
+                                ->required(),
 
-                    Select::make('leave_type_id')
-                        ->label('Type de congé')
-                        ->options(fn () => LeaveType::orderBy('name')->pluck('name', 'id')->toArray())
-                        ->searchable()
-                        ->placeholder('Sélectionner un type…')
-                        ->nullable()
-                        ->visible(fn ($get) => $get('categorie') === 'conge')
-                        ->helperText('Laissez vide si le type n\'est pas applicable.'),
-                ]),
+                            Select::make('communication_method')
+                                ->label('Mode de communication')
+                                ->options(fn () => CommunicationMethod::where('active', true)->orderBy('sort_order')->pluck('name', 'code')->toArray())
+                                ->placeholder('Choisir un mode…')
+                                ->nullable()
+                                ->native(false),
 
-            // ── Section 3 : Période ───────────────────────────────────────────
-            Section::make('Période')
-                ->description('Définissez les dates et ajoutez un motif ou un justificatif.')
-                ->icon('heroicon-o-calendar-days')
-                ->schema([
-                    Grid::make(3)->schema([
-                        DatePicker::make('start_date')
-                            ->label('Date de début')
-                            ->required()
-                            ->live()
-                            ->native(false)
-                            ->displayFormat('d/m/Y')
-                            ->columnSpan(1),
+                            DateTimePicker::make('appointment_date')
+                                ->label('Date de rendez-vous')
+                                ->seconds(false)
+                                ->native(false)
+                                ->nullable(),
+                        ]),
 
-                        DatePicker::make('end_date')
-                            ->label('Date de fin')
-                            ->required()
-                            ->live()
-                            ->native(false)
-                            ->displayFormat('d/m/Y')
-                            ->minDate(fn ($get) => $get('start_date'))
-                            ->columnSpan(1),
+                    // Remplacement (professeurs uniquement)
+                    Grid::make(2)
+                        ->visible(fn ($get) => filled($get('employee_id')) && Employee::find($get('employee_id'))?->isProfesseur())
+                        ->schema([
+                            Select::make('remplacant_id')
+                                ->label('Professeur remplaçant')
+                                ->relationship(
+                                    'remplacant',
+                                    'first_name',
+                                    fn ($query, $get) => $query->when(
+                                        $get('employee_id'),
+                                        fn ($q, $id) => $q->where('id', '!=', $id)
+                                    )
+                                )
+                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                                ->searchable()
+                                ->preload()
+                                ->placeholder('Choisir un remplaçant…')
+                                ->nullable(),
 
-                        Placeholder::make('duree_calculee')
-                            ->label('Durée estimée')
-                            ->content(function ($get): string {
-                                $start = $get('start_date');
-                                $end   = $get('end_date');
-                                if (! $start || ! $end) {
-                                    return '—';
-                                }
-                                try {
-                                    $days = Carbon::parse($start)->diffInWeekdays(Carbon::parse($end)) + 1;
-                                    return $days . ' jour' . ($days > 1 ? 's' : '') . ' ouvrable' . ($days > 1 ? 's' : '');
-                                } catch (\Exception) {
-                                    return '—';
-                                }
-                            })
-                            ->columnSpan(1),
-                    ]),
+                            Select::make('type_cours')
+                                ->label('Type de cours')
+                                ->options(['exercice' => 'Exercice', 'lecon' => 'Leçon', 'activite' => 'Activité'])
+                                ->placeholder('Sélectionner…')
+                                ->nullable()
+                                ->live(),
+                        ]),
 
-                    Textarea::make('reason')
-                        ->label('Motif')
-                        ->placeholder('Décrivez brièvement la raison de cette demande…')
-                        ->rows(3)
-                        ->nullable(),
+                    TextInput::make('nb_pages')
+                        ->label('Nombre de pages')
+                        ->numeric()->minValue(1)->nullable()
+                        ->visible(fn ($get) => $get('type_cours') === 'exercice'),
+
+                    TextInput::make('intitule_lecon')
+                        ->label('Intitulé de la leçon')
+                        ->maxLength(200)->nullable()
+                        ->visible(fn ($get) => $get('type_cours') === 'lecon'),
+
+                    TextInput::make('intitule_activite')
+                        ->label('Intitulé de l\'activité')
+                        ->maxLength(200)->nullable()
+                        ->visible(fn ($get) => $get('type_cours') === 'activite'),
+
+                    Grid::make(2)
+                        ->hidden($isEmployee)
+                        ->schema([
+                            Textarea::make('actions_taken')
+                                ->label('Mesures prises')
+                                ->rows(2)->nullable(),
+
+                            Textarea::make('rh_notes')
+                                ->label('Notes RH')
+                                ->rows(2)->nullable(),
+                        ]),
 
                     FileUpload::make('justificatif')
                         ->label('Justificatif')
@@ -198,124 +274,11 @@ class LeaveResource extends Resource
                         ->acceptedFileTypes(['application/pdf', 'image/*'])
                         ->maxSize(5120)
                         ->nullable()
-                        ->helperText('PDF ou image — max 5 Mo. Optionnel.'),
-                ]),
-
-            // ── Section 4 : Remplacement (professeurs) ────────────────────────
-            Section::make('Remplacement')
-                ->description('Désignez un remplaçant et précisez le contenu prévu.')
-                ->icon('heroicon-o-academic-cap')
-                ->visible(fn ($get) => filled($get('employee_id')) && Employee::find($get('employee_id'))?->isProfesseur())
-                ->schema([
-                    Grid::make(2)->schema([
-                        Select::make('remplacant_id')
-                            ->label('Professeur remplaçant')
-                            ->relationship(
-                                'remplacant',
-                                'first_name',
-                                fn ($query, $get) => $query->when(
-                                    $get('employee_id'),
-                                    fn ($q, $id) => $q->where('id', '!=', $id)
-                                )
-                            )
-                            ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                            ->searchable()
-                            ->preload()
-                            ->placeholder('Choisir un remplaçant…')
-                            ->nullable(),
-
-                        Select::make('type_cours')
-                            ->label('Type de cours prévu')
-                            ->options([
-                                'exercice' => 'Exercice',
-                                'lecon'    => 'Leçon',
-                                'activite' => 'Activité',
-                            ])
-                            ->placeholder('Sélectionner…')
-                            ->nullable()
-                            ->live(),
-                    ]),
-
-                    TextInput::make('nb_pages')
-                        ->label('Nombre de pages')
-                        ->numeric()
-                        ->minValue(1)
-                        ->nullable()
-                        ->visible(fn ($get) => $get('type_cours') === 'exercice'),
-
-                    TextInput::make('intitule_lecon')
-                        ->label('Intitulé de la leçon')
-                        ->maxLength(200)
-                        ->nullable()
-                        ->visible(fn ($get) => $get('type_cours') === 'lecon'),
-
-                    TextInput::make('intitule_activite')
-                        ->label('Intitulé de l\'activité')
-                        ->maxLength(200)
-                        ->nullable()
-                        ->visible(fn ($get) => $get('type_cours') === 'activite'),
-                ]),
-
-            // ── Section 5 : Décision ──────────────────────────────────────────
-            Section::make('Décision')
-                ->description('Définissez le statut de cette demande.')
-                ->icon('heroicon-o-clipboard-document-check')
-                ->hidden($isEmployee)
-                ->schema([
-                    ToggleButtons::make('status')
-                        ->label('Statut')
-                        ->options([
-                            'en_attente' => 'En attente',
-                            'approuvé'   => 'Approuvé',
-                            'refusé'     => 'Refusé',
-                        ])
-                        ->icons([
-                            'en_attente' => 'heroicon-o-clock',
-                            'approuvé'   => 'heroicon-o-check-circle',
-                            'refusé'     => 'heroicon-o-x-circle',
-                        ])
-                        ->colors([
-                            'en_attente' => 'warning',
-                            'approuvé'   => 'success',
-                            'refusé'     => 'danger',
-                        ])
-                        ->default('en_attente')
-                        ->grouped()
-                        ->required(),
-                ]),
-
-            // ── Section 6 : Suivi RH ──────────────────────────────────────────
-            Section::make('Suivi RH')
-                ->description('Informations internes à l\'équipe RH.')
-                ->icon('heroicon-o-shield-check')
-                ->hidden($isEmployee)
-                ->schema([
-                    Grid::make(2)->schema([
-                        Select::make('communication_method')
-                            ->label('Mode de communication')
-                            ->options(fn () => CommunicationMethod::where('active', true)->orderBy('sort_order')->pluck('name', 'code')->toArray())
-                            ->placeholder('Choisir un mode…')
-                            ->nullable()
-                            ->native(false),
-
-                        DateTimePicker::make('appointment_date')
-                            ->label('Date de rendez-vous')
-                            ->seconds(false)
-                            ->native(false)
-                            ->nullable(),
-                    ]),
-
-                    Grid::make(2)->schema([
-                        Textarea::make('actions_taken')
-                            ->label('Mesures prises')
-                            ->rows(3)
-                            ->nullable(),
-
-                        Textarea::make('rh_notes')
-                            ->label('Notes RH')
-                            ->rows(3)
-                            ->nullable(),
-                    ]),
+                        ->openable()
+                        ->downloadable()
+                        ->previewable()
+                        ->helperText('PDF ou image — max 5 Mo.')
+                        ->columnSpanFull(),
                 ]),
         ]);
     }
@@ -358,24 +321,35 @@ class LeaveResource extends Resource
                 ]),
             ])
             ->actions([
-                Action::make('approve')
-                    ->label('Approuver')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
-                    ->requiresConfirmation()
-                    ->action(fn (Leave $record) => $record->update([
-                        'status' => 'approuvé', 'approved_by' => auth()->id(), 'approved_at' => now(),
-                    ])),
-                Action::make('reject')
-                    ->label('Refuser')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
-                    ->requiresConfirmation()
-                    ->action(fn (Leave $record) => $record->update([
-                        'status' => 'refusé', 'approved_by' => auth()->id(), 'approved_at' => now(),
-                    ])),
+                ActionGroup::make([
+                    Action::make('voir_justificatif')
+                        ->label('Voir justificatif')
+                        ->icon('heroicon-o-paper-clip')
+                        ->color('info')
+                        ->visible(fn (Leave $record) => filled($record->justificatif))
+                        ->url(fn (Leave $record) => asset('storage/' . $record->justificatif))
+                        ->openUrlInNewTab(),
+
+                    Action::make('approve')
+                        ->label('Approuver')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->requiresConfirmation()
+                        ->action(fn (Leave $record) => $record->update([
+                            'status' => 'approuvé', 'approved_by' => auth()->id(), 'approved_at' => now(),
+                        ])),
+
+                    Action::make('reject')
+                        ->label('Refuser')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->requiresConfirmation()
+                        ->action(fn (Leave $record) => $record->update([
+                            'status' => 'refusé', 'approved_by' => auth()->id(), 'approved_at' => now(),
+                        ])),
+                ])->icon('heroicon-m-ellipsis-horizontal'),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

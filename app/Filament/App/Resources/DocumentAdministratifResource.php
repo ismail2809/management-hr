@@ -3,7 +3,7 @@
 namespace App\Filament\App\Resources;
 
 use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\DocumentRequestResource\Pages;
+use App\Filament\App\Resources\DocumentAdministratifResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;
@@ -12,6 +12,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -24,25 +25,37 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class DocumentRequestResource extends Resource
+class DocumentAdministratifResource extends Resource
 {
     use HasCompanyField;
+
     protected static ?string $model = DocumentRequest::class;
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-inbox-arrow-down';
-    protected static ?string $navigationLabel = 'Demandes';
-    protected static ?string $modelLabel = 'Demande';
+    protected static ?string $slug = 'documents-administratifs';
+    protected static ?string $modelLabel = 'Document administratif';
+    protected static ?string $pluralModelLabel = 'Documents administratifs';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
     protected static \UnitEnum|string|null $navigationGroup = 'Demandes';
-    protected static ?int $navigationSort = 10;
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?int $navigationSort = 11;
 
     public static function getNavigationLabel(): string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Demandes';
+        return auth()->user()?->hasRole('employee') ? 'Mes documents' : 'Documents administratifs';
     }
 
     public static function getNavigationGroup(): ?string
     {
         return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Demandes';
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->where('categorie', 'document');
+
+        if (auth()->user()?->hasRole('employee')) {
+            $query->where('employee_id', auth()->user()->employee_id);
+        }
+
+        return $query;
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
@@ -60,32 +73,13 @@ class DocumentRequestResource extends Resource
         return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
     }
 
-    public static function canForceDelete(\Illuminate\Database\Eloquent\Model $record): bool
-    {
-        return false;
-    }
-
-    public static function canForceDeleteAny(): bool
-    {
-        return false;
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery();
-
-        if (auth()->user()?->hasRole('employee')) {
-            $query->where('employee_id', auth()->user()->employee_id);
-        }
-
-        return $query;
-    }
-
     public static function form(Schema $schema): Schema
     {
         $isEmployee = auth()->user()?->hasRole('employee');
 
         return $schema->columns(1)->components([
+            Hidden::make('categorie')->default('document'),
+
             Section::make('Demandeur')
                 ->description('Sélectionnez l\'employé concerné par cette demande.')
                 ->icon('heroicon-o-user-circle')
@@ -93,7 +87,7 @@ class DocumentRequestResource extends Resource
                 ->schema([
                     static::companyField(),
 
-                    Section::make('Employé(e)s')
+                    Section::make('Employé(e)')
                         ->icon('heroicon-o-user')
                         ->compact()
                         ->schema([
@@ -111,41 +105,19 @@ class DocumentRequestResource extends Resource
                         ]),
                 ]),
 
-            Section::make('Type de demande')
-                ->description('Choisissez la catégorie de votre demande.')
-                ->icon('heroicon-o-tag')
-                ->schema([
-                    Radio::make('categorie')
-                        ->label('Catégorie de demande')
-                        ->options(['document' => 'Document administratif', 'autre' => 'Autre demande'])
-                        ->default('document')
-                        ->inline()
-                        ->required()
-                        ->live(),
-                ]),
-
             Section::make('Document administratif')
-                ->visible(fn ($get) => $get('categorie') === 'document')
+                ->icon('heroicon-o-document-text')
                 ->schema([
                     Select::make('type')
                         ->label('Type de document')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'document')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$documentTypes)
-                        ->required(fn ($get) => $get('categorie') === 'document'),
+                        ->required(),
 
                     Radio::make('format')
                         ->label('Format souhaité')
                         ->options(['digital' => 'Version digitale (PDF)', 'papier' => 'Version papier'])
                         ->default('digital')
                         ->inline(),
-                ]),
-
-            Section::make('Autre demande')
-                ->visible(fn ($get) => $get('categorie') === 'autre')
-                ->schema([
-                    Select::make('type')
-                        ->label('Type de demande')
-                        ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
-                        ->required(fn ($get) => $get('categorie') === 'autre'),
                 ]),
 
             Section::make('Détails')->schema([
@@ -172,10 +144,7 @@ class DocumentRequestResource extends Resource
                     ->disk('public')
                     ->directory('document-requests/finals')
                     ->acceptedFileTypes([
-                        'application/pdf',
-                        'image/jpeg',
-                        'image/png',
-                        'image/webp',
+                        'application/pdf', 'image/jpeg', 'image/png', 'image/webp',
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
@@ -196,15 +165,9 @@ class DocumentRequestResource extends Resource
                     ->sortable()
                     ->weight('semibold'),
 
-                TextColumn::make('categorie')
-                    ->label('Catégorie')
-                    ->badge()
-                    ->color(fn ($state) => $state === 'document' ? 'primary' : 'warning')
-                    ->formatStateUsing(fn ($state) => $state === 'document' ? 'Document' : 'Autre'),
-
                 TextColumn::make('type')
-                    ->label('Type')
-                    ->formatStateUsing(fn ($state) => DocumentRequest::$documentTypes[$state] ?? DocumentRequest::$autreTypes[$state] ?? $state)
+                    ->label('Type de document')
+                    ->formatStateUsing(fn ($state) => DocumentRequest::$documentTypes[$state] ?? $state)
                     ->badge()
                     ->color('info'),
 
@@ -226,18 +189,12 @@ class DocumentRequestResource extends Resource
                         default      => 'gray',
                     }),
 
-                TextColumn::make('nb_telechargements')
-                    ->label('Téléchargements')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-
                 TextColumn::make('created_at')
                     ->label('Demandé le')
                     ->date('d/m/Y')
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('categorie')->label('Catégorie')->options(['document' => 'Document', 'autre' => 'Autre']),
                 SelectFilter::make('status')->label('Statut')->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé']),
                 SelectFilter::make('format')->label('Format')->options(['digital' => 'Digitale', 'papier' => 'Papier']),
             ])
@@ -252,9 +209,7 @@ class DocumentRequestResource extends Resource
                         ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && $record->fichier_final)
                         ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
                         ->openUrlInNewTab()
-                        ->action(function (DocumentRequest $record) {
-                            $record->increment('nb_telechargements');
-                        }),
+                        ->action(fn (DocumentRequest $record) => $record->increment('nb_telechargements')),
 
                     Action::make('approve')
                         ->label('Approuver')
@@ -284,10 +239,10 @@ class DocumentRequestResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListDocumentRequests::route('/'),
-            'create' => Pages\CreateDocumentRequest::route('/create'),
-            'view'   => Pages\ViewDocumentRequest::route('/{record}'),
-            'edit'   => Pages\EditDocumentRequest::route('/{record}/edit'),
+            'index'  => Pages\ListDocumentAdministratifs::route('/'),
+            'create' => Pages\CreateDocumentAdministratif::route('/create'),
+            'view'   => Pages\ViewDocumentAdministratif::route('/{record}'),
+            'edit'   => Pages\EditDocumentAdministratif::route('/{record}/edit'),
         ];
     }
 }
