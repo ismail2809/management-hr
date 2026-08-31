@@ -11,6 +11,7 @@ use App\Filament\App\Concerns\HasCompanyField;
 use App\Models\Transport;
 use BackedEnum;
 use App\Filament\App\Concerns\HasRoleBasedDelete;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -28,6 +29,15 @@ class TransportResource extends Resource
     protected static ?string $modelLabel = 'Transport';
     protected static \UnitEnum|string|null $navigationGroup = 'Paramétrage';
     protected static ?int $navigationSort = 23;
+
+    public static function getEloquentQuery(): Builder
+    {
+        if (auth()->user()?->hasRole('super-admin')) {
+            return parent::getEloquentQuery()->withoutGlobalScopes();
+        }
+
+        return parent::getEloquentQuery();
+    }
 
     public static function canViewAny(): bool { return ! auth()->user()?->hasRole('employee'); }
 
