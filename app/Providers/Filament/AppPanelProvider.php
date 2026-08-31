@@ -51,7 +51,7 @@ class AppPanelProvider extends PanelProvider
             ->favicon(asset('images/logo.svg'))
             ->renderHook(
                 PanelsRenderHook::STYLES_AFTER,
-                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=6">')
+                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=7">')
             )
             ->navigationGroups([
                 NavigationGroup::make('Personnel')

@@ -186,9 +186,9 @@ html, body, .fi-body {
   margin-bottom: 4px !important;
 }
 
-/* Nav items */
+/* Nav items — texte blanc au repos */
 .fi-sidebar-item-button {
-  color: var(--hr-sidebar-text) !important;
+  color: rgba(255,255,255,0.82) !important;
   border-radius: var(--hr-radius-sm) !important;
   margin-inline: 10px !important;
   padding-block: 8px !important;
@@ -199,16 +199,17 @@ html, body, .fi-body {
   gap: 10px !important;
 }
 
+/* Hover — fond bleu + texte bleu clair */
 .fi-sidebar-item-button:hover {
-  background-color: var(--hr-sidebar-hover) !important;
-  color: #ffffff !important;
+  background-color: rgba(96,165,250,0.15) !important;
+  color: #93c5fd !important;
 }
 
-/* Active nav item — blanc, pas bleu */
+/* Active — fond bleu discret + texte bleu */
 .fi-sidebar-item-button[aria-current="page"],
 .fi-sidebar-item-button.fi-active {
-  background-color: rgba(255,255,255,0.12) !important;
-  color: #ffffff !important;
+  background-color: rgba(96,165,250,0.18) !important;
+  color: #60a5fa !important;
   font-weight: 600 !important;
 }
 
