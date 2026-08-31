@@ -227,8 +227,17 @@ html, body, .fi-body {
 .fi-topbar-nav {
   background-color: var(--hr-topbar) !important;
   border-bottom: 1px solid var(--hr-border) !important;
+  border-top: none !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
+  box-shadow: var(--hr-shadow-xs) !important;
+}
+
+.dark .fi-topbar,
+.dark .fi-topbar-nav {
+  background-color: var(--hr-topbar) !important;
+  border-bottom-color: var(--hr-border) !important;
+  box-shadow: none !important;
 }
 
 /* ════════════════════════════════
@@ -308,6 +317,10 @@ html body.fi-body .fi-main,
 .fi-section-header {
   border-bottom: 1px solid var(--hr-border) !important;
   padding: 14px 20px !important;
+  background-color: #f1f5f9 !important; /* plus contrasté que #f8fafc */
+}
+
+.dark .fi-section-header {
   background-color: var(--hr-bg-elevated) !important;
 }
 
@@ -319,12 +332,57 @@ html body.fi-body .fi-main,
   letter-spacing: -0.1px !important;
 }
 
+.fi-section-header-icon {
+  color: var(--hr-primary) !important;
+  width: 16px !important;
+  height: 16px !important;
+  opacity: 0.8 !important;
+}
+
+.fi-section-description,
+.fi-section-header-description {
+  color: var(--hr-text-muted) !important;
+  font-size: 0.78rem !important;
+  margin-top: 2px !important;
+}
+
 .fi-section-content {
   padding: 20px !important;
+  background-color: var(--hr-bg-card) !important;
 }
 
 .fi-section-content-ctn {
   padding: 0 !important;
+}
+
+/* Nested sections (compact sub-cards) */
+.fi-section .fi-section {
+  border: 1px solid var(--hr-border) !important;
+  border-radius: var(--hr-radius) !important;
+  box-shadow: none !important;
+}
+
+.fi-section .fi-section:hover {
+  box-shadow: var(--hr-shadow-xs) !important;
+}
+
+.fi-section .fi-section .fi-section-header {
+  background-color: #e8edf5 !important;
+  padding: 10px 16px !important;
+}
+
+.dark .fi-section .fi-section .fi-section-header {
+  background-color: rgba(255,255,255,0.04) !important;
+}
+
+.fi-section .fi-section .fi-section-header-heading {
+  font-size: 0.82rem !important;
+  color: var(--hr-text-muted) !important;
+  font-weight: 600 !important;
+}
+
+.fi-section .fi-section .fi-section-content {
+  padding: 14px 16px !important;
 }
 
 /* ════════════════════════════════
