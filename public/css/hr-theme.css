@@ -204,11 +204,11 @@ html, body, .fi-body {
   color: #ffffff !important;
 }
 
-/* Active nav item */
+/* Active nav item — blanc, pas bleu */
 .fi-sidebar-item-button[aria-current="page"],
 .fi-sidebar-item-button.fi-active {
-  background-color: var(--hr-sidebar-active) !important;
-  color: var(--hr-sidebar-accent) !important;
+  background-color: rgba(255,255,255,0.12) !important;
+  color: #ffffff !important;
   font-weight: 600 !important;
 }
 
