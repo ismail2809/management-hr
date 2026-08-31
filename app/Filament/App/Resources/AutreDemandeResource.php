@@ -7,16 +7,25 @@ use App\Filament\App\Resources\AutreDemandeResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;
+use App\Models\CategorieAutreDemande;
+use App\Models\Groupe;
+use App\Models\NatureDocument;
+use App\Models\NiveauScolaire;
+use App\Models\Profession;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -107,13 +116,127 @@ class AutreDemandeResource extends Resource
             Section::make('Autre demande')
                 ->icon('heroicon-o-chat-bubble-left-right')
                 ->schema([
+                    Select::make('categorie_autre_demande_id')
+                        ->label('Catégorie de demande')
+                        ->options(fn () => CategorieAutreDemande::where('active', true)
+                            ->orderBy('sort_order')
+                            ->pluck('name', 'id')
+                            ->toArray()
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->nullable(),
+
                     Select::make('type')
                         ->label('Type de demande')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
+                        ->required()
+                        ->live(),
+                ]),
+
+            Section::make('Détails Photocopie')
+                ->icon('heroicon-o-document-duplicate')
+                ->columns(2)
+                ->visible(fn (Get $get) => $get('type') === 'photocopie')
+                ->description(fn () => sprintf(
+                    'La demande doit être déposée au moins %d jour(s) avant la date souhaitée.',
+                    config('hr.photocopie_delay_days', 3)
+                ))
+                ->schema([
+                    Select::make('photocopie_sous_type')
+                        ->label('Nature du document')
+                        ->options(fn () => NatureDocument::where('active', true)
+                            ->orderBy('sort_order')
+                            ->pluck('name', 'name')
+                            ->toArray()
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->columnSpanFull(),
+
+                    Select::make('photocopie_niveau')
+                        ->label('Niveau')
+                        ->options(fn () => NiveauScolaire::orderBy('order')->pluck('name', 'name')->toArray())
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(fn ($set) => $set('photocopie_groupe', null))
+                        ->required(),
+
+                    Select::make('photocopie_groupe')
+                        ->label('Groupe / Classe')
+                        ->options(function (Get $get) {
+                            $niveauName = $get('photocopie_niveau');
+                            if (! $niveauName) {
+                                return [];
+                            }
+                            $niveau = NiveauScolaire::where('name', $niveauName)->first();
+                            if (! $niveau) {
+                                return [];
+                            }
+                            return Groupe::where('niveau_scolaire_id', $niveau->id)
+                                ->orderBy('name')
+                                ->pluck('name', 'name')
+                                ->toArray();
+                        })
+                        ->searchable()
+                        ->required()
+                        ->disabled(fn (Get $get) => ! $get('photocopie_niveau')),
+
+                    TextInput::make('photocopie_nb_copies')
+                        ->label('Nombre de copies souhaitées')
+                        ->numeric()
+                        ->minValue(1)
+                        ->required(),
+
+                    DatePicker::make('photocopie_date_souhaitee')
+                        ->label('Date souhaitée')
+                        ->minDate(fn () => now()->addDays(config('hr.photocopie_delay_days', 3))->toDateString())
+                        ->hint(fn () => sprintf('Minimum %d jour(s) à l\'avance', config('hr.photocopie_delay_days', 3)))
+                        ->hintIcon('heroicon-o-clock')
+                        ->hintColor('warning')
                         ->required(),
                 ]),
 
+            Section::make('Participants — Rencontre direction')
+                ->icon('heroicon-o-users')
+                ->visible(fn (Get $get) => $get('type') === 'rencontre_direction')
+                ->schema([
+                    Select::make('rencontre_employee_ids')
+                        ->label('Employés concernés')
+                        ->multiple()
+                        ->options(function () {
+                            $excluded = config('hr.rencontre_direction_excluded_professions', []);
+
+                            $excludedIds = Profession::withoutGlobalScopes()
+                                ->whereIn('name', $excluded)
+                                ->pluck('id');
+
+                            return Employee::with('profession')
+                                ->whereNotIn('profession_id', $excludedIds)
+                                ->orWhereNull('profession_id')
+                                ->get()
+                                ->mapWithKeys(fn (Employee $e) => [
+                                    $e->id => $e->full_name . ($e->profession ? ' — ' . $e->profession->name : ''),
+                                ])
+                                ->toArray();
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->required()
+                        ->columnSpanFull(),
+                ]),
+
             Section::make('Détails')->schema([
+                Select::make('status')
+                    ->label('Statut')
+                    ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
+                    ->default('en_attente')
+                    ->disabled($isEmployee)
+                    ->dehydrated()
+                    ->required(),
+
                 Textarea::make('description')
                     ->label('Description / détails')
                     ->rows(3)
@@ -124,16 +247,8 @@ class AutreDemandeResource extends Resource
                     ->rows(2)
                     ->nullable(),
 
-                Select::make('status')
-                    ->label('Statut')
-                    ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
-                    ->default('en_attente')
-                    ->disabled($isEmployee)
-                    ->dehydrated()
-                    ->required(),
-
                 FileUpload::make('fichier_final')
-                    ->label('Fichier final (uploadé par l\'admin)')
+                    ->label('Fichier')
                     ->disk('public')
                     ->directory('document-requests/finals')
                     ->acceptedFileTypes([
@@ -143,8 +258,75 @@ class AutreDemandeResource extends Resource
                     ])
                     ->maxSize(10240)
                     ->nullable()
-                    ->hidden($isEmployee),
+                    ->disabled($isEmployee)
+                    ->dehydrated(! $isEmployee),
             ]),
+        ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Demandeur')
+                ->icon('heroicon-o-user-circle')
+                ->columns(2)
+                ->schema([
+                    TextEntry::make('employee.full_name')->label('Employé(e)'),
+                    TextEntry::make('type')
+                        ->label('Type de demande')
+                        ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state] ?? $state)
+                        ->badge()
+                        ->color('warning'),
+                ]),
+
+            Section::make('Détails Photocopie')
+                ->icon('heroicon-o-document-duplicate')
+                ->columns(2)
+                ->hidden(fn (DocumentRequest $record) => $record->type !== 'photocopie')
+                ->schema([
+                    TextEntry::make('photocopie_sous_type')->label('Nature du document')->columnSpanFull(),
+                    TextEntry::make('photocopie_niveau')->label('Niveau'),
+                    TextEntry::make('photocopie_groupe')->label('Groupe / Classe'),
+                    TextEntry::make('photocopie_nb_copies')->label('Nombre de copies'),
+                    TextEntry::make('photocopie_date_souhaitee')->label('Date souhaitée')->date('d/m/Y'),
+                ]),
+
+            Section::make('Participants — Rencontre direction')
+                ->icon('heroicon-o-users')
+                ->hidden(fn (DocumentRequest $record) => $record->type !== 'rencontre_direction')
+                ->schema([
+                    TextEntry::make('rencontre_employee_ids')
+                        ->label('Employés concernés')
+                        ->html()
+                        ->formatStateUsing(function ($state, DocumentRequest $record): string {
+                            if (empty($state)) {
+                                return '—';
+                            }
+                            return Employee::withoutGlobalScopes()
+                                ->with('profession')
+                                ->whereIn('id', $state)
+                                ->get()
+                                ->map(fn (Employee $e) => e($e->full_name) . ($e->profession ? ' <span class="text-gray-400">— ' . e($e->profession->name) . '</span>' : ''))
+                                ->join('<br>');
+                        }),
+                ]),
+
+            Section::make('Détails')
+                ->columns(2)
+                ->schema([
+                    TextEntry::make('status')
+                        ->label('Statut')
+                        ->badge()
+                        ->color(fn ($state) => match ($state) {
+                            'en_attente' => 'warning',
+                            'approuvé'   => 'success',
+                            'refusé'     => 'danger',
+                            default      => 'gray',
+                        }),
+                    TextEntry::make('created_at')->label('Demandé le')->date('d/m/Y'),
+                    TextEntry::make('description')->label('Description / détails')->columnSpanFull(),
+                    TextEntry::make('reason')->label('Remarques complémentaires')->columnSpanFull(),
+                ]),
         ]);
     }
 
@@ -164,6 +346,22 @@ class AutreDemandeResource extends Resource
                     ->badge()
                     ->color('warning'),
 
+                TextColumn::make('rencontre_employee_ids')
+                    ->label('Employés concernés')
+                    ->formatStateUsing(function ($state, DocumentRequest $record): string {
+                        if ($record->type !== 'rencontre_direction' || empty($state)) {
+                            return '—';
+                        }
+                        return Employee::withoutGlobalScopes()
+                            ->with('profession')
+                            ->whereIn('id', $state)
+                            ->get()
+                            ->map(fn (Employee $e) => $e->full_name . ($e->profession ? ' (' . $e->profession->name . ')' : ''))
+                            ->join(', ');
+                    })
+                    ->wrap()
+                    ->toggleable(),
+
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -173,6 +371,14 @@ class AutreDemandeResource extends Resource
                         'refusé'     => 'danger',
                         default      => 'gray',
                     }),
+
+                TextColumn::make('fichier_final')
+                    ->label('Fichier')
+                    ->formatStateUsing(fn ($state) => $state ? 'Télécharger' : '—')
+                    ->icon(fn ($state) => $state ? 'heroicon-o-paper-clip' : null)
+                    ->color(fn ($state) => $state ? 'primary' : 'gray')
+                    ->url(fn (DocumentRequest $record) => $record->fichier_final ? asset('storage/' . $record->fichier_final) : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('created_at')
                     ->label('Demandé le')
