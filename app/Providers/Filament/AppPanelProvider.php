@@ -55,46 +55,38 @@ class AppPanelProvider extends PanelProvider
             )
             ->renderHook(
                 PanelsRenderHook::BODY_END,
-                fn () => new HtmlString('<style>
-/* ════ SIDEBAR — BODY_END — always dark navy ════ */
-.fi-sidebar,
-.fi-main-sidebar,
-.fi-sidebar-header,
-.fi-sidebar-header-ctn,
-.fi-sidebar-footer,
-.fi-sidebar-nav,
-.fi-sidebar-nav-groups,
-.fi-sidebar-group,
-.fi-sidebar-group-items,
+                fn () => new HtmlString('
+<style>
+/* Sidebar wrapper bg — couvre bg-white et lg:bg-transparent */
+.fi-layout-sidebar-layout > .fi-sidebar,
+.fi-sidebar.fi-main-sidebar,
 aside.fi-sidebar {
     background-color: #0f1c3f !important;
-    color: rgba(255,255,255,0.82) !important;
 }
-.fi-sidebar { border-right: 1px solid rgba(255,255,255,0.07) !important; }
-
-/* Group label */
+@media (min-width: 1024px) {
+    .fi-sidebar, .fi-main-sidebar, aside.fi-sidebar {
+        background-color: #0f1c3f !important;
+    }
+}
+.fi-sidebar-header, .fi-sidebar-header-ctn,
+.fi-sidebar-footer, .fi-sidebar-nav,
+.fi-sidebar-nav-groups, .fi-sidebar-group,
+.fi-sidebar-group-items {
+    background-color: #0f1c3f !important;
+}
 .fi-sidebar-group-label {
     color: rgba(148,163,184,0.55) !important;
-    font-size: 0.6rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 1.4px !important;
-    text-transform: uppercase !important;
+    font-size: 0.6rem !important; font-weight: 700 !important;
+    letter-spacing: 1.4px !important; text-transform: uppercase !important;
 }
-.fi-sidebar-group-btn { color: rgba(255,255,255,0.6) !important; background: transparent !important; }
-.fi-sidebar-group-btn svg { color: rgba(255,255,255,0.5) !important; }
-
-/* Nav items */
+.fi-sidebar-group-btn { color: rgba(255,255,255,0.6) !important; }
 .fi-sidebar-item-btn {
     color: rgba(255,255,255,0.82) !important;
     background-color: transparent !important;
-    border-radius: 6px !important;
-    margin-inline: 8px !important;
-    padding: 8px 10px !important;
-    font-size: 0.82rem !important;
-    font-weight: 500 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
+    border-radius: 6px !important; margin-inline: 8px !important;
+    padding: 8px 10px !important; font-size: 0.82rem !important;
+    font-weight: 500 !important; display: flex !important;
+    align-items: center !important; gap: 10px !important;
     transition: background-color 0.15s, color 0.15s !important;
     text-decoration: none !important;
 }
@@ -105,17 +97,37 @@ aside.fi-sidebar {
 li.fi-active > .fi-sidebar-item-btn,
 .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
     background-color: rgba(96,165,250,0.20) !important;
-    color: #60a5fa !important;
-    font-weight: 600 !important;
+    color: #60a5fa !important; font-weight: 600 !important;
 }
 .fi-sidebar-item-label { color: inherit !important; }
-.fi-sidebar-item-icon,
-.fi-sidebar-item-icon svg { color: inherit !important; width: 16px !important; height: 16px !important; }
-
-/* Brand name */
-.fi-sidebar .fi-logo,
-.fi-sidebar .fi-brand-name { color: #ffffff !important; }
-</style>')
+.fi-sidebar-item-icon svg { color: inherit !important; }
+</style>
+<script>
+(function() {
+    function applySidebarStyles() {
+        var sidebar = document.querySelector(".fi-sidebar, .fi-main-sidebar, aside.fi-sidebar");
+        if (!sidebar) return;
+        var els = [sidebar].concat(
+            Array.from(sidebar.querySelectorAll(
+                ".fi-sidebar-header,.fi-sidebar-header-ctn,.fi-sidebar-footer,.fi-sidebar-nav,.fi-sidebar-group,.fi-sidebar-group-items"
+            ))
+        );
+        els.forEach(function(el) {
+            el.style.setProperty("background-color", "#0f1c3f", "important");
+        });
+        sidebar.querySelectorAll(".fi-sidebar-item-btn").forEach(function(el) {
+            el.style.setProperty("color", "rgba(255,255,255,0.82)", "important");
+        });
+        sidebar.querySelectorAll("li.fi-active > .fi-sidebar-item-btn").forEach(function(el) {
+            el.style.setProperty("background-color", "rgba(96,165,250,0.20)", "important");
+            el.style.setProperty("color", "#60a5fa", "important");
+        });
+    }
+    document.addEventListener("DOMContentLoaded", applySidebarStyles);
+    document.addEventListener("livewire:navigated", applySidebarStyles);
+    setTimeout(applySidebarStyles, 300);
+})();
+</script>')
             )
             ->navigationGroups([
                 NavigationGroup::make('Personnel')
