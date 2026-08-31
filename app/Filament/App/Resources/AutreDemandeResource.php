@@ -118,7 +118,7 @@ class AutreDemandeResource extends Resource
                 ->schema([
                     Select::make('categorie_autre_demande_id')
                         ->label('Catégorie de demande')
-                        ->options(fn () => CategorieAutreDemande::where('active', true)
+                        ->options(fn () => CategorieAutreDemande::withoutGlobalScopes()->where('active', true)
                             ->orderBy('sort_order')
                             ->pluck('name', 'id')
                             ->toArray()
@@ -272,9 +272,12 @@ class AutreDemandeResource extends Resource
                 ->columns(2)
                 ->schema([
                     TextEntry::make('employee.full_name')->label('Employé(e)'),
+                    TextEntry::make('categorieAutreDemande.name')->label('Catégorie')->placeholder('—'),
                     TextEntry::make('type')
                         ->label('Type de demande')
-                        ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state] ?? $state)
+                        ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
+                            ?? DocumentType::withoutGlobalScopes()->where('code', $state)->value('name')
+                            ?? $state)
                         ->badge()
                         ->color('warning'),
                 ]),
@@ -334,15 +337,33 @@ class AutreDemandeResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'en_attente' => 'warning',
+                        'approuvé'   => 'success',
+                        'refusé'     => 'danger',
+                        default      => 'gray',
+                    }),
+
                 TextColumn::make('employee.full_name')
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
                     ->sortable()
                     ->weight('semibold'),
 
+                TextColumn::make('categorieAutreDemande.name')
+                    ->label('Catégorie')
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('—'),
+
                 TextColumn::make('type')
                     ->label('Type de demande')
-                    ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state] ?? $state)
+                    ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
+                        ?? DocumentType::withoutGlobalScopes()->where('code', $state)->value('name')
+                        ?? $state)
                     ->badge()
                     ->color('warning'),
 
