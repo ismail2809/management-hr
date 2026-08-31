@@ -136,7 +136,8 @@ class AutreDemandeResource extends Resource
                 ->schema([
                     Select::make('photocopie_sous_type')
                         ->label('Nature du document')
-                        ->options(fn () => NatureDocument::where('active', true)
+                        ->options(fn () => NatureDocument::withoutGlobalScopes()
+                            ->where('active', true)
                             ->orderBy('sort_order')
                             ->pluck('name', 'name')
                             ->toArray()
