@@ -120,7 +120,8 @@ class AutreDemandeResource extends Resource
                         ->label('Type de demande')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
                         ->required()
-                        ->live(),
+                        ->live()
+                        ->columnSpanFull(),
 
                 ]),
 

@@ -308,39 +308,43 @@ html body.fi-body .fi-main,
   box-shadow: var(--hr-shadow-sm) !important;
   overflow: visible !important;
   transition: box-shadow 0.2s ease !important;
-}
-.fi-section-header {
-  border-top-left-radius: var(--hr-radius-md) !important;
-  border-top-right-radius: var(--hr-radius-md) !important;
+  position: relative !important;
 }
 
 .fi-section:hover {
   box-shadow: var(--hr-shadow-md) !important;
 }
 
-.fi-section-header {
+/* Section header — light mode fort contraste */
+.fi-section > .fi-section-header,
+.fi-section > * > .fi-section-header {
   border-bottom: 1px solid var(--hr-border) !important;
-  padding: 14px 20px !important;
-  background-color: #f1f5f9 !important; /* plus contrasté que #f8fafc */
+  border-top-left-radius: var(--hr-radius-md) !important;
+  border-top-right-radius: var(--hr-radius-md) !important;
+  padding: 13px 20px !important;
+  background-color: #e8eef5 !important;
+  overflow: hidden !important;
 }
 
-.dark .fi-section-header {
-  background-color: var(--hr-bg-elevated) !important;
+.dark .fi-section > .fi-section-header,
+.dark .fi-section > * > .fi-section-header {
+  background-color: #1a2235 !important;
 }
 
 .fi-section-header-heading {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 600 !important;
+  font-weight: 700 !important;
   font-size: 0.875rem !important;
   color: var(--hr-heading) !important;
   letter-spacing: -0.1px !important;
 }
 
-.fi-section-header-icon {
+.fi-section-header-icon,
+.fi-section-header svg {
   color: var(--hr-primary) !important;
   width: 16px !important;
   height: 16px !important;
-  opacity: 0.8 !important;
+  flex-shrink: 0 !important;
 }
 
 .fi-section-description,
@@ -364,19 +368,24 @@ html body.fi-body .fi-main,
   border: 1px solid var(--hr-border) !important;
   border-radius: var(--hr-radius) !important;
   box-shadow: none !important;
+  overflow: visible !important;
 }
 
 .fi-section .fi-section:hover {
   box-shadow: var(--hr-shadow-xs) !important;
 }
 
-.fi-section .fi-section .fi-section-header {
-  background-color: #e8edf5 !important;
-  padding: 10px 16px !important;
+.fi-section .fi-section > .fi-section-header,
+.fi-section .fi-section > * > .fi-section-header {
+  background-color: #dde5ef !important;
+  border-top-left-radius: var(--hr-radius) !important;
+  border-top-right-radius: var(--hr-radius) !important;
+  padding: 9px 14px !important;
 }
 
-.dark .fi-section .fi-section .fi-section-header {
-  background-color: rgba(255,255,255,0.04) !important;
+.dark .fi-section .fi-section > .fi-section-header,
+.dark .fi-section .fi-section > * > .fi-section-header {
+  background-color: rgba(255,255,255,0.05) !important;
 }
 
 .fi-section .fi-section .fi-section-header-heading {
