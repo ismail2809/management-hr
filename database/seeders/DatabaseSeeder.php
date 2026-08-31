@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ProfessionSeeder::class,
             NiveauScolaireSeeder::class,
             GroupeSeeder::class,
+            NatureDocumentSeeder::class,
         ]);
 
         // Générer les permissions Shield avant d'assigner les rôles

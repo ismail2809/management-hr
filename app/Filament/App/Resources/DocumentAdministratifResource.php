@@ -121,6 +121,14 @@ class DocumentAdministratifResource extends Resource
                 ]),
 
             Section::make('Détails')->schema([
+                Select::make('status')
+                    ->label('Statut')
+                    ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
+                    ->default('en_attente')
+                    ->disabled($isEmployee)
+                    ->dehydrated()
+                    ->required(),
+
                 Textarea::make('description')
                     ->label('Description / détails')
                     ->rows(3)
@@ -130,14 +138,6 @@ class DocumentAdministratifResource extends Resource
                     ->label('Remarques complémentaires')
                     ->rows(2)
                     ->nullable(),
-
-                Select::make('status')
-                    ->label('Statut')
-                    ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
-                    ->default('en_attente')
-                    ->disabled($isEmployee)
-                    ->dehydrated()
-                    ->required(),
 
                 FileUpload::make('fichier_final')
                     ->label('Fichier final (uploadé par l\'admin)')
@@ -162,6 +162,16 @@ class DocumentAdministratifResource extends Resource
     {
         return $table
             ->columns([
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'en_attente' => 'warning',
+                        'approuvé'   => 'success',
+                        'refusé'     => 'danger',
+                        default      => 'gray',
+                    }),
+
                 TextColumn::make('employee.full_name')
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
@@ -180,16 +190,6 @@ class DocumentAdministratifResource extends Resource
                     ->color(fn ($state) => $state === 'digital' ? 'primary' : 'gray')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'digital' => 'PDF', 'papier' => 'Papier', default => '—',
-                    }),
-
-                TextColumn::make('status')
-                    ->label('Statut')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'en_attente' => 'warning',
-                        'approuvé'   => 'success',
-                        'refusé'     => 'danger',
-                        default      => 'gray',
                     }),
 
                 TextColumn::make('created_at')

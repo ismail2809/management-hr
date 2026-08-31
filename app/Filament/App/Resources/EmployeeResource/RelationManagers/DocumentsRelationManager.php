@@ -18,6 +18,11 @@ class DocumentsRelationManager extends RelationManager
     protected static string $relationship = 'documents';
     protected static ?string $title = 'Documents';
 
+    public static function canViewForRecord(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): bool
+    {
+        return true;
+    }
+
     public static array $typeLabels = [
         'photo'           => 'Photo',
         'extrait_naissance' => 'Extrait de naissance',
@@ -74,6 +79,12 @@ class DocumentsRelationManager extends RelationManager
                     ])),
             ])
             ->actions([
+                \Filament\Actions\Action::make('download')
+                    ->label('Télécharger')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('primary')
+                    ->url(fn ($record) => asset('storage/' . $record->file_path))
+                    ->openUrlInNewTab(),
                 DeleteAction::make(),
             ])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);

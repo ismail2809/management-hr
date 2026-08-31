@@ -34,7 +34,7 @@ class EmployeeResource extends Resource
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Employés';
     protected static ?string $modelLabel = 'Employé';
-    protected static \UnitEnum|string|null $navigationGroup = 'Employés';
+    protected static \UnitEnum|string|null $navigationGroup = 'Personnel';
     protected static ?int $navigationSort = 1;
 
     /** Disabled for employee if the field already has a value in DB. */

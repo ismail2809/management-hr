@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="96" stroke="#1e40af" stroke-width="3" fill="white"/>
+
+  <!-- Book icon background shield -->
+  <path d="M100 30 L150 60 L150 130 Q150 160 100 175 Q50 160 50 130 L50 60 Z"
+        fill="#1e40af" opacity="0.08"/>
+
+  <!-- Graduation cap -->
+  <path d="M100 55 L140 75 L100 95 L60 75 Z" fill="#1e40af"/>
+  <path d="M82 83 L82 108 Q82 120 100 126 Q118 120 118 108 L118 83" fill="#1e40af" opacity="0.85"/>
+  <line x1="140" y1="75" x2="140" y2="100" stroke="#1e40af" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="140" cy="103" r="5" fill="#f59e0b"/>
+
+  <!-- School initials text -->
+  <text x="100" y="155" text-anchor="middle"
+        font-family="'Plus Jakarta Sans', 'Inter', sans-serif"
+        font-weight="800" font-size="18" fill="#1e40af" letter-spacing="3">
+    ÉCOLE RH
+  </text>
+
+  <!-- Decorative divider -->
+  <line x1="60" y1="140" x2="140" y2="140" stroke="#1e40af" stroke-width="1.5" opacity="0.3"/>
+</svg>

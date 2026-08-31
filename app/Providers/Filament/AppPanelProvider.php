@@ -37,28 +37,35 @@ class AppPanelProvider extends PanelProvider
             ->login(\App\Filament\App\Pages\Auth\Login::class)
             ->profile(isSimple: false)
             ->colors([
-                'primary'  => Color::hex('#0da8b1'),
-                'warning'  => Color::hex('#fda31a'),
-                'success'  => Color::hex('#10b981'),
-                'danger'   => Color::hex('#ef4444'),
-                'info'     => Color::hex('#6366f1'),
+                'primary'  => Color::hex('#1e40af'),
+                'warning'  => Color::hex('#f59e0b'),
+                'success'  => Color::hex('#059669'),
+                'danger'   => Color::hex('#dc2626'),
+                'info'     => Color::hex('#0284c7'),
                 'gray'     => Color::Slate,
             ])
-            ->brandName('GestionHR')
+            ->brandName('École RH')
             ->maxContentWidth(Width::Full)
-            ->sidebarWidth('220px')
+            ->sidebarWidth('230px')
             ->sidebarCollapsibleOnDesktop()
+            ->favicon(asset('images/logo.svg'))
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=2">')
+                fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=3">')
             )
             ->navigationGroups([
-                NavigationGroup::make('Employés'),
-                NavigationGroup::make('Congés & Présence'),
-                NavigationGroup::make('Demandes'),
-                NavigationGroup::make('Administration'),
-                NavigationGroup::make('Paramétrage'),
-                NavigationGroup::make('Journal d\'audit'),
+                NavigationGroup::make('Personnel')
+                    ->icon('heroicon-o-users'),
+                NavigationGroup::make('Congés & Absences')
+                    ->icon('heroicon-o-calendar-days'),
+                NavigationGroup::make('Demandes')
+                    ->icon('heroicon-o-document-text'),
+                NavigationGroup::make('Administration')
+                    ->icon('heroicon-o-cog-6-tooth'),
+                NavigationGroup::make('Paramétrage')
+                    ->icon('heroicon-o-adjustments-horizontal'),
+                NavigationGroup::make('Journal d\'audit')
+                    ->icon('heroicon-o-clipboard-document-list'),
             ])
             ->navigationItems([
                 NavigationItem::make('Mon profil')

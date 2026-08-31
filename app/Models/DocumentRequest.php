@@ -36,10 +36,19 @@ class DocumentRequest extends Model
         'nb_telechargements',
         'processed_by',
         'processed_at',
+        'photocopie_sous_type',
+        'photocopie_niveau',
+        'photocopie_groupe',
+        'photocopie_nb_copies',
+        'photocopie_date_souhaitee',
+        'rencontre_employee_ids',
     ];
 
     protected $casts = [
-        'processed_at' => 'datetime',
+        'processed_at'              => 'datetime',
+        'photocopie_date_souhaitee' => 'date',
+        'photocopie_nb_copies'      => 'integer',
+        'rencontre_employee_ids'    => 'array',
     ];
 
     public static array $documentTypes = [
@@ -71,7 +80,7 @@ class DocumentRequest extends Model
             ?? $this->type;
     }
 
-    public function employee(): BelongsTo  { return $this->belongsTo(Employee::class); }
-    public function processor(): BelongsTo { return $this->belongsTo(User::class, 'processed_by'); }
-    public function company(): BelongsTo   { return $this->belongsTo(Company::class); }
+    public function employee(): BelongsTo        { return $this->belongsTo(Employee::class); }
+    public function processor(): BelongsTo       { return $this->belongsTo(User::class, 'processed_by'); }
+    public function company(): BelongsTo         { return $this->belongsTo(Company::class); }
 }
