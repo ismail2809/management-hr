@@ -675,112 +675,113 @@ textarea::placeholder {
 }
 
 /* ════════════════════════════════
-   DROPDOWN MENUS
+   DROPDOWN MENUS (user menu right)
    ════════════════════════════════ */
-.fi-dropdown-panel {
-  background-color: var(--hr-bg-card) !important;
-  border: 1px solid var(--hr-border) !important;
-  border-radius: var(--hr-radius-md) !important;
-  box-shadow: var(--hr-shadow-lg) !important;
+
+/* Panel = fond blanc en light mode */
+html body .fi-dropdown-panel,
+html body [class*="fi-dropdown-panel"] {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.10), 0 1px 6px rgba(0,0,0,0.06) !important;
   overflow: hidden !important;
+  min-width: 180px !important;
 }
 
-/* Dropdown header (user name / email zone) */
-.fi-dropdown-header {
-  background-color: var(--hr-bg-elevated) !important;
-  border-bottom: 1px solid var(--hr-border) !important;
+/* Header du panel (nom utilisateur) */
+html body .fi-dropdown-header {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
   padding: 12px 14px !important;
+  color: #0f172a !important;
 }
 
-.fi-dropdown-header-label,
-.fi-dropdown-header-description,
-.fi-dropdown-header * {
-  color: var(--hr-text) !important;
+html body .fi-dropdown-header *,
+html body .fi-dropdown-header span {
+  color: #0f172a !important;
 }
 
-.fi-dropdown-header-description {
-  color: var(--hr-text-muted) !important;
-  font-size: 0.75rem !important;
+/* Liste — padding vertical */
+html body .fi-dropdown-list {
+  padding: 4px !important;
+  background-color: #ffffff !important;
 }
 
-/* Dropdown divider */
-.fi-dropdown-list-separator,
-.fi-dropdown-divider {
-  border-color: var(--hr-border) !important;
-  margin-block: 4px !important;
-}
-
-/* Dropdown items — vraie classe Filament v4 */
-.fi-dropdown-list-item {
-  color: var(--hr-text) !important;
-  font-size: 0.82rem !important;
-  border-radius: var(--hr-radius-sm) !important;
-  margin: 2px 4px !important;
-  padding-block: 7px !important;
-  padding-inline: 10px !important;
-  transition: background-color 0.1s !important;
-  width: calc(100% - 8px) !important;
+/* Items */
+html body .fi-dropdown-list-item {
+  background-color: transparent !important;
+  color: #1e293b !important;
+  font-size: 0.83rem !important;
+  font-weight: 500 !important;
+  border-radius: 6px !important;
+  padding: 8px 10px !important;
+  margin: 1px 0 !important;
+  width: 100% !important;
   display: flex !important;
   align-items: center !important;
   gap: 8px !important;
+  transition: background-color 0.1s, color 0.1s !important;
 }
 
-.fi-dropdown-list-item:hover {
-  background-color: var(--hr-primary-light) !important;
-  color: var(--hr-primary) !important;
+html body .fi-dropdown-list-item:hover {
+  background-color: #eff6ff !important;
+  color: #1e40af !important;
 }
 
-/* Label du dropdown item */
-.fi-dropdown-list-item-label {
+/* Label item */
+html body .fi-dropdown-list-item-label {
   color: inherit !important;
-  font-size: 0.82rem !important;
 }
 
-/* Danger item (déconnexion) */
-.fi-dropdown-list-item[class*="danger"],
-.fi-dropdown-list-item[style*="--c-"] {
-  /* géré par Filament color system */
-}
-
-/* Override explicite logout/danger */
-.fi-user-menu .fi-dropdown-list-item:last-child,
-.fi-dropdown-list-item.fi-color-danger {
-  color: var(--hr-danger) !important;
-}
-
-.fi-user-menu .fi-dropdown-list-item:last-child:hover,
-.fi-dropdown-list-item.fi-color-danger:hover {
-  background-color: var(--hr-danger-bg) !important;
-  color: var(--hr-danger) !important;
-}
-
-/* Icônes dropdown */
-.fi-dropdown-list-item svg,
-.fi-dropdown-list-item-icon {
+/* Icônes item */
+html body .fi-dropdown-list-item svg {
   width: 15px !important;
   height: 15px !important;
   flex-shrink: 0 !important;
-  opacity: 0.7 !important;
+  opacity: 0.65 !important;
   color: inherit !important;
 }
 
-/* Dark mode dropdown */
-.dark .fi-dropdown-panel {
-  background-color: var(--hr-bg-elevated) !important;
-  border-color: var(--hr-border) !important;
+/* Séparateur */
+html body .fi-dropdown-list-separator,
+html body .fi-dropdown-divider {
+  border-color: #e2e8f0 !important;
+  margin: 3px 0 !important;
+}
+
+/* ── DARK MODE ── */
+.dark .fi-dropdown-panel,
+.dark [class*="fi-dropdown-panel"] {
+  background-color: #1a2235 !important;
+  border-color: rgba(255,255,255,0.07) !important;
 }
 
 .dark .fi-dropdown-header {
-  background-color: var(--hr-bg-card) !important;
+  background-color: #111827 !important;
+  border-bottom-color: rgba(255,255,255,0.06) !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .fi-dropdown-header * {
+  color: #e2e8f0 !important;
+}
+
+.dark .fi-dropdown-list {
+  background-color: #1a2235 !important;
 }
 
 .dark .fi-dropdown-list-item {
-  color: var(--hr-text) !important;
+  color: #cbd5e1 !important;
 }
 
 .dark .fi-dropdown-list-item:hover {
-  background-color: var(--hr-sidebar-hover) !important;
+  background-color: rgba(255,255,255,0.06) !important;
   color: #ffffff !important;
+}
+
+.dark .fi-dropdown-list-separator {
+  border-color: rgba(255,255,255,0.06) !important;
 }
 
 /* ════════════════════════════════
