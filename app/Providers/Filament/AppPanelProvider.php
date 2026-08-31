@@ -56,11 +56,37 @@ class AppPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn () => new HtmlString('<style>
-/* ── Sidebar override — BODY_END — highest priority ── */
-.fi-sidebar, .fi-main-sidebar { background-color: #0f1c3f !important; }
-.fi-sidebar-nav { background-color: transparent !important; }
+/* ════ SIDEBAR — BODY_END — always dark navy ════ */
+.fi-sidebar,
+.fi-main-sidebar,
+.fi-sidebar-header,
+.fi-sidebar-header-ctn,
+.fi-sidebar-footer,
+.fi-sidebar-nav,
+.fi-sidebar-nav-groups,
+.fi-sidebar-group,
+.fi-sidebar-group-items,
+aside.fi-sidebar {
+    background-color: #0f1c3f !important;
+    color: rgba(255,255,255,0.82) !important;
+}
+.fi-sidebar { border-right: 1px solid rgba(255,255,255,0.07) !important; }
+
+/* Group label */
+.fi-sidebar-group-label {
+    color: rgba(148,163,184,0.55) !important;
+    font-size: 0.6rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 1.4px !important;
+    text-transform: uppercase !important;
+}
+.fi-sidebar-group-btn { color: rgba(255,255,255,0.6) !important; background: transparent !important; }
+.fi-sidebar-group-btn svg { color: rgba(255,255,255,0.5) !important; }
+
+/* Nav items */
 .fi-sidebar-item-btn {
     color: rgba(255,255,255,0.82) !important;
+    background-color: transparent !important;
     border-radius: 6px !important;
     margin-inline: 8px !important;
     padding: 8px 10px !important;
@@ -69,7 +95,8 @@ class AppPanelProvider extends PanelProvider
     display: flex !important;
     align-items: center !important;
     gap: 10px !important;
-    transition: all 0.15s !important;
+    transition: background-color 0.15s, color 0.15s !important;
+    text-decoration: none !important;
 }
 .fi-sidebar-item-btn:hover {
     background-color: rgba(96,165,250,0.15) !important;
@@ -82,15 +109,12 @@ li.fi-active > .fi-sidebar-item-btn,
     font-weight: 600 !important;
 }
 .fi-sidebar-item-label { color: inherit !important; }
-.fi-sidebar-item-icon svg { color: inherit !important; width:16px !important; height:16px !important; }
-.fi-sidebar-group-label {
-    color: rgba(148,163,184,0.6) !important;
-    font-size: 0.6rem !important;
-    font-weight: 700 !important;
-    letter-spacing: 1.4px !important;
-    text-transform: uppercase !important;
-}
-.fi-sidebar-group-btn { color: rgba(255,255,255,0.6) !important; }
+.fi-sidebar-item-icon,
+.fi-sidebar-item-icon svg { color: inherit !important; width: 16px !important; height: 16px !important; }
+
+/* Brand name */
+.fi-sidebar .fi-logo,
+.fi-sidebar .fi-brand-name { color: #ffffff !important; }
 </style>')
             )
             ->navigationGroups([
