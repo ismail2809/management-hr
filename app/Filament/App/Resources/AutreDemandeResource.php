@@ -7,7 +7,6 @@ use App\Filament\App\Resources\AutreDemandeResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;
-use App\Models\CategorieAutreDemande;
 use App\Models\Groupe;
 use App\Models\NatureDocument;
 use App\Models\NiveauScolaire;
@@ -115,23 +114,14 @@ class AutreDemandeResource extends Resource
 
             Section::make('Autre demande')
                 ->icon('heroicon-o-chat-bubble-left-right')
+                ->columns(2)
                 ->schema([
-                    Select::make('categorie_autre_demande_id')
-                        ->label('Catégorie de demande')
-                        ->options(fn () => CategorieAutreDemande::withoutGlobalScopes()->where('active', true)
-                            ->orderBy('sort_order')
-                            ->pluck('name', 'id')
-                            ->toArray()
-                        )
-                        ->searchable()
-                        ->preload()
-                        ->nullable(),
-
                     Select::make('type')
                         ->label('Type de demande')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
                         ->required()
-                        ->live(),
+                        ->live()
+                        ->columnSpanFull(),
                 ]),
 
             Section::make('Détails Photocopie')
@@ -271,8 +261,17 @@ class AutreDemandeResource extends Resource
                 ->icon('heroicon-o-user-circle')
                 ->columns(2)
                 ->schema([
+                    TextEntry::make('status')
+                        ->label('Statut')
+                        ->badge()
+                        ->color(fn ($state) => match ($state) {
+                            'en_attente' => 'warning',
+                            'approuvé'   => 'success',
+                            'refusé'     => 'danger',
+                            default      => 'gray',
+                        }),
+                    TextEntry::make('created_at')->label('Demandé le')->date('d/m/Y'),
                     TextEntry::make('employee.full_name')->label('Employé(e)'),
-                    TextEntry::make('categorieAutreDemande.name')->label('Catégorie')->placeholder('—'),
                     TextEntry::make('type')
                         ->label('Type de demande')
                         ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
@@ -317,16 +316,6 @@ class AutreDemandeResource extends Resource
             Section::make('Détails')
                 ->columns(2)
                 ->schema([
-                    TextEntry::make('status')
-                        ->label('Statut')
-                        ->badge()
-                        ->color(fn ($state) => match ($state) {
-                            'en_attente' => 'warning',
-                            'approuvé'   => 'success',
-                            'refusé'     => 'danger',
-                            default      => 'gray',
-                        }),
-                    TextEntry::make('created_at')->label('Demandé le')->date('d/m/Y'),
                     TextEntry::make('description')->label('Description / détails')->columnSpanFull(),
                     TextEntry::make('reason')->label('Remarques complémentaires')->columnSpanFull(),
                 ]),
@@ -353,12 +342,6 @@ class AutreDemandeResource extends Resource
                     ->sortable()
                     ->weight('semibold'),
 
-                TextColumn::make('categorieAutreDemande.name')
-                    ->label('Catégorie')
-                    ->badge()
-                    ->color('info')
-                    ->placeholder('—'),
-
                 TextColumn::make('type')
                     ->label('Type de demande')
                     ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
@@ -367,33 +350,7 @@ class AutreDemandeResource extends Resource
                     ->badge()
                     ->color('warning'),
 
-                TextColumn::make('rencontre_employee_ids')
-                    ->label('Employés concernés')
-                    ->formatStateUsing(function ($state, DocumentRequest $record): string {
-                        if ($record->type !== 'rencontre_direction' || empty($state)) {
-                            return '—';
-                        }
-                        return Employee::withoutGlobalScopes()
-                            ->with('profession')
-                            ->whereIn('id', $state)
-                            ->get()
-                            ->map(fn (Employee $e) => $e->full_name . ($e->profession ? ' (' . $e->profession->name . ')' : ''))
-                            ->join(', ');
-                    })
-                    ->wrap()
-                    ->toggleable(),
-
-                TextColumn::make('status')
-                    ->label('Statut')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'en_attente' => 'warning',
-                        'approuvé'   => 'success',
-                        'refusé'     => 'danger',
-                        default      => 'gray',
-                    }),
-
-                TextColumn::make('fichier_final')
+TextColumn::make('fichier_final')
                     ->label('Fichier')
                     ->formatStateUsing(fn ($state) => $state ? 'Télécharger' : '—')
                     ->icon(fn ($state) => $state ? 'heroicon-o-paper-clip' : null)

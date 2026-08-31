@@ -19,10 +19,25 @@ class GroupeSeeder extends Seeder
         }
 
         $data = [
-            'Préscolaire' => ['Petite section', 'Moyenne section', 'Grande section'],
-            'Primaire'    => ['1ère année', '2ème année', '3ème année', '4ème année', '5ème année', '6ème année'],
-            'Collège'     => ['1ère année collège', '2ème année collège', '3ème année collège'],
-            'Lycée'       => ['Tronc commun', '1ère bac', '2ème bac'],
+            'Primaire' => [
+                '1ère Année du primaire',
+                '2ème Année du primaire',
+                '3ème Année du primaire',
+                '4ème Année du primaire',
+                '5ème Année du primaire',
+                '6ème Année du primaire',
+            ],
+            'Collège' => [
+                '1ère Année du collège – Parcours International',
+                '2ème Année du collège – Parcours International',
+                '3ème Année du collège – Parcours International',
+            ],
+            'Lycée' => [
+                'Tronc Commun Scientifiques – Parcours International',
+                '1ère Année du Baccalauréat Sciences Expérimentales – Parcours International',
+                '1ère Année du Baccalauréat Sciences Mathématiques',
+                '2ème Année du Baccalauréat Sciences Physiques – Parcours International',
+            ],
         ];
 
         $count = 0;
