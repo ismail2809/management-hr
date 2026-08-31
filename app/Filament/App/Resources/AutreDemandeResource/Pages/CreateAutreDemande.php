@@ -45,6 +45,7 @@ class CreateAutreDemande extends CreateRecord
             Step::make('Demandeur')
                 ->description('Sélectionnez l\'employé concerné.')
                 ->icon('heroicon-o-user-circle')
+                ->columns(2)
                 ->schema([
                     AutreDemandeResource::companyField(),
 
@@ -69,6 +70,7 @@ class CreateAutreDemande extends CreateRecord
             Step::make('Autre demande')
                 ->description('Choisissez le type et les détails.')
                 ->icon('heroicon-o-chat-bubble-left-right')
+                ->columns(2)
                 ->schema([
                     Section::make('Type de demande')
                         ->icon('heroicon-o-chat-bubble-left-right')
