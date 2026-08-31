@@ -46,6 +46,7 @@ class CreateDocumentAdministratif extends CreateRecord
             Step::make('Demandeur')
                 ->description('Sélectionnez l\'employé concerné.')
                 ->icon('heroicon-o-user-circle')
+                ->columns(2)
                 ->schema([
                     DocumentAdministratifResource::companyField(),
 
@@ -73,6 +74,7 @@ class CreateDocumentAdministratif extends CreateRecord
                 ->schema([
                     Section::make('Type de document')
                         ->icon('heroicon-o-document-text')
+                        ->columns(2)
                         ->schema([
                             Select::make('type')
                                 ->label('Type de document')
@@ -87,6 +89,14 @@ class CreateDocumentAdministratif extends CreateRecord
                         ]),
 
                     Section::make('Détails')->schema([
+                        Select::make('status')
+                            ->label('Statut')
+                            ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
+                            ->default('en_attente')
+                            ->disabled($isEmployee)
+                            ->dehydrated()
+                            ->required(),
+
                         Textarea::make('description')
                             ->label('Description / détails')
                             ->rows(3)
@@ -96,14 +106,6 @@ class CreateDocumentAdministratif extends CreateRecord
                             ->label('Remarques complémentaires')
                             ->rows(2)
                             ->nullable(),
-
-                        Select::make('status')
-                            ->label('Statut')
-                            ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
-                            ->default('en_attente')
-                            ->disabled($isEmployee)
-                            ->dehydrated()
-                            ->required(),
 
                         FileUpload::make('fichier_final')
                             ->label('Fichier final (uploadé par l\'admin)')

@@ -150,6 +150,9 @@ class DocumentAdministratifResource extends Resource
                     ])
                     ->maxSize(10240)
                     ->nullable()
+                    ->openable()
+                    ->downloadable()
+                    ->previewable()
                     ->hidden($isEmployee),
             ]),
         ]);
@@ -201,6 +204,14 @@ class DocumentAdministratifResource extends Resource
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()->label('Voir'),
+
+                    Action::make('voir_fichier')
+                        ->label('Voir fichier')
+                        ->icon('heroicon-o-eye')
+                        ->color('info')
+                        ->visible(fn (DocumentRequest $record) => filled($record->fichier_final))
+                        ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
+                        ->openUrlInNewTab(),
 
                     Action::make('download_final')
                         ->label('Télécharger document')
