@@ -3,96 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: DejaVu Sans, sans-serif; font-size: 11px; color: #1a1a1a; }
-    .page { padding: 40px 50px; }
-    .header { text-align: center; border-bottom: 2px solid #0da8b1; padding-bottom: 16px; margin-bottom: 30px; }
-    .company-name { font-size: 18px; font-weight: bold; color: #0da8b1; }
-    .company-info { font-size: 10px; color: #555; margin-top: 4px; line-height: 1.6; }
-    .doc-title { text-align: center; margin: 30px 0; }
-    .doc-title h1 { font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: #222; border-bottom: 1px solid #333; display: inline-block; padding-bottom: 6px; }
-    .body-text { line-height: 1.9; font-size: 12px; text-align: justify; margin-bottom: 20px; }
-    .body-text .highlight { font-weight: bold; color: #0a1628; }
-    .info-box { background: #f0fdfe; border-left: 4px solid #0da8b1; padding: 12px 16px; margin: 20px 0; font-size: 11px; }
-    .info-box .row { display: flex; margin-bottom: 6px; }
-    .info-box .label { width: 180px; color: #555; flex-shrink: 0; }
-    .info-box .value { font-weight: bold; }
-    .footer-note { font-size: 10px; color: #777; margin-top: 30px; font-style: italic; }
-    .signature-block { margin-top: 50px; display: flex; justify-content: space-between; }
-    .sig-left { width: 45%; }
-    .sig-right { width: 45%; text-align: center; }
-    .sig-right .sig-title { font-weight: bold; margin-bottom: 60px; }
-    .sig-right .sig-name { border-top: 1px solid #333; padding-top: 6px; font-size: 10px; color: #555; }
-    .date-lieu { margin-top: 40px; font-size: 11px; }
-    .stamp-area { border: 1px dashed #aaa; width: 120px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #aaa; margin: 0 auto 8px; }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DejaVu Sans', Arial, sans-serif;
+    font-size: 12px;
+    color: #1a1a1a;
+    background: #fff;
+  }
+
+  /* ── Coins décoratifs (position:fixed = relatif à la page physique) ── */
+  .corner-top-right {
+    position: fixed;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 130px 130px 0;
+    border-color: transparent #1c3f6e transparent transparent;
+  }
+  .corner-bottom-left {
+    position: fixed;
+    bottom: 0; left: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 0 110px 165px;
+    border-color: transparent transparent #2a9d8f transparent;
+  }
+
+  /* ── Pied de page fixé ── */
+  .doc-footer {
+    position: fixed;
+    bottom: 10mm;
+    left: 18mm;
+    right: 18mm;
+    border-top: 1px solid #ccc;
+    padding-top: 7px;
+    font-size: 9px;
+    color: #333;
+    line-height: 1.7;
+  }
+  .footer-left  { float: left; }
+  .footer-right { float: right; text-align: right; }
+  .footer-clear { clear: both; }
+
+  /* ── Contenu principal ── */
+  .content {
+    padding: 20mm 20mm 36mm 20mm;
+    position: relative;
+  }
+
+  /* En-tête */
+  .header-left  { float: left; }
+  .header-right { float: right; text-align: right; font-size: 12px; line-height: 1.8; padding-top: 6px; }
+  .header-clear { clear: both; margin-bottom: 30px; }
+
+  .brand-logo img { height: 70px; width: auto; display: block; }
+
+  /* Titre encadré */
+  .title-wrap { text-align: center; margin: 10px 0 38px 0; }
+  .title-box {
+    display: inline-block;
+    border: 2.5px solid #1a1a1a;
+    padding: 14px 50px;
+    font-weight: bold;
+    font-size: 16px;
+    letter-spacing: 3px;
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* Corps */
+  .body-text { font-size: 13px; line-height: 2.1; text-align: justify; }
+  .body-text p { margin-bottom: 22px; text-indent: 40px; }
+
+  /* Signature */
+  .signature { text-align: right; margin-top: 55px; font-weight: bold; font-size: 13px; }
 </style>
 </head>
 <body>
-<div class="page">
-    <div class="header">
-        <div class="company-name">{{ $company->name }}</div>
-        <div class="company-info">
-            {{ $company->address ?? '' }}{{ $company->city ? ', ' . $company->city : '' }}<br>
-            @if($company->phone) Tél : {{ $company->phone }} — @endif
-            @if($company->email) Email : {{ $company->email }} @endif<br>
-            @if($company->rc) RC : {{ $company->rc }} — @endif
-            @if($company->ice) ICE : {{ $company->ice }} @endif
-        </div>
-    </div>
 
-    <div class="doc-title">
-        <h1>Attestation de Travail</h1>
-    </div>
+{{-- Coins --}}
+<div class="corner-top-right"></div>
+<div class="corner-bottom-left"></div>
 
-    <div class="body-text">
-        Je soussigné(e), représentant légal de la société <span class="highlight">{{ $company->name }}</span>,
-        atteste par la présente que :
-    </div>
-
-    <div class="info-box">
-        <div class="row"><span class="label">Nom et prénom :</span><span class="value">{{ $employee->full_name }}</span></div>
-        <div class="row"><span class="label">CIN :</span><span class="value">{{ $employee->cin ?? '—' }}</span></div>
-        <div class="row"><span class="label">N° CNSS :</span><span class="value">{{ $employee->cnss_number ?? '—' }}</span></div>
-        <div class="row"><span class="label">Poste occupé :</span><span class="value">{{ $employee->profession?->name ?? '—' }}</span></div>
-        <div class="row"><span class="label">Département :</span><span class="value">{{ — }}</span></div>
-        <div class="row"><span class="label">Type de contrat :</span><span class="value">{{ $employee->contract_type }}</span></div>
-        <div class="row"><span class="label">Date d'embauche :</span><span class="value">{{ $employee->hire_date ? \Carbon\Carbon::parse($employee->hire_date)->format('d/m/Y') : '—' }}</span></div>
-    </div>
-
-    <div class="body-text">
-        <span class="highlight">{{ $employee->full_name }}</span> est employé(e) au sein de notre entreprise
-        @if($employee->hire_date)
-            depuis le <span class="highlight">{{ \Carbon\Carbon::parse($employee->hire_date)->format('d/m/Y') }}</span>,
-        @endif
-        en qualité de <span class="highlight">{{ $employee->profession?->name ?? 'collaborateur(trice)' }}</span>.
-    </div>
-
-    <div class="body-text">
-        Cette attestation est délivrée à l'intéressé(e) pour servir et valoir ce que de droit.
-    </div>
-
-    @if($documentRequest->reason)
-    <div class="body-text">
-        <em>Motif de la demande : {{ $documentRequest->reason }}</em>
-    </div>
-    @endif
-
-    <div class="date-lieu">
-        Fait à {{ $company->city ?? '___________' }}, le {{ $date }}
-    </div>
-
-    <div class="signature-block">
-        <div class="sig-left"></div>
-        <div class="sig-right">
-            <div class="stamp-area">Cachet &amp; Signature</div>
-            <div class="sig-title">La Direction</div>
-            <div class="sig-name">{{ $company->name }}</div>
-        </div>
-    </div>
-
-    <div class="footer-note">
-        Document généré le {{ $date }} — {{ $company->name }} — Réf. DRH-AT-{{ $employee->matricule }}-{{ now()->format('Ymd') }}
-    </div>
+{{-- Pied de page --}}
+<div class="doc-footer">
+  <div class="footer-left">
+    @if($company->patente)PATENTE : {{ $company->patente }}@if($company->cnss_affiliation) &nbsp;–&nbsp; CNSS : {{ $company->cnss_affiliation }}@endif<br>@endif
+    @if($company->rc)RC : {{ $company->rc }}@endif@if($company->ice) &nbsp;–&nbsp; IF : {{ $company->ice }}@endif
+  </div>
+  <div class="footer-right">
+    @if($company->email)✉ {{ $company->email }}<br>@endif
+    @if($company->phone)☏ {{ $company->phone }}<br>@endif
+    @if($company->city)⚲ {{ $company->city }}@endif
+  </div>
+  <div class="footer-clear"></div>
 </div>
+
+{{-- Contenu --}}
+<div class="content">
+
+  @php
+    $civilite   = match($employee->gender ?? '') { 'female','F','f' => 'Mme', default => 'M.' };
+    $nomComplet = strtoupper($employee->last_name) . ' ' . $employee->first_name;
+    $fonction   = $employee->profession?->name ?? 'collaborateur(trice)';
+    $dateDebut  = $employee->hire_date
+        ? \Carbon\Carbon::parse($employee->hire_date)->format('d/m/Y')
+        : '___/___/______';
+    $ref        = $documentRequest->id . '/DRH/' . now()->format('Y') . '.' . now()->format('m');
+    $dateEd     = now()->format('d / m / Y');
+  @endphp
+
+  {{-- En-tête --}}
+  <div class="header-left">
+    <div class="brand-logo">
+      <img src="{{ public_path('logo.png') }}" alt="{{ $company->name }}">
+    </div>
+  </div>
+  <div class="header-right">
+    Réf : {{ $ref }}<br>
+    {{ $company->city ?? '' }}, le {{ $dateEd }}
+  </div>
+  <div class="header-clear"></div>
+
+  {{-- Titre --}}
+  <div class="title-wrap">
+    <div class="title-box">ATTESTATION<br>DE<br>TRAVAIL</div>
+  </div>
+
+  {{-- Corps --}}
+  <div class="body-text">
+    <p>
+      Je soussigné(e), représentant légal de <strong>{{ $company->name }}</strong>@if($company->city), sise à {{ $company->city }}@endif,
+      atteste par la présente que
+      <strong>{{ $civilite }} {{ $nomComplet }}</strong>,
+      titulaire de la CIN <strong>{{ $employee->cin ?? '—' }}</strong>,
+      exerce au sein de notre établissement la fonction de
+      <strong>{{ $fonction }}</strong>
+      du <strong>{{ $dateDebut }}</strong> à ce jour.
+    </p>
+    <p>
+      En foi de quoi, la présente attestation est délivrée, sur demande de
+      l'intéressé(e) pour servir et valoir ce que de droit.
+    </p>
+    @if($documentRequest->reason)
+    <p><em>Motif : {{ $documentRequest->reason }}</em></p>
+    @endif
+  </div>
+
+  {{-- Signature --}}
+  <div class="signature">Signée :</div>
+
+</div>{{-- /.content --}}
+
 </body>
 </html>

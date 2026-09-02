@@ -205,17 +205,33 @@ class DocumentAdministratifResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()->label('Voir'),
 
-                    Action::make('voir_fichier')
-                        ->label('Voir fichier')
-                        ->icon('heroicon-o-eye')
+                    Action::make('apercu_pdf')
+                        ->label('Aperçu PDF')
+                        ->icon('heroicon-o-document-magnifying-glass')
                         ->color('info')
+                        ->visible(fn (DocumentRequest $record) => view()->exists('pdf.documents.' . $record->type))
+                        ->url(fn (DocumentRequest $record) => route('documents.preview', $record))
+                        ->openUrlInNewTab(),
+
+                    Action::make('generer_pdf')
+                        ->label('Télécharger PDF généré')
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->visible(fn (DocumentRequest $record) => view()->exists('pdf.documents.' . $record->type) && ! auth()->user()?->hasRole('employee'))
+                        ->url(fn (DocumentRequest $record) => route('documents.pdf', $record))
+                        ->openUrlInNewTab(),
+
+                    Action::make('voir_fichier')
+                        ->label('Voir fichier uploadé')
+                        ->icon('heroicon-o-eye')
+                        ->color('gray')
                         ->visible(fn (DocumentRequest $record) => filled($record->fichier_final))
                         ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
                         ->openUrlInNewTab(),
 
                     Action::make('download_final')
-                        ->label('Télécharger document')
-                        ->icon('heroicon-o-arrow-down-tray')
+                        ->label('Télécharger fichier uploadé')
+                        ->icon('heroicon-o-paper-clip')
                         ->color('primary')
                         ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && $record->fichier_final)
                         ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
