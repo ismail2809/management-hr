@@ -53,37 +53,34 @@ class EmployeeResource extends Resource
     {
         return $schema->columns(1)->components([
 
-            /* ── Entreprise + Situation familiale (même ligne) ── */
-            Grid::make(2)->schema([
-                static::companyField(),
+            static::companyField(),
 
-                /* ══ 4. Situation familiale ════════════════ */
-                Section::make('Situation familiale')
-                    ->icon('heroicon-o-heart')
-                    ->visible(fn () => ! auth()->user()?->hasRole('employee'))
-                    ->compact()
-                    ->schema([
-                        Grid::make(2)->schema([
-                            Select::make('marital_status')
-                                ->label('État matrimonial')
-                                ->options([
-                                    'celibataire' => 'Célibataire',
-                                    'marie'       => 'Marié(e)',
-                                    'divorce'     => 'Divorcé(e)',
-                                    'veuf'        => 'Veuf/Veuve',
-                                ])
-                                ->nullable()
-                                ->live()
-                                ->disabled(static::d('marital_status')),
-                            TextInput::make('number_of_children')
-                                ->label("Nombre d'enfants")
-                                ->numeric()
-                                ->minValue(0)
-                                ->default(0)
-                                ->disabled(static::d('number_of_children')),
-                        ]),
+            /* ══ 4. Situation familiale ════════════════ */
+            Section::make('Situation familiale')
+                ->icon('heroicon-o-heart')
+                ->visible(fn () => ! auth()->user()?->hasRole('employee'))
+                ->compact()
+                ->schema([
+                    Grid::make(2)->schema([
+                        Select::make('marital_status')
+                            ->label('État matrimonial')
+                            ->options([
+                                'celibataire' => 'Célibataire',
+                                'marie'       => 'Marié(e)',
+                                'divorce'     => 'Divorcé(e)',
+                                'veuf'        => 'Veuf/Veuve',
+                            ])
+                            ->nullable()
+                            ->live()
+                            ->disabled(static::d('marital_status')),
+                        TextInput::make('number_of_children')
+                            ->label("Nombre d'enfants")
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(0)
+                            ->disabled(static::d('number_of_children')),
                     ]),
-            ]),
+                ]),
 
             /* ══ 1. Identité ══════════════════════════════ */
             Section::make('Identité')

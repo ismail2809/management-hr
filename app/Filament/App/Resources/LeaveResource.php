@@ -14,7 +14,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Radio;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -102,7 +101,8 @@ class LeaveResource extends Resource
                     Section::make('Demandeur')
                         ->icon('heroicon-o-user-circle')
                         ->compact()
-                        ->columns(2)
+                        ->columnSpanFull()
+                        ->columns(3)
                         ->schema([
                             Select::make('employee_id')
                                 ->label('Employé(e)')
@@ -114,15 +114,13 @@ class LeaveResource extends Resource
                                 ->disabled($isEmployee)
                                 ->dehydrated()
                                 ->required()
-                                ->live()
-                                ->columnSpanFull(),
+                                ->live(),
 
-                            Radio::make('categorie')
+                            Select::make('categorie')
                                 ->label('Catégorie')
                                 ->options(['conge' => 'Congé', 'absence' => 'Absence'])
                                 ->default('conge')
                                 ->required()
-                                ->inline()
                                 ->live(),
 
                             Select::make('leave_type_id')
@@ -139,8 +137,8 @@ class LeaveResource extends Resource
                     Section::make('Période')
                         ->icon('heroicon-o-clock')
                         ->compact()
-                        ->columns(2)
                         ->columnSpanFull()
+                        ->columns(1)
                         ->schema([
                             Grid::make(3)->schema([
                                 DatePicker::make('start_date')
@@ -177,7 +175,8 @@ class LeaveResource extends Resource
                                 ->label('Motif')
                                 ->placeholder('Raison de la demande…')
                                 ->rows(2)
-                                ->nullable(),
+                                ->nullable()
+                                ->columnSpanFull(),
                         ]),
                 ]),
 
@@ -255,7 +254,7 @@ class LeaveResource extends Resource
                         ->maxLength(200)->nullable()
                         ->visible(fn ($get) => $get('type_cours') === 'activite'),
 
-                    Grid::make(2)
+                    Grid::make(1)
                         ->hidden($isEmployee)
                         ->schema([
                             Textarea::make('actions_taken')
