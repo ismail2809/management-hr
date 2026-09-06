@@ -70,9 +70,9 @@ class AuditLogResource extends Resource
                     ->state(function ($record) {
                         $employee = $record->causer?->employee;
                         if ($employee) {
-                            return "{$employee->first_name} {$employee->last_name}";
+                            return $employee->full_name;
                         }
-                        return $record->causer?->name ?? '—';
+                        return $record->causer?->email ?? '—';
                     })
                     ->default('—'),
                 TextColumn::make('subject_type')
