@@ -5,6 +5,7 @@ namespace App\Filament\App\Resources\CommunicationMethods\Schemas;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput as NumberInput;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -14,18 +15,20 @@ class CommunicationMethodForm
     {
         return $schema->columns(1)->components([
             Section::make('Mode de communication')->schema([
-                TextInput::make('name')
-                    ->label('Nom')
-                    ->placeholder('Téléphone, Email, WhatsApp…')
-                    ->required()
-                    ->maxLength(100),
+                Grid::make(2)->schema([
+                    TextInput::make('name')
+                        ->label('Nom')
+                        ->placeholder('Téléphone, Email, WhatsApp…')
+                        ->required()
+                        ->maxLength(100),
 
-                TextInput::make('code')
-                    ->label('Code (identifiant unique)')
-                    ->placeholder('telephone, email, whatsapp…')
-                    ->required()
-                    ->maxLength(50)
-                    ->unique(ignoreRecord: true),
+                    TextInput::make('code')
+                        ->label('Code (identifiant unique)')
+                        ->placeholder('telephone, email, whatsapp…')
+                        ->required()
+                        ->maxLength(50)
+                        ->unique(ignoreRecord: true),
+                ]),
 
                 TextInput::make('sort_order')
                     ->label('Ordre d\'affichage')
