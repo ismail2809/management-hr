@@ -15,10 +15,6 @@ class TransportsTable
             ->columns([
                 \Filament\Tables\Columns\TextColumn::make('name')->label('Nom')->searchable()->sortable(),
                 \Filament\Tables\Columns\TextColumn::make('matricule')->label('Matricule')->default('—'),
-                \Filament\Tables\Columns\TextColumn::make('type')->label('Type')->badge()
-                    ->color(fn ($state) => match($state) {
-                        'bus' => 'info', 'minibus' => 'warning', 'voiture' => 'success', default => 'gray',
-                    }),
                 \Filament\Tables\Columns\TextColumn::make('chauffeurs_count')->label('Chauffeurs')->counts('chauffeurs')->sortable(),
             ])
             ->filters([])
