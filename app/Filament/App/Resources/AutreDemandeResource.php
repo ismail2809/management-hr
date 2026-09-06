@@ -23,6 +23,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
@@ -90,39 +91,40 @@ class AutreDemandeResource extends Resource
             Section::make('Demandeur')
                 ->description('Sélectionnez l\'employé concerné par cette demande.')
                 ->icon('heroicon-o-user-circle')
-                ->columns(2)
+                ->compact()
                 ->schema([
                     static::companyField(),
 
-                    Section::make('Employé(e)')
-                        ->icon('heroicon-o-user')
-                        ->compact()
-                        ->schema([
-                            Select::make('employee_id')
-                                ->label('Employé(e)')
-                                ->relationship('employee', 'first_name')
-                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
-                                ->searchable()
-                                ->preload()
-                                ->default(fn () => auth()->user()?->employee_id)
-                                ->disabled($isEmployee)
-                                ->dehydrated()
-                                ->required()
-                                ->columnSpanFull(),
-                        ]),
+                    Grid::make(2)->schema([
+                        Select::make('employee_id')
+                            ->label('Employé(e)')
+                            ->relationship('employee', 'first_name')
+                            ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                            ->searchable()
+                            ->preload()
+                            ->default(fn () => auth()->user()?->employee_id)
+                            ->disabled($isEmployee)
+                            ->dehydrated()
+                            ->required(),
+
+                        Select::make('status')
+                            ->label('Statut')
+                            ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
+                            ->default('en_attente')
+                            ->disabled($isEmployee)
+                            ->dehydrated()
+                            ->required(),
+                    ]),
                 ]),
 
             Section::make('Autre demande')
                 ->icon('heroicon-o-chat-bubble-left-right')
-                ->columns(2)
                 ->schema([
                     Select::make('type')
                         ->label('Type de demande')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
                         ->required()
-                        ->live()
-                        ->columnSpanFull(),
-
+                        ->live(),
                 ]),
 
             Section::make('Détails Photocopie')
@@ -221,14 +223,6 @@ class AutreDemandeResource extends Resource
                 ]),
 
             Section::make('Détails')->schema([
-                Select::make('status')
-                    ->label('Statut')
-                    ->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé'])
-                    ->default('en_attente')
-                    ->disabled($isEmployee)
-                    ->dehydrated()
-                    ->required(),
-
                 Textarea::make('description')
                     ->label('Description / détails')
                     ->rows(3)
