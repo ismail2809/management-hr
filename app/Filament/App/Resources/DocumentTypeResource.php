@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
@@ -40,18 +41,20 @@ class DocumentTypeResource extends Resource
             Section::make('Type de demande')->schema([
                 static::companyField(),
 
-                TextInput::make('name')
-                    ->label('Nom')
-                    ->placeholder('Ex : Activités, Matériel, Attestation de travail…')
-                    ->required()
-                    ->maxLength(100),
+                Grid::make(2)->schema([
+                    TextInput::make('name')
+                        ->label('Nom')
+                        ->placeholder('Ex : Activités, Matériel, Attestation de travail…')
+                        ->required()
+                        ->maxLength(100),
 
-                TextInput::make('code')
-                    ->label('Code')
-                    ->placeholder('Ex : activites, materiel, attestation_travail…')
-                    ->required()
-                    ->maxLength(100)
-                    ->unique(ignoreRecord: true),
+                    TextInput::make('code')
+                        ->label('Code')
+                        ->placeholder('Ex : activites, materiel, attestation_travail…')
+                        ->required()
+                        ->maxLength(100)
+                        ->unique(ignoreRecord: true),
+                ]),
 
                 Select::make('categorie')
                     ->label('Catégorie')
