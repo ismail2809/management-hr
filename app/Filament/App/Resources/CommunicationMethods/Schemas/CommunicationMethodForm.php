@@ -30,14 +30,16 @@ class CommunicationMethodForm
                         ->unique(ignoreRecord: true),
                 ]),
 
-                TextInput::make('sort_order')
-                    ->label('Ordre d\'affichage')
-                    ->numeric()
-                    ->default(0),
+                Grid::make(2)->schema([
+                    TextInput::make('sort_order')
+                        ->label('Ordre d\'affichage')
+                        ->numeric()
+                        ->default(0),
 
-                Toggle::make('active')
-                    ->label('Actif')
-                    ->default(true),
+                    Toggle::make('active')
+                        ->label('Actif')
+                        ->default(true),
+                ]),
             ]),
         ]);
     }
