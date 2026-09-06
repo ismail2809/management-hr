@@ -8,6 +8,7 @@ use App\Models\NiveauScolaire;
 use Filament\Forms\Components\TextInput;
 use App\Filament\App\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
@@ -35,8 +36,10 @@ class NiveauScolaireResource extends Resource
         return $schema->columns(1)->components([
             Section::make('Niveau scolaire')->schema([
                 static::companyField(),
-                TextInput::make('name')->label('Nom')->required()->maxLength(100),
-                TextInput::make('order')->label('Ordre d\'affichage')->numeric()->default(0),
+                Grid::make(2)->schema([
+                    TextInput::make('name')->label('Nom')->required()->maxLength(100),
+                    TextInput::make('order')->label('Ordre d\'affichage')->numeric()->default(0),
+                ]),
             ]),
         ]);
     }
