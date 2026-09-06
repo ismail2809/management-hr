@@ -106,8 +106,8 @@ class LeaveResource extends Resource
                         ->schema([
                             Select::make('employee_id')
                                 ->label('Employé(e)')
-                                ->relationship('employee', 'first_name')
-                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                                ->relationship('employee', 'first_name', fn ($query) => $query->with('profession'))
+                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name . ($record->profession ? ' — ' . $record->profession->name : ''))
                                 ->searchable()
                                 ->preload()
                                 ->default(fn () => auth()->user()?->employee_id)
@@ -220,12 +220,12 @@ class LeaveResource extends Resource
                                 ->relationship(
                                     'remplacant',
                                     'first_name',
-                                    fn ($query, $get) => $query->when(
+                                    fn ($query, $get) => $query->with('profession')->when(
                                         $get('employee_id'),
                                         fn ($q, $id) => $q->where('id', '!=', $id)
                                     )
                                 )
-                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name . ($record->profession ? ' — ' . $record->profession->name : ''))
                                 ->searchable()
                                 ->preload()
                                 ->placeholder('Choisir un remplaçant…')

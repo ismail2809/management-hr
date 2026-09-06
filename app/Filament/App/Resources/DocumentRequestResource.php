@@ -99,8 +99,8 @@ class DocumentRequestResource extends Resource
                         ->schema([
                             Select::make('employee_id')
                                 ->label('Employé(e)')
-                                ->relationship('employee', 'first_name')
-                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name)
+                                ->relationship('employee', 'first_name', fn ($query) => $query->with('profession'))
+                                ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name . ($record->profession ? ' — ' . $record->profession->name : ''))
                                 ->searchable()
                                 ->preload()
                                 ->default(fn () => auth()->user()?->employee_id)
