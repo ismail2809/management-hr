@@ -56,18 +56,20 @@ class DocumentTypeResource extends Resource
                         ->unique(ignoreRecord: true),
                 ]),
 
-                Select::make('categorie')
-                    ->label('Catégorie')
-                    ->options([
-                        'document' => 'Document administratif',
-                        'autre'    => 'Autre demande',
-                    ])
-                    ->required(),
+                Grid::make(2)->schema([
+                    Select::make('categorie')
+                        ->label('Catégorie')
+                        ->options([
+                            'document' => 'Document administratif',
+                            'autre'    => 'Autre demande',
+                        ])
+                        ->required(),
 
-                TextInput::make('sort_order')
-                    ->label('Ordre d\'affichage')
-                    ->numeric()
-                    ->default(0),
+                    TextInput::make('sort_order')
+                        ->label('Ordre d\'affichage')
+                        ->numeric()
+                        ->default(0),
+                ]),
 
                 Toggle::make('active')
                     ->label('Actif')
