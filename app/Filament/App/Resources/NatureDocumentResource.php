@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
@@ -51,16 +52,18 @@ class NatureDocumentResource extends Resource
             Section::make('Nature de document')->schema([
                 static::companyField(),
 
-                TextInput::make('name')
-                    ->label('Nom')
-                    ->placeholder('Examen, Série d\'exercices, Contrôle continu…')
-                    ->required()
-                    ->maxLength(100),
+                Grid::make(2)->schema([
+                    TextInput::make('name')
+                        ->label('Nom')
+                        ->placeholder('Examen, Série d\'exercices, Contrôle continu…')
+                        ->required()
+                        ->maxLength(100),
 
-                TextInput::make('sort_order')
-                    ->label("Ordre d'affichage")
-                    ->numeric()
-                    ->default(0),
+                    TextInput::make('sort_order')
+                        ->label("Ordre d'affichage")
+                        ->numeric()
+                        ->default(0),
+                ]),
 
                 Toggle::make('active')
                     ->label('Actif')
