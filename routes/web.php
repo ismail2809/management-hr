@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (app()->environment('production')) {
+        return redirect('/admin');
+    }
     return view('welcome');
 });
 
