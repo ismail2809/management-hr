@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\App\Resources\EmployeeResource\Pages;
+namespace App\Filament\Admin\Resources\EmployeeResource\Pages;
 
-use App\Filament\App\Resources\EmployeeResource;
+use App\Filament\Admin\Resources\EmployeeResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\App\Concerns\InjectsCompanyId;
+use App\Filament\Admin\Concerns\InjectsCompanyId;
 
 class CreateEmployee extends CreateRecord
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Resources\EmployeeResource\RelationManagers;
+namespace App\Filament\Admin\Resources\EmployeeResource\RelationManagers;
 
 use App\Models\Groupe;
 use Filament\Forms\Components\Select;

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\LeaveTypeResource\Pages;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\LeaveTypeResource\Pages;
 use App\Models\LeaveType;
 use Filament\Forms\Components\TextInput;
-use App\Filament\App\Concerns\HasRoleBasedDelete;
+use App\Filament\Admin\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;

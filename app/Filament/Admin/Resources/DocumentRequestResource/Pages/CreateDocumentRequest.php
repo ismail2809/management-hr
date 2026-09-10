@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\App\Resources\DocumentRequestResource\Pages;
+namespace App\Filament\Admin\Resources\DocumentRequestResource\Pages;
 
-use App\Filament\App\Concerns\InjectsCompanyId;
-use App\Filament\App\Resources\DocumentRequestResource;
+use App\Filament\Admin\Concerns\InjectsCompanyId;
+use App\Filament\Admin\Resources\DocumentRequestResource;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;

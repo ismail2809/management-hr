@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Resources\UserResource\Pages;
+use App\Filament\Admin\Resources\UserResource\Pages;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Models\User;
@@ -10,7 +10,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
-use App\Filament\App\Concerns\HasRoleBasedDelete;
+use App\Filament\Admin\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\NatureDocumentResource\Pages;
+namespace App\Filament\Admin\Resources\NatureDocumentResource\Pages;
 
-use App\Filament\App\Resources\NatureDocumentResource;
+use App\Filament\Admin\Resources\NatureDocumentResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

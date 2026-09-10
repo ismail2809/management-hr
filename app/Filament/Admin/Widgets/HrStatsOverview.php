@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\App\Widgets;
+namespace App\Filament\Admin\Widgets;
 
-use App\Filament\App\Resources\EmployeeResource;
-use App\Filament\App\Resources\LeaveResource;
+use App\Filament\Admin\Resources\EmployeeResource;
+use App\Filament\Admin\Resources\LeaveResource;
 use App\Models\Employee;
 use App\Models\Leave;
 use Filament\Widgets\StatsOverviewWidget;

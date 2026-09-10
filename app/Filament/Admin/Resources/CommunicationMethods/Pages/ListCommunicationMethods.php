@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\CommunicationMethods\Pages;
+namespace App\Filament\Admin\Resources\CommunicationMethods\Pages;
 
-use App\Filament\App\Resources\CommunicationMethods\CommunicationMethodResource;
+use App\Filament\Admin\Resources\CommunicationMethods\CommunicationMethodResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

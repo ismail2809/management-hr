@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\EmployeeResource\Pages;
+namespace App\Filament\Admin\Resources\EmployeeResource\Pages;
 
-use App\Filament\App\Resources\EmployeeResource;
+use App\Filament\Admin\Resources\EmployeeResource;
 use App\Models\EmployeeDocument;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;

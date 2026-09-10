@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\DocumentRequestResource\Pages;
+namespace App\Filament\Admin\Resources\DocumentRequestResource\Pages;
 
-use App\Filament\App\Resources\DocumentRequestResource;
+use App\Filament\Admin\Resources\DocumentRequestResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

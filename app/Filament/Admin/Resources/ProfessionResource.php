@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\ProfessionResource\Pages;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\ProfessionResource\Pages;
 use App\Models\Profession;
 use Filament\Forms\Components\TextInput;
-use App\Filament\App\Concerns\HasRoleBasedDelete;
+use App\Filament\Admin\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;

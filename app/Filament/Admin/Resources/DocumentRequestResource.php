@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\DocumentRequestResource\Pages;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\DocumentRequestResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;

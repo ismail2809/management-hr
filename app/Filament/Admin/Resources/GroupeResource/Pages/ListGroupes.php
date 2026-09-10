@@ -1,6 +1,6 @@
 <?php
-namespace App\Filament\App\Resources\GroupeResource\Pages;
-use App\Filament\App\Resources\GroupeResource;
+namespace App\Filament\Admin\Resources\GroupeResource\Pages;
+use App\Filament\Admin\Resources\GroupeResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 class ListGroupes extends ListRecords {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Widgets;
+namespace App\Filament\Admin\Widgets;
 
 use Filament\Widgets\AccountWidget as BaseAccountWidget;
 

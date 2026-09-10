@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\AutreDemandeResource\Pages;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\AutreDemandeResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;
@@ -252,6 +252,14 @@ class AutreDemandeResource extends Resource
                 ->icon('heroicon-o-user-circle')
                 ->columns(2)
                 ->schema([
+                    TextEntry::make('employee.full_name')->label('Employé(e)'),
+                    TextEntry::make('type')
+                        ->label('Type de demande')
+                        ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
+                            ?? DocumentType::withoutGlobalScopes()->where('code', $state)->value('name')
+                            ?? $state)
+                        ->badge()
+                        ->color('warning'),
                     TextEntry::make('status')
                         ->label('Statut')
                         ->badge()
@@ -262,14 +270,6 @@ class AutreDemandeResource extends Resource
                             default      => 'gray',
                         }),
                     TextEntry::make('created_at')->label('Demandé le')->date('d/m/Y'),
-                    TextEntry::make('employee.full_name')->label('Employé(e)'),
-                    TextEntry::make('type')
-                        ->label('Type de demande')
-                        ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
-                            ?? DocumentType::withoutGlobalScopes()->where('code', $state)->value('name')
-                            ?? $state)
-                        ->badge()
-                        ->color('warning'),
                 ]),
 
             Section::make('Détails Photocopie')
@@ -316,16 +316,6 @@ class AutreDemandeResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('status')
-                    ->label('Statut')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'en_attente' => 'warning',
-                        'approuvé'   => 'success',
-                        'refusé'     => 'danger',
-                        default      => 'gray',
-                    }),
-
                 TextColumn::make('employee.full_name')
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
@@ -339,6 +329,16 @@ class AutreDemandeResource extends Resource
                         ?? $state)
                     ->badge()
                     ->color('warning'),
+
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'en_attente' => 'warning',
+                        'approuvé'   => 'success',
+                        'refusé'     => 'danger',
+                        default      => 'gray',
+                    }),
 
 TextColumn::make('fichier_final')
                     ->label('Fichier')

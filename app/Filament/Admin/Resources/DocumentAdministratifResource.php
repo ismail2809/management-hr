@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\DocumentAdministratifResource\Pages;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\DocumentAdministratifResource\Pages;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;
@@ -156,16 +156,6 @@ class DocumentAdministratifResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('status')
-                    ->label('Statut')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'en_attente' => 'warning',
-                        'approuvé'   => 'success',
-                        'refusé'     => 'danger',
-                        default      => 'gray',
-                    }),
-
                 TextColumn::make('employee.full_name')
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
@@ -177,6 +167,16 @@ class DocumentAdministratifResource extends Resource
                     ->formatStateUsing(fn ($state) => DocumentRequest::$documentTypes[$state] ?? $state)
                     ->badge()
                     ->color('info'),
+
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'en_attente' => 'warning',
+                        'approuvé'   => 'success',
+                        'refusé'     => 'danger',
+                        default      => 'gray',
+                    }),
 
                 TextColumn::make('format')
                     ->label('Format')

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Concerns;
+namespace App\Filament\Admin\Concerns;
 
 /**
  * À ajouter sur toutes les pages CreateRecord du panel app.

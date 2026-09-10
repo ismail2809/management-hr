@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Concerns;
+namespace App\Filament\Admin\Concerns;
 
 /**
  * Restrict delete actions to super-admin and directeur only.

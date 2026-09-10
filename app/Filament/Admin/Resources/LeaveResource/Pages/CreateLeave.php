@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\App\Resources\LeaveResource\Pages;
+namespace App\Filament\Admin\Resources\LeaveResource\Pages;
 
-use App\Filament\App\Resources\LeaveResource;
+use App\Filament\Admin\Resources\LeaveResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\App\Concerns\InjectsCompanyId;
+use App\Filament\Admin\Concerns\InjectsCompanyId;
 
 class CreateLeave extends CreateRecord
 {

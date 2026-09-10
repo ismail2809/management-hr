@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\Transports\Pages;
+namespace App\Filament\Admin\Resources\Transports\Pages;
 
-use App\Filament\App\Resources\Transports\TransportResource;
+use App\Filament\Admin\Resources\Transports\TransportResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Concerns;
+namespace App\Filament\Admin\Concerns;
 
 use Filament\Forms\Components\Hidden;
 use Filament\Schemas\Components\Section;

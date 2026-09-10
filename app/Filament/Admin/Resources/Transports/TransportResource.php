@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\App\Resources\Transports;
+namespace App\Filament\Admin\Resources\Transports;
 
-use App\Filament\App\Resources\Transports\Pages\CreateTransport;
-use App\Filament\App\Resources\Transports\Pages\EditTransport;
-use App\Filament\App\Resources\Transports\Pages\ListTransports;
-use App\Filament\App\Resources\Transports\Schemas\TransportForm;
-use App\Filament\App\Resources\Transports\Tables\TransportsTable;
-use App\Filament\App\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\Transports\Pages\CreateTransport;
+use App\Filament\Admin\Resources\Transports\Pages\EditTransport;
+use App\Filament\Admin\Resources\Transports\Pages\ListTransports;
+use App\Filament\Admin\Resources\Transports\Schemas\TransportForm;
+use App\Filament\Admin\Resources\Transports\Tables\TransportsTable;
+use App\Filament\Admin\Concerns\HasCompanyField;
 use App\Models\Transport;
 use BackedEnum;
-use App\Filament\App\Concerns\HasRoleBasedDelete;
+use App\Filament\Admin\Concerns\HasRoleBasedDelete;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;

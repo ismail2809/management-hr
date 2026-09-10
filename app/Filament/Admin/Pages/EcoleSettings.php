@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\App\Pages;
+namespace App\Filament\Admin\Pages;
 
 use App\Models\EcoleSettings as EcoleSettingsModel;
 use Filament\Forms\Components\FileUpload;

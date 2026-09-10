@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\DocumentAdministratifResource\Pages;
+namespace App\Filament\Admin\Resources\DocumentAdministratifResource\Pages;
 
-use App\Filament\App\Resources\DocumentAdministratifResource;
+use App\Filament\Admin\Resources\DocumentAdministratifResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateDocumentAdministratif extends CreateRecord

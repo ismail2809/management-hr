@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Resources\EmployeeResource\Pages;
-use App\Filament\App\Resources\EmployeeResource\RelationManagers\DocumentsRelationManager;
-use App\Filament\App\Resources\EmployeeResource\RelationManagers\GroupesRelationManager;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Resources\EmployeeResource\Pages;
+use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\DocumentsRelationManager;
+use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\GroupesRelationManager;
 use App\Models\Employee;
 use App\Models\Groupe;
 use App\Models\Profession;

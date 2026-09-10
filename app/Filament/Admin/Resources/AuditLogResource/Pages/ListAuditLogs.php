@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\AuditLogResource\Pages;
+namespace App\Filament\Admin\Resources\AuditLogResource\Pages;
 
-use App\Filament\App\Resources\AuditLogResource;
+use App\Filament\Admin\Resources\AuditLogResource;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAuditLogs extends ListRecords

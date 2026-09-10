@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\App\Resources\AutreDemandeResource\Pages;
+namespace App\Filament\Admin\Resources\AutreDemandeResource\Pages;
 
-use App\Filament\App\Resources\AutreDemandeResource;
+use App\Filament\Admin\Resources\AutreDemandeResource;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;

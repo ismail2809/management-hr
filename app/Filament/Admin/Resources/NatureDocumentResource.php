@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\App\Resources;
+namespace App\Filament\Admin\Resources;
 
-use App\Filament\App\Concerns\HasCompanyField;
-use App\Filament\App\Concerns\HasRoleBasedDelete;
-use App\Filament\App\Resources\NatureDocumentResource\Pages;
+use App\Filament\Admin\Concerns\HasCompanyField;
+use App\Filament\Admin\Concerns\HasRoleBasedDelete;
+use App\Filament\Admin\Resources\NatureDocumentResource\Pages;
 use App\Models\NatureDocument;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;

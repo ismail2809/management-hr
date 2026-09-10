@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\App\Resources\NatureDocumentResource\Pages;
+namespace App\Filament\Admin\Resources\NatureDocumentResource\Pages;
 
-use App\Filament\App\Concerns\InjectsCompanyId;
-use App\Filament\App\Resources\NatureDocumentResource;
+use App\Filament\Admin\Concerns\InjectsCompanyId;
+use App\Filament\Admin\Resources\NatureDocumentResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateNatureDocument extends CreateRecord

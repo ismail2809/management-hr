@@ -7,7 +7,7 @@ use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use App\Filament\App\Pages\Dashboard;
+use App\Filament\Admin\Pages\Dashboard;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
@@ -16,9 +16,9 @@ use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
-use App\Filament\App\Widgets\HrStatsOverview;
-use App\Filament\App\Widgets\LeavesWidget;
-use App\Filament\App\Widgets\AccountWidget;
+use App\Filament\Admin\Widgets\HrStatsOverview;
+use App\Filament\Admin\Widgets\LeavesWidget;
+use App\Filament\Admin\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -34,7 +34,7 @@ class AppPanelProvider extends PanelProvider
             ->default()
             ->id('app')
             ->path('admin')
-            ->login(\App\Filament\App\Pages\Auth\Login::class)
+            ->login(\App\Filament\Admin\Pages\Auth\Login::class)
             ->profile(isSimple: false)
             ->colors([
                 'primary'  => Color::hex('#1e40af'),
@@ -72,16 +72,16 @@ class AppPanelProvider extends PanelProvider
                     ->icon('heroicon-o-user-circle')
                     ->sort(2)
                     ->url(fn () => ($emp = auth()->user()?->employee)
-                        ? \App\Filament\App\Resources\EmployeeResource::getUrl('view', ['record' => $emp])
+                        ? \App\Filament\Admin\Resources\EmployeeResource::getUrl('view', ['record' => $emp])
                         : '#')
                     ->visible(fn () => auth()->user()?->hasRole('employee') && auth()->user()?->employee_id),
             ])
-            ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\\Filament\\App\\Resources')
-            ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\\Filament\\App\\Pages')
+            ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
+            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->pages([
                 Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\\Filament\\App\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
                 AccountWidget::class,
                 HrStatsOverview::class,

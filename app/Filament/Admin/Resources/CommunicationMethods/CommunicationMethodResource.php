@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\App\Resources\CommunicationMethods;
+namespace App\Filament\Admin\Resources\CommunicationMethods;
 
-use App\Filament\App\Resources\CommunicationMethods\Pages\CreateCommunicationMethod;
-use App\Filament\App\Resources\CommunicationMethods\Pages\EditCommunicationMethod;
-use App\Filament\App\Resources\CommunicationMethods\Pages\ListCommunicationMethods;
-use App\Filament\App\Resources\CommunicationMethods\Schemas\CommunicationMethodForm;
-use App\Filament\App\Resources\CommunicationMethods\Tables\CommunicationMethodsTable;
+use App\Filament\Admin\Resources\CommunicationMethods\Pages\CreateCommunicationMethod;
+use App\Filament\Admin\Resources\CommunicationMethods\Pages\EditCommunicationMethod;
+use App\Filament\Admin\Resources\CommunicationMethods\Pages\ListCommunicationMethods;
+use App\Filament\Admin\Resources\CommunicationMethods\Schemas\CommunicationMethodForm;
+use App\Filament\Admin\Resources\CommunicationMethods\Tables\CommunicationMethodsTable;
 use App\Models\CommunicationMethod;
-use App\Filament\App\Concerns\HasRoleBasedDelete;
+use App\Filament\Admin\Concerns\HasRoleBasedDelete;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;

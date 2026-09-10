@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\App\Resources\UserResource\Pages;
+namespace App\Filament\Admin\Resources\UserResource\Pages;
 
-use App\Filament\App\Resources\UserResource;
+use App\Filament\Admin\Resources\UserResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\App\Concerns\InjectsCompanyId;
+use App\Filament\Admin\Concerns\InjectsCompanyId;
 
 class CreateUser extends CreateRecord
 {

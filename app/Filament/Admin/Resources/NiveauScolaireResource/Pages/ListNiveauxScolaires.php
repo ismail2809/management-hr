@@ -1,6 +1,6 @@
 <?php
-namespace App\Filament\App\Resources\NiveauScolaireResource\Pages;
-use App\Filament\App\Resources\NiveauScolaireResource;
+namespace App\Filament\Admin\Resources\NiveauScolaireResource\Pages;
+use App\Filament\Admin\Resources\NiveauScolaireResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 class ListNiveauxScolaires extends ListRecords {
