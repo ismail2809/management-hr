@@ -133,11 +133,6 @@ class DocumentAdministratifResource extends Resource
                     ->rows(3)
                     ->nullable(),
 
-                Textarea::make('reason')
-                    ->label('Remarques complémentaires')
-                    ->rows(2)
-                    ->nullable(),
-
                 FileUpload::make('fichier_final')
                     ->label('Fichier final (uploadé par l\'admin)')
                     ->disk('public')

@@ -228,11 +228,6 @@ class AutreDemandeResource extends Resource
                     ->rows(3)
                     ->nullable(),
 
-                Textarea::make('reason')
-                    ->label('Remarques complémentaires')
-                    ->rows(2)
-                    ->nullable(),
-
                 FileUpload::make('fichier_final')
                     ->label('Fichier')
                     ->disk('public')
@@ -313,7 +308,6 @@ class AutreDemandeResource extends Resource
                 ->columns(2)
                 ->schema([
                     TextEntry::make('description')->label('Description / détails')->columnSpanFull(),
-                    TextEntry::make('reason')->label('Remarques complémentaires')->columnSpanFull(),
                 ]),
         ]);
     }
