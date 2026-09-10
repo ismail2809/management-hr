@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             TestCompanySeeder::class,
             LeaveTypeSeeder::class,
             ProfessionSeeder::class,
+            EmployeeSeeder::class,
             NiveauScolaireSeeder::class,
             GroupeSeeder::class,
             NatureDocumentSeeder::class,
