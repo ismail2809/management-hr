@@ -674,6 +674,13 @@ html body .fi-dropdown-divider {
   margin: 3px 0 !important;
 }
 
+/* Select searchable dropdown — override overflow:hidden pour permettre le scroll */
+.fi-select-input .fi-dropdown-panel {
+  overflow: auto !important;
+  max-height: 15rem !important;
+  min-width: unset !important;
+}
+
 /* ── DARK MODE ── */
 .dark .fi-dropdown-panel,
 .dark [class*="fi-dropdown-panel"] {
