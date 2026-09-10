@@ -21,7 +21,6 @@ use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -242,73 +241,6 @@ class AutreDemandeResource extends Resource
                     ->disabled($isEmployee)
                     ->dehydrated(! $isEmployee),
             ]),
-        ]);
-    }
-
-    public static function infolist(Schema $schema): Schema
-    {
-        return $schema->components([
-            Section::make('Demandeur')
-                ->icon('heroicon-o-user-circle')
-                ->columns(2)
-                ->schema([
-                    TextEntry::make('employee.full_name')->label('Employé(e)'),
-                    TextEntry::make('type')
-                        ->label('Type de demande')
-                        ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
-                            ?? DocumentType::withoutGlobalScopes()->where('code', $state)->value('name')
-                            ?? $state)
-                        ->badge()
-                        ->color('warning'),
-                    TextEntry::make('status')
-                        ->label('Statut')
-                        ->badge()
-                        ->color(fn ($state) => match ($state) {
-                            'en_attente' => 'warning',
-                            'approuvé'   => 'success',
-                            'refusé'     => 'danger',
-                            default      => 'gray',
-                        }),
-                    TextEntry::make('created_at')->label('Demandé le')->date('d/m/Y'),
-                ]),
-
-            Section::make('Détails Photocopie')
-                ->icon('heroicon-o-document-duplicate')
-                ->columns(2)
-                ->hidden(fn (DocumentRequest $record) => $record->type !== 'photocopie')
-                ->schema([
-                    TextEntry::make('photocopie_sous_type')->label('Nature du document')->columnSpanFull(),
-                    TextEntry::make('photocopie_niveau')->label('Niveau'),
-                    TextEntry::make('photocopie_groupe')->label('Groupe / Classe'),
-                    TextEntry::make('photocopie_nb_copies')->label('Nombre de copies'),
-                    TextEntry::make('photocopie_date_souhaitee')->label('Date souhaitée')->date('d/m/Y'),
-                ]),
-
-            Section::make('Participants — Rencontre direction')
-                ->icon('heroicon-o-users')
-                ->hidden(fn (DocumentRequest $record) => $record->type !== 'rencontre_direction')
-                ->schema([
-                    TextEntry::make('rencontre_employee_ids')
-                        ->label('Employés concernés')
-                        ->html()
-                        ->formatStateUsing(function ($state, DocumentRequest $record): string {
-                            if (empty($state)) {
-                                return '—';
-                            }
-                            return Employee::withoutGlobalScopes()
-                                ->with('profession')
-                                ->whereIn('id', $state)
-                                ->get()
-                                ->map(fn (Employee $e) => e($e->full_name) . ($e->profession ? ' <span class="text-gray-400">— ' . e($e->profession->name) . '</span>' : ''))
-                                ->join('<br>');
-                        }),
-                ]),
-
-            Section::make('Détails')
-                ->columns(2)
-                ->schema([
-                    TextEntry::make('description')->label('Description / détails')->columnSpanFull(),
-                ]),
         ]);
     }
 
