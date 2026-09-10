@@ -22,7 +22,7 @@ class Profession extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = ['company_id', 'name'];
+    protected $fillable = ['ecole_setting_id', 'name'];
 
     public function employees(): HasMany
     {

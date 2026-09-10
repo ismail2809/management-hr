@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Company;
+use App\Models\EcoleSettings;
 use App\Models\Groupe;
 use App\Models\NiveauScolaire;
 use Illuminate\Database\Seeder;
@@ -11,7 +11,7 @@ class GroupeSeeder extends Seeder
 {
     public function run(): void
     {
-        $company = Company::where('name', 'Les Écoles Al Baraime')->first();
+        $company = EcoleSettings::where('nom_ecole', 'Les écoles AL BARAIME')->first();
 
         if (! $company) {
             $this->command->warn('GroupeSeeder : company introuvable, seeder ignoré.');
@@ -44,7 +44,7 @@ class GroupeSeeder extends Seeder
 
         foreach ($data as $niveauName => $groupes) {
             $niveau = NiveauScolaire::withoutGlobalScopes()
-                ->where('company_id', $company->id)
+                ->where('ecole_setting_id', $company->id)
                 ->where('name', $niveauName)
                 ->first();
 
@@ -55,7 +55,7 @@ class GroupeSeeder extends Seeder
 
             foreach ($groupes as $groupeName) {
                 Groupe::withoutGlobalScopes()->firstOrCreate(
-                    ['company_id' => $company->id, 'niveau_scolaire_id' => $niveau->id, 'name' => $groupeName]
+                    ['ecole_setting_id' => $company->id, 'niveau_scolaire_id' => $niveau->id, 'name' => $groupeName]
                 );
                 $count++;
             }

@@ -13,7 +13,7 @@ class CompanyScope implements Scope
         $user = auth()->user() ?? \Filament\Facades\Filament::auth()->user();
 
         if ($user && ! $user->hasRole('super-admin')) {
-            $builder->where($model->getTable() . '.company_id', $user->company_id);
+            $builder->where($model->getTable() . '.ecole_setting_id', $user->ecole_setting_id);
         }
     }
 }

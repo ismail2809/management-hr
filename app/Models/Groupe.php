@@ -23,7 +23,7 @@ class Groupe extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = ['company_id', 'niveau_scolaire_id', 'name'];
+    protected $fillable = ['ecole_setting_id', 'niveau_scolaire_id', 'name'];
 
     public function niveauScolaire(): BelongsTo
     {

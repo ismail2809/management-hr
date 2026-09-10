@@ -23,7 +23,7 @@ class DocumentRequest extends Model
     }
 
     protected $fillable = [
-        'company_id',
+        'ecole_setting_id',
         'employee_id',
         'categorie',
         'type',
@@ -82,5 +82,5 @@ class DocumentRequest extends Model
 
     public function employee(): BelongsTo        { return $this->belongsTo(Employee::class); }
     public function processor(): BelongsTo       { return $this->belongsTo(User::class, 'processed_by'); }
-    public function company(): BelongsTo         { return $this->belongsTo(Company::class); }
+    public function company(): BelongsTo         { return $this->belongsTo(EcoleSettings::class); }
 }

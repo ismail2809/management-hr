@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('ecole_setting_id')->constrained('ecole_settings')->cascadeOnDelete();
             $table->string('name'); // Annuel, Maladie, Maternité, Sans solde…
             $table->unsignedSmallInteger('legal_days_per_year')->default(0);
             $table->timestamps();

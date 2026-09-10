@@ -74,7 +74,7 @@ class DocumentsRelationManager extends RelationManager
                 CreateAction::make()
                     ->label('Ajouter un document')
                     ->mutateFormDataUsing(fn (array $data): array => array_merge($data, [
-                        'company_id' => $this->getOwnerRecord()->company_id,
+                        'ecole_setting_id' => $this->getOwnerRecord()->ecole_setting_id,
                         'name'       => basename($data['file_path']),
                     ])),
             ])

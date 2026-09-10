@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('groupes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('ecole_setting_id')->constrained('ecole_settings')->cascadeOnDelete();
             $table->foreignId('niveau_scolaire_id')->constrained('niveaux_scolaires')->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();

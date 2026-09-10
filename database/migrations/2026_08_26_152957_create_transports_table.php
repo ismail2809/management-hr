@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('transports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('ecole_setting_id')->constrained('ecole_settings')->cascadeOnDelete();
             $table->string('name');
             $table->string('matricule')->nullable();
             $table->enum('type', ['bus', 'minibus', 'voiture', 'autre'])->default('bus');

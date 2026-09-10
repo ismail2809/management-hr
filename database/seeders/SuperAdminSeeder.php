@@ -19,7 +19,7 @@ class SuperAdminSeeder extends Seeder
             [
                 'name'       => 'Super Admin',
                 'password'   => bcrypt('password'),
-                'company_id' => null,
+                'ecole_setting_id' => null,
             ]
         );
 

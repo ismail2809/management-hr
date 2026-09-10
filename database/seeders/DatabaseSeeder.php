@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
             DocumentTypeSeeder::class,
             CommunicationMethodSeeder::class,
             SuperAdminSeeder::class,
-            TestCompanySeeder::class,
+            EcoleSettingsSeeder::class,
             LeaveTypeSeeder::class,
             ProfessionSeeder::class,
             EmployeeSeeder::class,

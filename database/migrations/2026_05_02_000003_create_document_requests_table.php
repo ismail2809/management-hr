@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('document_requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('ecole_setting_id')->constrained('ecole_settings')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->enum('type', [
                 'attestation_travail',

@@ -9,7 +9,7 @@ class CommunicationMethodSeeder extends Seeder
 {
     public function run(): void
     {
-        // Méthodes globales (company_id = null) — disponibles pour toutes les companies
+        // Méthodes globales (ecole_setting_id = null) — disponibles pour toutes les companies
         $methods = [
             ['code' => 'email',       'name' => 'Email',       'sort_order' => 1],
             ['code' => 'telephone',   'name' => 'Téléphone',   'sort_order' => 2],
@@ -21,7 +21,7 @@ class CommunicationMethodSeeder extends Seeder
 
         foreach ($methods as $data) {
             CommunicationMethod::withoutGlobalScopes()->firstOrCreate(
-                ['code' => $data['code'], 'company_id' => null],
+                ['code' => $data['code'], 'ecole_setting_id' => null],
                 array_merge($data, ['active' => true])
             );
         }

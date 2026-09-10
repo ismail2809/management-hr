@@ -38,7 +38,7 @@ class Employee extends Model
     }
 
     protected $fillable = [
-        'company_id',
+        'ecole_setting_id',
         'profession_id',
         'profession_type',
         'matricule',
@@ -86,8 +86,8 @@ class Employee extends Model
         return $this->profession?->name === 'Professeur';
     }
 
-    public function company(): BelongsTo   { return $this->belongsTo(Company::class); }
-    public function transport(): BelongsTo { return $this->belongsTo(Transport::class); }
+    public function ecoleSettings(): BelongsTo { return $this->belongsTo(EcoleSettings::class, 'ecole_setting_id'); }
+    public function transport(): BelongsTo     { return $this->belongsTo(Transport::class); }
     public function profession(): BelongsTo { return $this->belongsTo(Profession::class); }
     public function documents(): HasMany   { return $this->hasMany(EmployeeDocument::class); }
     public function leaves(): HasMany      { return $this->hasMany(Leave::class); }

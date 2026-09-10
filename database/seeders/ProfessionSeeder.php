@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Company;
+use App\Models\EcoleSettings;
 use App\Models\Profession;
 use Illuminate\Database\Seeder;
 
@@ -10,7 +10,7 @@ class ProfessionSeeder extends Seeder
 {
     public function run(): void
     {
-        $company = Company::where('name', 'Les Écoles Al Baraime')->first();
+        $company = EcoleSettings::where('nom_ecole', 'Les écoles AL BARAIME')->first();
 
         if (! $company) {
             $this->command->warn('ProfessionSeeder : company introuvable, seeder ignoré.');
@@ -31,7 +31,7 @@ class ProfessionSeeder extends Seeder
 
         foreach ($professions as $name) {
             Profession::withoutGlobalScopes()->firstOrCreate(
-                ['company_id' => $company->id, 'name' => $name]
+                ['ecole_setting_id' => $company->id, 'name' => $name]
             );
         }
 

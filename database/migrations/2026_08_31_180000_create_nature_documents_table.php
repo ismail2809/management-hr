@@ -10,13 +10,13 @@ return new class extends Migration
     {
         Schema::create('nature_documents', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id')->nullable()->index();
+            $table->unsignedBigInteger('ecole_setting_id')->nullable()->index();
             $table->string('name');
             $table->boolean('active')->default(true);
             $table->unsignedSmallInteger('sort_order')->default(0);
             $table->timestamps();
 
-            $table->foreign('company_id')->references('id')->on('companies')->cascadeOnDelete();
+            $table->foreign('ecole_setting_id')->references('id')->on('ecole_settings')->cascadeOnDelete();
         });
     }
 

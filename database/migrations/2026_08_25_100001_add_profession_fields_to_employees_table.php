@@ -10,7 +10,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('employees', function (Blueprint $table) {
-            $table->foreignId('profession_id')->nullable()->constrained('professions')->nullOnDelete()->after('company_id');
+            $table->foreignId('profession_id')->nullable()->constrained('professions')->nullOnDelete()->after('ecole_setting_id');
             $table->enum('profession_type', ['permanent', 'stagiaire', 'vacataire'])->nullable()->after('profession_id');
             $table->string('birth_place')->nullable()->after('birth_date');
             $table->string('phone_fixed')->nullable()->after('phone');

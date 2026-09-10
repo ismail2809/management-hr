@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Company;
+use App\Models\EcoleSettings;
 use App\Models\NatureDocument;
 use Illuminate\Database\Seeder;
 
@@ -10,7 +10,7 @@ class NatureDocumentSeeder extends Seeder
 {
     public function run(): void
     {
-        $company = Company::where('name', 'Les Écoles Al Baraime')->first();
+        $company = EcoleSettings::where('nom_ecole', 'Les écoles AL BARAIME')->first();
 
         if (! $company) {
             $this->command->warn('NatureDocumentSeeder : company introuvable, seeder ignoré.');
@@ -26,7 +26,7 @@ class NatureDocumentSeeder extends Seeder
 
         foreach ($natures as $data) {
             NatureDocument::withoutGlobalScopes()->firstOrCreate(
-                ['company_id' => $company->id, 'name' => $data['name']],
+                ['ecole_setting_id' => $company->id, 'name' => $data['name']],
                 ['sort_order' => $data['sort_order'], 'active' => true]
             );
         }

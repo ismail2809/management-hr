@@ -23,8 +23,8 @@ class Transport extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = ['company_id', 'name', 'matricule'];
+    protected $fillable = ['ecole_setting_id', 'name', 'matricule'];
 
-    public function company(): BelongsTo { return $this->belongsTo(Company::class); }
+    public function company(): BelongsTo { return $this->belongsTo(EcoleSettings::class); }
     public function chauffeurs(): HasMany { return $this->hasMany(Employee::class); }
 }

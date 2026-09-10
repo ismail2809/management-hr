@@ -23,11 +23,11 @@ class LeaveType extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = ['company_id', 'name'];
+    protected $fillable = ['ecole_setting_id', 'name'];
 
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(EcoleSettings::class);
     }
 
     public function leaves(): HasMany

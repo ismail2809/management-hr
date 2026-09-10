@@ -10,21 +10,13 @@ trait HasCompanyScope
     {
         static::addGlobalScope(new CompanyScope());
         static::creating(function ($model) {
-            if (is_null($model->company_id)) {
+            if (is_null($model->ecole_setting_id)) {
                 $authUser     = auth()->user();
                 $filamentUser = null;
                 try { $filamentUser = \Filament\Facades\Filament::auth()->user(); } catch (\Throwable $e) {}
 
-                \Illuminate\Support\Facades\Log::debug('HasCompanyScope::creating', [
-                    'model'           => get_class($model),
-                    'auth_user'       => $authUser?->email,
-                    'auth_company_id' => $authUser?->company_id,
-                    'fil_user'        => $filamentUser?->email,
-                    'fil_company_id'  => $filamentUser?->company_id,
-                ]);
-
                 $user = $authUser ?? $filamentUser;
-                $model->company_id = $user?->company_id;
+                $model->ecole_setting_id = $user?->ecole_setting_id;
             }
         });
     }

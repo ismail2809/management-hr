@@ -11,13 +11,13 @@ trait HasCompanyField
     {
         $user = \Filament\Facades\Filament::auth()->user();
 
-        $companyId = $user?->company_id
-            ?? \App\Models\Company::value('id');
+        $ecoleSettingId = $user?->ecole_setting_id
+            ?? \App\Models\EcoleSettings::value('id');
 
         return Section::make()
             ->hidden()
             ->schema([
-                Hidden::make('company_id')->default($companyId),
+                Hidden::make('ecole_setting_id')->default($ecoleSettingId),
             ]);
     }
 }

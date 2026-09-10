@@ -61,8 +61,8 @@ class EmployeeImportService
             if (! empty($data['profession_name'])) {
                 $profession = Profession::withoutGlobalScopes()
                     ->firstOrCreate(
-                        ['company_id' => $companyId, 'name' => $data['profession_name']],
-                        ['company_id' => $companyId, 'name' => $data['profession_name']]
+                        ['ecole_setting_id' => , 'name' => $data['profession_name']],
+                        ['ecole_setting_id' => , 'name' => $data['profession_name']]
                     );
                 $data['profession_id'] = $profession->id;
             }
@@ -80,18 +80,18 @@ class EmployeeImportService
                 continue;
             }
 
-            $data['company_id'] = $companyId;
+             = ;
             $data['status']     = $data['status'] ?? 'actif';
 
             try {
                 if (! empty($data['cin'])) {
                     Employee::withoutGlobalScopes()->updateOrCreate(
-                        ['company_id' => $companyId, 'cin' => $data['cin']],
+                        ['ecole_setting_id' => , 'cin' => $data['cin']],
                         $data
                     );
                 } elseif (! empty($data['matricule'])) {
                     Employee::withoutGlobalScopes()->updateOrCreate(
-                        ['company_id' => $companyId, 'matricule' => $data['matricule']],
+                        ['ecole_setting_id' => , 'matricule' => $data['matricule']],
                         $data
                     );
                 } else {

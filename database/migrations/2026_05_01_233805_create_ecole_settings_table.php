@@ -10,13 +10,12 @@ return new class extends Migration
     {
         Schema::create('ecole_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->string('nom_ecole')->default('Mon École');
-            $table->string('academie')->nullable();
-            $table->string('direction_provinciale')->nullable();
-            $table->string('directeur')->nullable();
-            $table->string('type_etablissement')->nullable();
             $table->string('code_massare')->nullable();
+            $table->string('cnss')->nullable();
+            $table->string('patente')->nullable();
+            $table->string('rc')->nullable();
+            $table->string('if_number')->nullable();
             $table->text('adresse')->nullable();
             $table->string('ville')->nullable();
             $table->string('code_postal')->nullable();
@@ -25,7 +24,6 @@ return new class extends Migration
             $table->string('fax')->nullable();
             $table->string('email')->nullable();
             $table->string('site_web')->nullable();
-            $table->string('annee_scolaire')->nullable();
             $table->string('logo')->nullable();
             $table->string('cachet')->nullable();
             $table->boolean('afficher_logo_pdf')->default(true);
@@ -33,8 +31,6 @@ return new class extends Migration
             $table->text('entete_document')->nullable();
             $table->text('pied_document')->nullable();
             $table->timestamps();
-
-            $table->unique('company_id');
         });
     }
 

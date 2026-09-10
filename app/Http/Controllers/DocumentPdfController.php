@@ -21,11 +21,11 @@ class DocumentPdfController extends Controller
     {
         $user = auth()->user();
         abort_if(
-            ! $user->hasRole('super-admin') && $user->company_id !== $documentRequest->company_id,
+            ! $user->hasRole('super-admin') && $user->ecole_setting_id !== $documentRequest->ecole_setting_id,
             403
         );
 
-        $documentRequest->load(['employee.profession', 'company']);
+        $documentRequest->load(['employee.profession', 'ecoleSettings']);
 
         if ($download) {
             $documentRequest->update([
@@ -36,7 +36,7 @@ class DocumentPdfController extends Controller
         }
 
         $employee = $documentRequest->employee;
-        $company  = $documentRequest->company;
+        $company  = $documentRequest->ecoleSettings;
         $date     = now()->locale('fr')->isoFormat('D MMMM YYYY');
 
         $view = 'pdf.documents.' . $documentRequest->type;

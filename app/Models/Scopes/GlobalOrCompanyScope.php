@@ -7,21 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 
 /**
- * Scope pour les tables à company_id NULLABLE.
- * Retourne les enregistrements globaux (company_id IS NULL)
- * ET ceux de la company courante.
+ * Scope pour les tables à ecole_setting_id NULLABLE.
+ * Retourne les enregistrements globaux (ecole_setting_id IS NULL)
+ * ET ceux de l'école courante.
  */
 class GlobalOrCompanyScope implements Scope
 {
     public function apply(Builder $builder, Model $model): void
     {
         if (auth()->check()) {
-            $table = $model->getTable();
-            $companyId = auth()->user()->company_id;
+            $table          = $model->getTable();
+            $ecoleSettingId = auth()->user()->ecole_setting_id;
 
-            $builder->where(function ($q) use ($table, $companyId) {
-                $q->whereNull($table . '.company_id')
-                  ->orWhere($table . '.company_id', $companyId);
+            $builder->where(function ($q) use ($table, $ecoleSettingId) {
+                $q->whereNull($table . '.ecole_setting_id')
+                  ->orWhere($table . '.ecole_setting_id', $ecoleSettingId);
             });
         }
     }

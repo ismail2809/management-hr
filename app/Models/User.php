@@ -23,7 +23,7 @@ class User extends Authenticatable implements FilamentUser
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'company_id', 'employee_id'])
+            ->logOnly(['name', 'email', 'ecole_setting_id', 'employee_id'])
             ->logOnlyDirty()
             ->useLogName('user')
             ->dontSubmitEmptyLogs();
@@ -38,7 +38,7 @@ class User extends Authenticatable implements FilamentUser
         'name',
         'email',
         'password',
-        'company_id',
+        'ecole_setting_id',
         'employee_id',
     ];
 

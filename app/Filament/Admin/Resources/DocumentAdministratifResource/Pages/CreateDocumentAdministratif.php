@@ -19,8 +19,8 @@ class CreateDocumentAdministratif extends CreateRecord
         $data['categorie'] = 'document';
 
         $user = \Filament\Facades\Filament::auth()->user();
-        if (empty($data['company_id'])) {
-            $data['company_id'] = $user?->company_id;
+        if (empty($data['ecole_setting_id'])) {
+            $data['ecole_setting_id'] = $user?->ecole_setting_id;
         }
 
         return $data;

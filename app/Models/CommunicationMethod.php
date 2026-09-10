@@ -13,9 +13,9 @@ class CommunicationMethod extends Model
 
     use HasGlobalOrCompanyScope;
 
-    protected $fillable = ['company_id', 'name', 'code', 'active', 'sort_order'];
+    protected $fillable = ['ecole_setting_id', 'name', 'code', 'active', 'sort_order'];
 
     protected $casts = ['active' => 'boolean'];
 
-    public function company(): BelongsTo { return $this->belongsTo(Company::class); }
+    public function company(): BelongsTo { return $this->belongsTo(EcoleSettings::class); }
 }

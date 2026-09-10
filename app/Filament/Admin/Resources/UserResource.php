@@ -3,7 +3,7 @@
 namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Resources\UserResource\Pages;
-use App\Models\Company;
+use App\Models\EcoleSettings;
 use App\Models\Employee;
 use App\Models\User;
 use Filament\Schemas\Components\Grid;
@@ -38,7 +38,7 @@ class UserResource extends Resource
         $query = parent::getEloquentQuery();
 
         if (! auth()->user()?->hasRole('super-admin')) {
-            $query->where('company_id', auth()->user()?->company_id);
+            $query->where('ecole_setting_id', auth()->user()?->ecole_setting_id);
         }
 
         return $query;
@@ -92,9 +92,9 @@ class UserResource extends Resource
             ]),
 
             Section::make('Rôle & Employé associé')->columns(3)->schema([
-                Select::make('company_id')
+                Select::make('ecole_setting_id')
                     ->label('Company')
-                    ->options(\App\Models\Company::pluck('name', 'id'))
+                    ->options(\App\Models\EcoleSettings::pluck('name', 'id'))
                     ->searchable()
                     ->nullable()
                     ->visible($isSuperAdmin)
@@ -117,7 +117,7 @@ class UserResource extends Resource
                     ->options(function () {
                         $query = Employee::withoutGlobalScopes();
                         if (! auth()->user()?->hasRole('super-admin')) {
-                            $query->where('company_id', auth()->user()?->company_id);
+                            $query->where('ecole_setting_id', auth()->user()?->ecole_setting_id);
                         }
                         return $query->get()->mapWithKeys(fn ($e) => [
                             $e->id => $e->full_name . ' — ' . $e->matricule,

@@ -62,7 +62,7 @@ class ViewEmployee extends ViewRecord
         $path = $this->uploadedFile->store('employee-documents', 'public');
 
         EmployeeDocument::create([
-            'company_id'  => $this->record->company_id,
+            'ecole_setting_id'  => $this->record->ecole_setting_id,
             'employee_id' => $this->record->id,
             'name'        => $this->documentName,
             'file_path'   => $path,

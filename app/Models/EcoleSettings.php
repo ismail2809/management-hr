@@ -10,7 +10,6 @@ class EcoleSettings extends Model
     protected $table = 'ecole_settings';
 
     protected $fillable = [
-        'company_id',
         'nom_ecole',
         'code_massare',
         'cnss',
@@ -25,7 +24,6 @@ class EcoleSettings extends Model
         'fax',
         'email',
         'site_web',
-        'annee_scolaire',
         'logo',
         'cachet',
         'afficher_logo_pdf',
@@ -39,23 +37,20 @@ class EcoleSettings extends Model
         'afficher_cachet_pdf' => 'boolean',
     ];
 
-    /**
-     * Récupérer les paramètres de l'école pour la company courante (singleton par company)
-     */
     public static function get(): self
     {
-        $companyId = auth()->user()?->company_id
-            ?? \App\Models\Company::value('id');
+        $ecoleSettingId = auth()->user()?->ecole_setting_id;
 
-        return self::firstOrCreate(
-            ['company_id' => $companyId],
-            [
-                'nom_ecole'           => 'Mon École',
-                'pays'                => 'Maroc',
-                'afficher_logo_pdf'   => true,
-                'afficher_cachet_pdf' => true,
-            ]
-        );
+        if ($ecoleSettingId) {
+            return self::findOrNew($ecoleSettingId);
+        }
+
+        return self::firstOrCreate([], [
+            'nom_ecole'           => 'Mon École',
+            'pays'                => 'Maroc',
+            'afficher_logo_pdf'   => true,
+            'afficher_cachet_pdf' => true,
+        ]);
     }
 
     public function getLogoUrlAttribute(): ?string
@@ -87,10 +82,5 @@ class EcoleSettings extends Model
         ]);
 
         return implode("\n", $parts);
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class);
     }
 }

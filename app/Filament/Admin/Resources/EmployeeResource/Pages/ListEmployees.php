@@ -3,7 +3,7 @@
 namespace App\Filament\Admin\Resources\EmployeeResource\Pages;
 
 use App\Filament\Admin\Resources\EmployeeResource;
-use App\Models\Company;
+use App\Models\EcoleSettings;
 use App\Services\EmployeeImportService;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
@@ -25,10 +25,10 @@ class ListEmployees extends ListRecords
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('gray')
                 ->form(array_filter([
-                    auth()->user()->company_id === null
-                        ? Select::make('company_id')
-                            ->label('Company')
-                            ->options(Company::pluck('name', 'id'))
+                    auth()->user()->ecole_setting_id === null
+                        ? Select::make('ecole_setting_id')
+                            ->label('École')
+                            ->options(EcoleSettings::pluck('nom_ecole', 'id'))
                             ->required()
                             ->searchable()
                         : null,
@@ -46,7 +46,7 @@ class ListEmployees extends ListRecords
                         ->helperText('Colonnes reconnues : Matricule, Nom, Prénom, CIN, CNSS, Sexe, Date naissance, Date recrutement, Diplôme, Nationalité, Adresse'),
                 ]))
                 ->action(function (array $data): void {
-                    $companyId = auth()->user()->company_id ?? $data['company_id'] ?? null;
+                    $companyId = auth()->user()->ecole_setting_id ?? $data['ecole_setting_id'] ?? null;
 
                     if (! $companyId) {
                         Notification::make()

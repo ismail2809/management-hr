@@ -23,7 +23,7 @@ class EmployeeDocument extends Model
     }
 
     protected $fillable = [
-        'company_id',
+        'ecole_setting_id',
         'employee_id',
         'type_document',
         'name',
@@ -35,7 +35,7 @@ class EmployeeDocument extends Model
 
     public function employee(): BelongsTo { return $this->belongsTo(Employee::class); }
     public function uploader(): BelongsTo { return $this->belongsTo(User::class, 'uploaded_by'); }
-    public function company(): BelongsTo { return $this->belongsTo(Company::class); }
+    public function company(): BelongsTo { return $this->belongsTo(EcoleSettings::class); }
 
     public function getFileSizeHumanAttribute(): string
     {

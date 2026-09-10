@@ -12,11 +12,11 @@ class CreateUser extends CreateRecord
 
     protected static string $resource = UserResource::class;
 
-    // Injecter le company_id sauf si super-admin (qui le choisit manuellement)
+    // Injecter le ecole_setting_id sauf si super-admin (qui le choisit manuellement)
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         if (! auth()->user()?->hasRole('super-admin')) {
-            $data['company_id'] = auth()->user()?->company_id;
+            $data['ecole_setting_id'] = auth()->user()?->ecole_setting_id;
         }
         return $data;
     }

@@ -12,12 +12,12 @@ class NatureDocument extends Model
 
     protected $table = 'nature_documents';
 
-    protected $fillable = ['company_id', 'name', 'active', 'sort_order'];
+    protected $fillable = ['ecole_setting_id', 'name', 'active', 'sort_order'];
 
     protected $casts = ['active' => 'boolean'];
 
     public function company(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(EcoleSettings::class);
     }
 }

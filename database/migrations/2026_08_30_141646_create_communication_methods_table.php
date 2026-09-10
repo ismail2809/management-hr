@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('communication_methods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('ecole_setting_id')->nullable()->constrained()->nullOnDelete();
             $table->string('name');
             $table->string('code')->unique();
             $table->boolean('active')->default(true);

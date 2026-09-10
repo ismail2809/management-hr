@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('document_types', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->nullable()->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('ecole_setting_id')->nullable()->constrained('ecole_settings')->cascadeOnDelete();
             $table->string('name');
             $table->string('code')->nullable(); // for PDF template lookup
             $table->enum('categorie', ['document', 'autre'])->default('document');

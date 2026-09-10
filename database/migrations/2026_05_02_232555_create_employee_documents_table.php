@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employee_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained('companies')->cascadeOnDelete();
+            $table->foreignId('ecole_setting_id')->constrained('ecole_settings')->cascadeOnDelete();
             $table->foreignId('employee_id')->constrained('employees')->cascadeOnDelete();
             $table->string('name');
             $table->string('file_path');

@@ -23,7 +23,7 @@ class Leave extends Model
     }
 
     protected $fillable = [
-        'company_id',
+        'ecole_setting_id',
         'employee_id',
         'categorie',
         'leave_type_id',
@@ -57,7 +57,7 @@ class Leave extends Model
         return $this->start_date->diffInWeekdays($this->end_date) + 1;
     }
 
-    public function company(): BelongsTo   { return $this->belongsTo(Company::class); }
+    public function company(): BelongsTo   { return $this->belongsTo(EcoleSettings::class); }
     public function employee(): BelongsTo  { return $this->belongsTo(Employee::class); }
     public function leaveType(): BelongsTo { return $this->belongsTo(LeaveType::class); }
     public function approver(): BelongsTo  { return $this->belongsTo(User::class, 'approved_by'); }
