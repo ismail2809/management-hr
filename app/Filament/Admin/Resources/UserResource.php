@@ -94,7 +94,7 @@ class UserResource extends Resource
             Section::make('Rôle & Employé associé')->columns(3)->schema([
                 Select::make('ecole_setting_id')
                     ->label('Company')
-                    ->options(\App\Models\EcoleSettings::pluck('name', 'id'))
+                    ->options(\App\Models\EcoleSettings::pluck('nom_ecole', 'id'))
                     ->searchable()
                     ->nullable()
                     ->visible($isSuperAdmin)
