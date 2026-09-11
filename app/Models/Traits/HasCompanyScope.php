@@ -16,7 +16,8 @@ trait HasCompanyScope
                 try { $filamentUser = \Filament\Facades\Filament::auth()->user(); } catch (\Throwable $e) {}
 
                 $user = $authUser ?? $filamentUser;
-                $model->ecole_setting_id = $user?->ecole_setting_id;
+                $model->ecole_setting_id = $user?->ecole_setting_id
+                    ?? \App\Models\EcoleSettings::withoutGlobalScopes()->value('id');
             }
         });
     }

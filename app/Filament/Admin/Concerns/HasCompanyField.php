@@ -12,12 +12,16 @@ trait HasCompanyField
         $user = \Filament\Facades\Filament::auth()->user();
 
         $ecoleSettingId = $user?->ecole_setting_id
-            ?? \App\Models\EcoleSettings::value('id');
+            ?? \App\Models\EcoleSettings::withoutGlobalScopes()->value('id');
 
         return Section::make()
             ->hidden()
             ->schema([
-                Hidden::make('ecole_setting_id')->default($ecoleSettingId),
+                Hidden::make('ecole_setting_id')
+                    ->default($ecoleSettingId)
+                    ->dehydrated()
+                    ->dehydrateStateUsing(fn ($state) => $state
+                        ?? \App\Models\EcoleSettings::withoutGlobalScopes()->value('id')),
             ]);
     }
 }
