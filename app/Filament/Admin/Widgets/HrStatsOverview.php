@@ -29,6 +29,18 @@ class HrStatsOverview extends StatsOverviewWidget
         $autresDemandesEnAttente = DocumentRequest::where('categorie', 'autre')->where('status', 'en_attente')->count();
 
         return [
+            Stat::make('Documents administratifs en attente', $docsEnAttente)
+                ->description($docsEnAttente > 0 ? 'À traiter rapidement' : 'Aucune demande')
+                ->descriptionIcon($docsEnAttente > 0 ? 'heroicon-o-document-text' : 'heroicon-o-check-circle')
+                ->color($docsEnAttente > 0 ? 'warning' : 'success')
+                ->url(DocumentAdministratifResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
+
+            Stat::make('Autres demandes en attente', $autresDemandesEnAttente)
+                ->description($autresDemandesEnAttente > 0 ? 'À traiter rapidement' : 'Aucune demande')
+                ->descriptionIcon($autresDemandesEnAttente > 0 ? 'heroicon-o-inbox' : 'heroicon-o-check-circle')
+                ->color($autresDemandesEnAttente > 0 ? 'warning' : 'success')
+                ->url(AutreDemandeResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
+
             Stat::make('Congés en attente', $congesEnAttente)
                 ->description($congesEnAttente > 0 ? 'À traiter rapidement' : 'Aucune demande')
                 ->descriptionIcon($congesEnAttente > 0 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
@@ -40,18 +52,6 @@ class HrStatsOverview extends StatsOverviewWidget
                 ->descriptionIcon($absencesEnAttente > 0 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
                 ->color($absencesEnAttente > 0 ? 'warning' : 'success')
                 ->url(LeaveResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
-
-            Stat::make('Documents administratifs en attente', $docsEnAttente)
-                ->description($docsEnAttente > 0 ? 'Demandes à traiter' : 'Aucune demande')
-                ->descriptionIcon($docsEnAttente > 0 ? 'heroicon-o-document-text' : 'heroicon-o-check-circle')
-                ->color($docsEnAttente > 0 ? 'warning' : 'success')
-                ->url(DocumentAdministratifResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
-
-            Stat::make('Autres demandes en attente', $autresDemandesEnAttente)
-                ->description($autresDemandesEnAttente > 0 ? 'Demandes à traiter' : 'Aucune demande')
-                ->descriptionIcon($autresDemandesEnAttente > 0 ? 'heroicon-o-inbox' : 'heroicon-o-check-circle')
-                ->color($autresDemandesEnAttente > 0 ? 'warning' : 'success')
-                ->url(AutreDemandeResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
         ];
     }
 }
