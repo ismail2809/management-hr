@@ -177,21 +177,12 @@ class EcoleSettings extends Page
         $data = $this->form->getState();
 
         $settings = EcoleSettingsModel::get();
-        $settings->update($data);
+        $settings->fill($data)->save();
 
         Notification::make()
             ->success()
             ->title('Paramètres sauvegardés')
             ->body('Les paramètres de l\'école ont été mis à jour avec succès.')
             ->send();
-    }
-
-    protected function getFormActions(): array
-    {
-        return [
-            \Filament\Actions\Action::make('save')
-                ->label('Enregistrer')
-                ->submit('save'),
-        ];
     }
 }

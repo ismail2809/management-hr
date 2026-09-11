@@ -42,15 +42,10 @@ class EcoleSettings extends Model
         $ecoleSettingId = auth()->user()?->ecole_setting_id;
 
         if ($ecoleSettingId) {
-            return self::findOrNew($ecoleSettingId);
+            return self::find($ecoleSettingId) ?? self::firstOrNew([]);
         }
 
-        return self::firstOrCreate([], [
-            'nom_ecole'           => 'Mon École',
-            'pays'                => 'Maroc',
-            'afficher_logo_pdf'   => true,
-            'afficher_cachet_pdf' => true,
-        ]);
+        return self::firstOrNew([]);
     }
 
     public function getLogoUrlAttribute(): ?string
