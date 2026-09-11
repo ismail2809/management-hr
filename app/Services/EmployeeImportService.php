@@ -12,26 +12,38 @@ class EmployeeImportService
 {
     /** Noms de colonnes reconnus → champ Employee */
     private const COLUMN_MAP = [
-        'matricule'          => 'matricule',
-        'nom'                => 'last_name',
-        'prénom'             => 'first_name',
-        'prenom'             => 'first_name',
-        'sexe'               => 'gender',
-        'date naissance'     => 'birth_date',
-        'date de naissance'  => 'birth_date',
-        'cin'                => 'cin',
-        'cnss'               => 'cnss_number',
-        'date recrutement'   => 'hire_date',
-        "date d'embauche"    => 'hire_date',
-        'date embauche'      => 'hire_date',
-        'nationalité'        => 'nationality',
-        'nationalite'        => 'nationality',
-        'adresse'            => 'address',
-        'téléphone'          => 'phone',
-        'telephone'          => 'phone',
-        'profession'         => 'profession_name',
-        'métier'             => 'profession_name',
-        'metier'             => 'profession_name',
+        'matricule'            => 'matricule',
+        'nom'                  => 'last_name',
+        'prénom'               => 'first_name',
+        'prenom'               => 'first_name',
+        'sexe'                 => 'gender',
+        'date naissance'       => 'birth_date',
+        'date de naissance'    => 'birth_date',
+        'cin'                  => 'cin',
+        'cnss'                 => 'cnss_number',
+        'n° cnss'              => 'cnss_number',
+        'date recrutement'     => 'hire_date',
+        "date d'embauche"      => 'hire_date',
+        'date embauche'        => 'hire_date',
+        'nationalité'          => 'nationality',
+        'nationalite'          => 'nationality',
+        'adresse'              => 'address',
+        'téléphone'            => 'phone',
+        'telephone'            => 'phone',
+        'téléphone portable'   => 'phone',
+        'telephone portable'   => 'phone',
+        'mobile'               => 'phone',
+        'adresse mail'         => 'email',
+        'email'                => 'email',
+        'e-mail'               => 'email',
+        'mail'                 => 'email',
+        'diplôme'              => 'diploma',
+        'diplome'              => 'diploma',
+        'profession'           => 'profession_name',
+        'métier'               => 'profession_name',
+        'metier'               => 'profession_name',
+        'fonction'             => 'profession_name',
+        'poste'                => 'profession_name',
     ];
 
     public function import(string $filePath, int $companyId): array
@@ -61,8 +73,8 @@ class EmployeeImportService
             if (! empty($data['profession_name'])) {
                 $profession = Profession::withoutGlobalScopes()
                     ->firstOrCreate(
-                        ['ecole_setting_id' => , 'name' => $data['profession_name']],
-                        ['ecole_setting_id' => , 'name' => $data['profession_name']]
+                        ['ecole_setting_id' => $companyId, 'name' => $data['profession_name']],
+                        ['ecole_setting_id' => $companyId, 'name' => $data['profession_name']]
                     );
                 $data['profession_id'] = $profession->id;
             }
@@ -80,18 +92,18 @@ class EmployeeImportService
                 continue;
             }
 
-             = ;
-            $data['status']     = $data['status'] ?? 'actif';
+            $data['ecole_setting_id'] = $companyId;
+            $data['status']           = $data['status'] ?? 'actif';
 
             try {
                 if (! empty($data['cin'])) {
                     Employee::withoutGlobalScopes()->updateOrCreate(
-                        ['ecole_setting_id' => , 'cin' => $data['cin']],
+                        ['ecole_setting_id' => $companyId, 'cin' => $data['cin']],
                         $data
                     );
                 } elseif (! empty($data['matricule'])) {
                     Employee::withoutGlobalScopes()->updateOrCreate(
-                        ['ecole_setting_id' => , 'matricule' => $data['matricule']],
+                        ['ecole_setting_id' => $companyId, 'matricule' => $data['matricule']],
                         $data
                     );
                 } else {
@@ -143,8 +155,6 @@ class EmployeeImportService
     {
         $data = [];
         foreach ($columnMap as $field => $colIndex) {
-            // Pour les champs texte simples, lire uniquement la colonne exacte
-            // (le fallback gauche ne s'applique qu'aux champs date où les fusions sont courantes)
             $raw = null;
             if (in_array($field, ['birth_date', 'hire_date', 'exit_date'])) {
                 foreach ([$colIndex, $colIndex - 1, $colIndex - 2] as $tryCol) {
@@ -185,7 +195,6 @@ class EmployeeImportService
                 return true;
             }
         }
-        // Un nom réel ne contient pas d'espaces multiples ou ne fait pas plus de 40 chars
         return strlen($value) > 60;
     }
 
