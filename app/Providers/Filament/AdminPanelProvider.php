@@ -32,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('super-admin')
             ->login()
+            ->passwordReset()
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary'  => Color::hex('#0da8b1'),
