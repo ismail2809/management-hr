@@ -35,7 +35,7 @@ class AppPanelProvider extends PanelProvider
             ->id('app')
             ->path('admin')
             ->login(\App\Filament\Admin\Pages\Auth\Login::class)
-            ->passwordReset()
+            ->passwordReset(resetAction: \App\Filament\Admin\Pages\Auth\ResetPassword::class)
             ->profile(isSimple: false)
             ->colors([
                 'primary'  => Color::hex('#1e40af'),

@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('super-admin')
             ->login()
-            ->passwordReset()
+            ->passwordReset(resetAction: \App\Filament\Admin\Pages\Auth\ResetPassword::class)
             ->defaultThemeMode(ThemeMode::Dark)
             ->colors([
                 'primary'  => Color::hex('#0da8b1'),
