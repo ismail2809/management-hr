@@ -82,5 +82,6 @@ class DocumentRequest extends Model
 
     public function employee(): BelongsTo        { return $this->belongsTo(Employee::class); }
     public function processor(): BelongsTo       { return $this->belongsTo(User::class, 'processed_by'); }
-    public function company(): BelongsTo         { return $this->belongsTo(EcoleSettings::class); }
+    public function company(): BelongsTo          { return $this->belongsTo(EcoleSettings::class, 'ecole_setting_id'); }
+    public function ecoleSettings(): BelongsTo   { return $this->belongsTo(EcoleSettings::class, 'ecole_setting_id'); }
 }
