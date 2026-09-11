@@ -97,15 +97,25 @@ class EmployeeImportService
 
             try {
                 if (! empty($data['cin'])) {
-                    Employee::withoutGlobalScopes()->updateOrCreate(
-                        ['ecole_setting_id' => $companyId, 'cin' => $data['cin']],
-                        $data
-                    );
+                    $existing = Employee::withoutGlobalScopes()
+                        ->where('ecole_setting_id', $companyId)
+                        ->where('cin', $data['cin'])
+                        ->first();
+                    if ($existing) {
+                        $existing->fill($this->onlyEmptyFields($existing, $data))->save();
+                    } else {
+                        Employee::withoutGlobalScopes()->create($data);
+                    }
                 } elseif (! empty($data['matricule'])) {
-                    Employee::withoutGlobalScopes()->updateOrCreate(
-                        ['ecole_setting_id' => $companyId, 'matricule' => $data['matricule']],
-                        $data
-                    );
+                    $existing = Employee::withoutGlobalScopes()
+                        ->where('ecole_setting_id', $companyId)
+                        ->where('matricule', $data['matricule'])
+                        ->first();
+                    if ($existing) {
+                        $existing->fill($this->onlyEmptyFields($existing, $data))->save();
+                    } else {
+                        Employee::withoutGlobalScopes()->create($data);
+                    }
                 } else {
                     Employee::withoutGlobalScopes()->create($data);
                 }
@@ -117,6 +127,18 @@ class EmployeeImportService
         }
 
         return compact('imported', 'skipped', 'errors');
+    }
+
+    /**
+     * Retourne uniquement les champs de $data dont la valeur en DB est null ou vide.
+     * Les champs déjà remplis ne sont pas écrasés.
+     */
+    private function onlyEmptyFields(Employee $existing, array $data): array
+    {
+        return array_filter($data, function ($value, string $field) use ($existing) {
+            $current = $existing->getAttribute($field);
+            return $current === null || $current === '';
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     private function findHeaderRow(array $rows): ?int
