@@ -69,4 +69,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsTo(Employee::class);
     }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new \App\Notifications\ResetPasswordNotification($token));
+    }
 }
