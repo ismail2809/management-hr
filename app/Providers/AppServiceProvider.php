@@ -12,7 +12,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Remplace la notification Filament de reset password par notre version FR
+        $this->app->bind(
+            \Filament\Auth\Notifications\ResetPassword::class,
+            \App\Notifications\ResetPasswordNotification::class,
+        );
     }
 
     /**

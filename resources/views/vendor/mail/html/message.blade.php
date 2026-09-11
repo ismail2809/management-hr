@@ -21,7 +21,8 @@
 {{-- Footer --}}
 <x-slot:footer>
 <x-mail::footer>
-© {{ date('Y') }} {{ config('app.name') }}. {{ __('All rights reserved.') }}
+@php $nomEcole = \App\Models\EcoleSettings::withoutGlobalScopes()->first()?->nom_ecole ?? 'RH Les Écoles Al Baraime'; @endphp
+© {{ date('Y') }} {{ $nomEcole }}. Tous droits réservés.
 </x-mail::footer>
 </x-slot:footer>
 </x-mail::layout>
