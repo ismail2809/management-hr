@@ -2,8 +2,11 @@
 
 namespace App\Filament\Admin\Widgets;
 
+use App\Filament\Admin\Resources\AutreDemandeResource;
+use App\Filament\Admin\Resources\DocumentAdministratifResource;
 use App\Filament\Admin\Resources\EmployeeResource;
 use App\Filament\Admin\Resources\LeaveResource;
+use App\Models\DocumentRequest;
 use App\Models\Employee;
 use App\Models\Leave;
 use Filament\Widgets\StatsOverviewWidget;
@@ -22,17 +25,15 @@ class HrStatsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $totalActifs       = Employee::where('status', 'actif')->count();
-        $totalInactifs     = Employee::where('status', '!=', 'actif')->count();
-        $congesEnAttente   = Leave::where('status', 'en_attente')->count();
-        $absentsAujourdhui = Leave::where('status', 'approuvé')
+        $totalActifs             = Employee::where('status', 'actif')->count();
+        $totalInactifs           = Employee::where('status', '!=', 'actif')->count();
+        $congesEnAttente         = Leave::where('status', 'en_attente')->count();
+        $absentsAujourdhui       = Leave::where('status', 'approuvé')
             ->whereDate('start_date', '<=', today())
             ->whereDate('end_date', '>=', today())
             ->count();
-        $congesCeMois      = Leave::where('status', 'approuvé')
-            ->whereMonth('start_date', now()->month)
-            ->whereYear('start_date', now()->year)
-            ->count();
+        $docsEnAttente           = DocumentRequest::where('categorie', 'document')->where('status', 'en_attente')->count();
+        $autresDemandesEnAttente = DocumentRequest::where('categorie', 'autre')->where('status', 'en_attente')->count();
 
         $tauxPresence = $totalActifs > 0
             ? round((($totalActifs - $absentsAujourdhui) / $totalActifs) * 100)
@@ -61,6 +62,18 @@ class HrStatsOverview extends StatsOverviewWidget
                 ->description('Aujourd\'hui — ' . ($totalActifs - $absentsAujourdhui) . '/' . $totalActifs . ' présents')
                 ->descriptionIcon('heroicon-o-chart-bar')
                 ->color($tauxPresence >= 90 ? 'success' : ($tauxPresence >= 75 ? 'warning' : 'danger')),
+
+            Stat::make('Documents administratifs en attente', $docsEnAttente)
+                ->description($docsEnAttente > 0 ? 'Demandes à traiter' : 'Aucune demande')
+                ->descriptionIcon($docsEnAttente > 0 ? 'heroicon-o-document-text' : 'heroicon-o-check-circle')
+                ->color($docsEnAttente > 0 ? 'warning' : 'success')
+                ->url(DocumentAdministratifResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
+
+            Stat::make('Autres demandes en attente', $autresDemandesEnAttente)
+                ->description($autresDemandesEnAttente > 0 ? 'Demandes à traiter' : 'Aucune demande')
+                ->descriptionIcon($autresDemandesEnAttente > 0 ? 'heroicon-o-inbox' : 'heroicon-o-check-circle')
+                ->color($autresDemandesEnAttente > 0 ? 'warning' : 'success')
+                ->url(AutreDemandeResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
         ];
     }
 }
