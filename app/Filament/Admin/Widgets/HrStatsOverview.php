@@ -24,10 +24,7 @@ class HrStatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         $congesEnAttente         = Leave::where('status', 'en_attente')->count();
-        $absentsAujourdhui       = Leave::where('status', 'approuvé')
-            ->whereDate('start_date', '<=', today())
-            ->whereDate('end_date', '>=', today())
-            ->count();
+        $absencesEnAttente       = Leave::where('categorie', 'absence')->where('status', 'en_attente')->count();
         $docsEnAttente           = DocumentRequest::where('categorie', 'document')->where('status', 'en_attente')->count();
         $autresDemandesEnAttente = DocumentRequest::where('categorie', 'autre')->where('status', 'en_attente')->count();
 
@@ -38,11 +35,11 @@ class HrStatsOverview extends StatsOverviewWidget
                 ->color($congesEnAttente > 0 ? 'warning' : 'success')
                 ->url(LeaveResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
 
-            Stat::make("Absents aujourd'hui", $absentsAujourdhui)
-                ->description($absentsAujourdhui > 0 ? 'Absences approuvées' : 'Tout le monde est présent')
-                ->descriptionIcon($absentsAujourdhui > 0 ? 'heroicon-o-user-minus' : 'heroicon-o-user-group')
-                ->color($absentsAujourdhui > 0 ? 'danger' : 'success')
-                ->url(LeaveResource::getUrl('index') . '?tableFilters[status][value]=approuv%C3%A9'),
+            Stat::make('Absences en attente', $absencesEnAttente)
+                ->description($absencesEnAttente > 0 ? 'À traiter rapidement' : 'Aucune absence en attente')
+                ->descriptionIcon($absencesEnAttente > 0 ? 'heroicon-o-exclamation-circle' : 'heroicon-o-check-circle')
+                ->color($absencesEnAttente > 0 ? 'warning' : 'success')
+                ->url(LeaveResource::getUrl('index') . '?tableFilters[status][value]=en_attente'),
 
             Stat::make('Documents administratifs en attente', $docsEnAttente)
                 ->description($docsEnAttente > 0 ? 'Demandes à traiter' : 'Aucune demande')
