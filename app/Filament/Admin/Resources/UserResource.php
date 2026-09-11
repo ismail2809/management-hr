@@ -119,8 +119,8 @@ class UserResource extends Resource
                         if (! auth()->user()?->hasRole('super-admin')) {
                             $query->where('ecole_setting_id', auth()->user()?->ecole_setting_id);
                         }
-                        return $query->get()->mapWithKeys(fn ($e) => [
-                            $e->id => $e->full_name . ' — ' . $e->matricule,
+                        return $query->with('profession')->get()->mapWithKeys(fn ($e) => [
+                            $e->id => $e->id . ' — ' . $e->full_name . ($e->profession ? ' — ' . $e->profession->name : ''),
                         ]);
                     })
                     ->searchable()
