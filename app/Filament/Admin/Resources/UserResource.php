@@ -93,19 +93,9 @@ class UserResource extends Resource
             ]),
 
             Section::make('Rôle & Employé associé')->columns(3)->schema([
-                Select::make('ecole_setting_id')
-                    ->label('Company')
-                    ->options(\App\Models\EcoleSettings::pluck('nom_ecole', 'id'))
-                    ->searchable()
-                    ->nullable()
-                    ->visible($isSuperAdmin)
-                    ->live()
-                    ->helperText('Laisser vide = super-admin sans company'),
-
                 Hidden::make('ecole_setting_id')
                     ->default(auth()->user()?->ecole_setting_id ?? \App\Models\EcoleSettings::withoutGlobalScopes()->value('id'))
-                    ->visible(! $isSuperAdmin)
-                    ->dehydrated(! $isSuperAdmin),
+                    ->dehydrated(),
 
                 Select::make('roles')
                     ->label('Rôle')
