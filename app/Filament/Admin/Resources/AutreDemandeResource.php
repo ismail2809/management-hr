@@ -288,11 +288,12 @@ class AutreDemandeResource extends Resource
                         default      => 'gray',
                     }),
 
-TextColumn::make('fichier_final')
+                TextColumn::make('fichier_final')
                     ->label('Fichier')
-                    ->formatStateUsing(fn ($state) => $state ? 'Télécharger' : '—')
-                    ->icon(fn ($state) => $state ? 'heroicon-o-paper-clip' : null)
-                    ->color(fn ($state) => $state ? 'primary' : 'gray')
+                    ->default('—')
+                    ->formatStateUsing(fn ($state) => $state && $state !== '—' ? 'Télécharger' : '—')
+                    ->icon(fn ($state) => $state && $state !== '—' ? 'heroicon-o-paper-clip' : null)
+                    ->color(fn ($state) => $state && $state !== '—' ? 'primary' : 'gray')
                     ->url(fn (DocumentRequest $record) => $record->fichier_final ? asset('storage/' . $record->fichier_final) : null)
                     ->openUrlInNewTab(),
 
