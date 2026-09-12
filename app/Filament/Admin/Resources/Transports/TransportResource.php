@@ -39,7 +39,7 @@ class TransportResource extends Resource
         return parent::getEloquentQuery();
     }
 
-    public static function canViewAny(): bool { return ! auth()->user()?->isBasicRole(); }
+    public static function canViewAny(): bool { return auth()->user()?->hasRole('super-admin'); }
 
     public static function form(Schema $schema): Schema
     {

@@ -31,7 +31,7 @@ class EcoleSettings extends Page
 
     public static function canAccess(): bool
     {
-        return ! auth()->user()?->isBasicRole();
+        return auth()->user()?->hasRole('super-admin');
     }
 
     public function mount(): void

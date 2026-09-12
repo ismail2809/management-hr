@@ -46,7 +46,7 @@ class DocumentTypeResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return ! auth()->user()?->isBasicRole();
+        return auth()->user()?->hasRole('super-admin');
     }
 
     public static function form(Schema $schema): Schema
