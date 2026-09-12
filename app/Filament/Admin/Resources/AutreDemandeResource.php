@@ -92,13 +92,18 @@ class AutreDemandeResource extends Resource
     public static function canCreate(): bool
     {
         // Secretaire : vue seule sur Autres Demandes
-        return auth()->user()?->hasAnyRole(['super-admin', 'directeur', 'surveillante']);
+        return ! auth()->user()?->hasRole('secretaire');
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        // Secretaire : vue seule sur Autres Demandes
-        return auth()->user()?->hasAnyRole(['super-admin', 'directeur', 'surveillante']);
+        $user = auth()->user();
+        // Employés : peuvent modifier uniquement leur propre demande en attente
+        if ($user?->isBasicRole()) {
+            return $record->employee_id === $user->employee_id && $record->status === 'en_attente';
+        }
+        // Secretaire : vue seule
+        return $user?->hasAnyRole(['super-admin', 'directeur', 'surveillante']);
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
