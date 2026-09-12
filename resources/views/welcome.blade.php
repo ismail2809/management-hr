@@ -491,7 +491,7 @@
 
     <div class="nav-ctas">
         @auth
-            <a href="{{ url('/app') }}" class="btn btn-solid">Tableau de bord</a>
+            <a href="{{ url('/admin') }}" class="btn btn-solid">Tableau de bord</a>
         @else
             <a href="{{ route('filament.app.auth.login') }}" class="btn btn-outline">Connexion</a>
             <a href="{{ route('filament.app.auth.login') }}" class="btn btn-solid">Essai gratuit</a>
@@ -512,7 +512,7 @@
 
     <div class="hero-actions">
         @auth
-            <a href="{{ url('/app') }}" class="btn-hero">Accéder à mon espace</a>
+            <a href="{{ url('/admin') }}" class="btn-hero">Accéder à mon espace</a>
         @else
             <a href="{{ route('filament.app.auth.login') }}" class="btn-hero">Démarrer gratuitement</a>
             <a href="#fonctionnalites" class="btn-hero-ghost">Voir les fonctionnalités</a>
@@ -525,7 +525,7 @@
             <div class="preview-dot" style="background:#ef4444;"></div>
             <div class="preview-dot" style="background:#f59e0b;"></div>
             <div class="preview-dot" style="background:#22c55e;"></div>
-            <div class="preview-url">app.gestionrh.ma/app</div>
+            <div class="preview-url">app.gestionrh.ma/admin</div>
         </div>
         <div class="preview-body">
             <div class="preview-sidebar">
@@ -803,7 +803,7 @@
     <p>Rejoignez les PME marocaines qui font confiance à GestionRH pour leur paie, leurs congés et leurs déclarations légales.</p>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
         @auth
-            <a href="{{ url('/app') }}" class="btn-amber">Accéder à mon espace RH</a>
+            <a href="{{ url('/admin') }}" class="btn-amber">Accéder à mon espace RH</a>
         @else
             <a href="{{ route('filament.app.auth.login') }}" class="btn-amber">Créer un compte gratuit</a>
             <a href="{{ route('filament.app.auth.login') }}" style="display:inline-flex;align-items:center;padding:14px 28px;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:600;color:rgba(255,255,255,.7);border:1.5px solid rgba(255,255,255,.2);transition:all .2s;" onmouseover="this.style.color='white';this.style.borderColor='rgba(255,255,255,.5)'" onmouseout="this.style.color='rgba(255,255,255,.7)';this.style.borderColor='rgba(255,255,255,.2)'">Se connecter</a>
