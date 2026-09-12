@@ -75,12 +75,19 @@ class DocumentAdministratifResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->hasAnyRole(['super-admin', 'directeur', 'secretaire']);
+        // Surveillante : vue seule sur Docs Admin
+        return ! auth()->user()?->hasRole('surveillante');
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return auth()->user()?->hasAnyRole(['super-admin', 'directeur', 'secretaire']);
+        // Employés : peuvent modifier uniquement leur propre demande en attente
+        $user = auth()->user();
+        if ($user?->isBasicRole()) {
+            return $record->employee_id === $user->employee_id && $record->status === 'en_attente';
+        }
+        // Surveillante : vue seule
+        return $user?->hasAnyRole(['super-admin', 'directeur', 'secretaire']);
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
