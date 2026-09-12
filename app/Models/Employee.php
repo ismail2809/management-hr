@@ -83,7 +83,7 @@ class Employee extends Model
 
     public function isProfesseur(): bool
     {
-        return $this->profession?->name === 'Professeur';
+        return in_array($this->profession?->name, ['Professeur', 'Enseignant', 'Enseignante']);
     }
 
     public function ecoleSettings(): BelongsTo { return $this->belongsTo(EcoleSettings::class, 'ecole_setting_id'); }
