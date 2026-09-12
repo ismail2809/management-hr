@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -59,13 +60,6 @@ class GroupeResource extends Resource
                 TextColumn::make('niveauScolaire.name')->label('Niveau')->sortable()->badge()->color('info'),
                 TextColumn::make('name')->label('Groupe')->searchable()->sortable(),
                 TextColumn::make('employees_count')->label('Professeurs affectés')->counts('employees')->sortable(),
-            ])
-            ->modifyQueryUsing(fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*'))
-            ->defaultSort('niveaux_scolaires.order')
-            ->filters([
-                SelectFilter::make('niveau_scolaire_id')
-                    ->label('Niveau')
-                    ->relationship('niveauScolaire', 'name'),
                 TextColumn::make('created_at')
                     ->label('Créé le')
                     ->dateTime('d/m/Y H:i')
@@ -76,13 +70,15 @@ class GroupeResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->label('Supprimé le')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([EditAction::make()])
+            ->modifyQueryUsing(fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*'))
+            ->defaultSort('niveaux_scolaires.order')
+            ->filters([
+                SelectFilter::make('niveau_scolaire_id')
+                    ->label('Niveau')
+                    ->relationship('niveauScolaire', 'name'),
+            ])
+            ->actions([EditAction::make(), DeleteAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 
