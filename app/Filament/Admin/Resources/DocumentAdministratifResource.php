@@ -246,7 +246,7 @@ class DocumentAdministratifResource extends Resource
                         ->label('Aperçu PDF')
                         ->icon('heroicon-o-document-magnifying-glass')
                         ->color('info')
-                        ->visible(fn (DocumentRequest $record) => view()->exists('pdf.documents.' . $record->type))
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && view()->exists('pdf.documents.' . $record->type))
                         ->url(fn (DocumentRequest $record) => route('documents.preview', $record))
                         ->openUrlInNewTab(),
 
