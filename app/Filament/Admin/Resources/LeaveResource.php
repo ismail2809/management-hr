@@ -220,10 +220,10 @@ class LeaveResource extends Resource
                                 ->relationship(
                                     'remplacant',
                                     'first_name',
-                                    fn ($query, $get) => $query->with('profession')->when(
-                                        $get('employee_id'),
-                                        fn ($q, $id) => $q->where('id', '!=', $id)
-                                    )
+                                    fn ($query, $get) => $query
+                                        ->with('profession')
+                                        ->whereHas('profession', fn ($q) => $q->whereIn('name', ['Enseignant', 'Enseignante', 'Professeur']))
+                                        ->when($get('employee_id'), fn ($q, $id) => $q->where('id', '!=', $id))
                                 )
                                 ->getOptionLabelFromRecordUsing(fn (Employee $record) => $record->full_name . ($record->profession ? ' — ' . $record->profession->name : ''))
                                 ->searchable()
