@@ -102,7 +102,7 @@ class EmployeeImportService
                         ->where('cin', $data['cin'])
                         ->first();
                     if ($existing) {
-                        $existing->fill($this->onlyEmptyFields($existing, $data))->save();
+                        $existing->fill($this->mergeWithExisting($existing, $data))->save();
                     } else {
                         Employee::withoutGlobalScopes()->create($data);
                     }
@@ -112,7 +112,7 @@ class EmployeeImportService
                         ->where('matricule', $data['matricule'])
                         ->first();
                     if ($existing) {
-                        $existing->fill($this->onlyEmptyFields($existing, $data))->save();
+                        $existing->fill($this->mergeWithExisting($existing, $data))->save();
                     } else {
                         Employee::withoutGlobalScopes()->create($data);
                     }
@@ -130,15 +130,20 @@ class EmployeeImportService
     }
 
     /**
-     * Retourne uniquement les champs de $data dont la valeur en DB est null ou vide.
-     * Les champs déjà remplis ne sont pas écrasés.
+     * Champs jamais écrasés si déjà remplis en DB (saisis manuellement).
+     * Tous les autres champs Excel sont mis à jour librement.
      */
-    private function onlyEmptyFields(Employee $existing, array $data): array
+    private const PROTECTED_FIELDS = ['matricule', 'ecole_setting_id', 'status'];
+
+    private function mergeWithExisting(Employee $existing, array $data): array
     {
-        return array_filter($data, function ($value, string $field) use ($existing) {
+        foreach (self::PROTECTED_FIELDS as $field) {
             $current = $existing->getAttribute($field);
-            return $current === null || $current === '';
-        }, ARRAY_FILTER_USE_BOTH);
+            if ($current !== null && $current !== '') {
+                unset($data[$field]);
+            }
+        }
+        return $data;
     }
 
     private function findHeaderRow(array $rows): ?int
