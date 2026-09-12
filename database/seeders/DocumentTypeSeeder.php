@@ -16,8 +16,6 @@ class DocumentTypeSeeder extends Seeder
             ['code' => 'attestation_ir',       'name' => 'Attestation IR',           'categorie' => 'document', 'sort_order' => 4],
             ['code' => 'credit_irrevocable',   'name' => 'Crédit irrévocable',       'categorie' => 'document', 'sort_order' => 5],
             ['code' => 'attestation_cnss',     'name' => 'Attestation CNSS',         'categorie' => 'document', 'sort_order' => 6],
-            ['code' => 'ordre_mission',        'name' => 'Ordre de mission',         'categorie' => 'document', 'sort_order' => 7],
-            ['code' => 'certificat_travail',   'name' => 'Certificat de travail',    'categorie' => 'document', 'sort_order' => 8],
             ['code' => 'materiel',             'name' => 'Matériel',                 'categorie' => 'autre',    'sort_order' => 1],
             ['code' => 'grande_salle',         'name' => 'Grande salle',             'categorie' => 'autre',    'sort_order' => 2],
             ['code' => 'photocopie',           'name' => 'Photocopie',               'categorie' => 'autre',    'sort_order' => 3],

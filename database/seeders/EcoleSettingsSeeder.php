@@ -23,11 +23,18 @@ class EcoleSettingsSeeder extends Seeder
         $ecole = EcoleSettings::firstOrCreate(
             ['nom_ecole' => 'Les écoles AL BARAIME'],
             [
-                'cnss'                => '000503057000080',
-                'ville'               => 'Casablanca',
-                'email'               => 'albaraime.viescholaire@gmail.com',
-                'telephone'           => '+212523358346',
+                'cnss'                => '2920222',
+                'patente'             => '42500016',
+                'rc'                  => '16320',
+                'if_number'           => '64400070',
+                'adresse'             => 'Bvd Mohammed V, Bp 14, Azemmour, 24100 Maroc',
+                'ville'               => 'Azemmour',
+                'code_postal'         => '24100',
                 'pays'                => 'Maroc',
+                'telephone'           => '+212523358346',
+                'email'               => 'albaraime.viescholaire@gmail.com',
+                'site_web'            => 'https://lesecolesalbaraime.com/',
+                'logo'                => 'ecole/01M29J1HDNYV8Y3BNVJ5MS1HMC.png',
                 'afficher_logo_pdf'   => true,
                 'afficher_cachet_pdf' => true,
             ]
