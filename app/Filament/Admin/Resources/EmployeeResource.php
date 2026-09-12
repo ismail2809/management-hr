@@ -251,10 +251,14 @@ class EmployeeResource extends Resource
                         'vacataire'  => 'Vacataire',
                         default      => '—',
                     }),
-                TextColumn::make('contract_type')->label('Contrat')->badge()
+                TextColumn::make('gender')->label('Sexe')->badge()
                     ->color(fn ($state) => match ($state) {
-                        'CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info', 'ANAPEC' => 'gray', default => 'gray',
+                        'M' => 'info', 'F' => 'pink', default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'M' => 'Masculin', 'F' => 'Féminin', default => '—',
                     }),
+                TextColumn::make('cin')->label('CIN')->searchable()->default('—'),
                 TextColumn::make('status')->label('Statut')->badge()
                     ->color(fn ($state) => match ($state) {
                         'actif'   => 'success',
