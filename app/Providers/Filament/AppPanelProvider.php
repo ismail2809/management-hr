@@ -75,7 +75,7 @@ class AppPanelProvider extends PanelProvider
                     ->url(fn () => ($emp = auth()->user()?->employee)
                         ? \App\Filament\Admin\Resources\EmployeeResource::getUrl('view', ['record' => $emp])
                         : '#')
-                    ->visible(fn () => auth()->user()?->hasRole('employee') && auth()->user()?->employee_id),
+                    ->visible(fn () => auth()->user()?->isBasicRole() && auth()->user()?->employee_id),
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')

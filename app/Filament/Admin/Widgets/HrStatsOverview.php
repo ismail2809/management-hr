@@ -18,7 +18,7 @@ class HrStatsOverview extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     protected function getStats(): array

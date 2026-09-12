@@ -46,19 +46,19 @@ class AutreDemandeResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes autres demandes' : 'Autres demandes';
+        return auth()->user()?->isBasicRole() ? 'Mes autres demandes' : 'Autres demandes';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Demandes';
+        return auth()->user()?->isBasicRole() ? 'Mes demandes' : 'Demandes';
     }
 
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()->where('categorie', 'autre');
 
-        if (auth()->user()?->hasRole('employee')) {
+        if (auth()->user()?->isBasicRole()) {
             $query->where('employee_id', auth()->user()->employee_id);
         }
 
@@ -67,7 +67,7 @@ class AutreDemandeResource extends Resource
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
@@ -82,7 +82,7 @@ class AutreDemandeResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $isEmployee = auth()->user()?->hasRole('employee');
+        $isEmployee = auth()->user()?->isBasicRole();
 
         return $schema->columns(1)->components([
             Hidden::make('categorie')->default('autre'),
@@ -305,7 +305,7 @@ TextColumn::make('fichier_final')
                         ->label('Approuver')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->isBasicRole())
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
                             'status' => 'approuvé', 'processed_by' => auth()->id(), 'processed_at' => now(),
@@ -315,7 +315,7 @@ TextColumn::make('fichier_final')
                         ->label('Refuser')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->isBasicRole())
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
                             'status' => 'refusé', 'processed_by' => auth()->id(), 'processed_at' => now(),

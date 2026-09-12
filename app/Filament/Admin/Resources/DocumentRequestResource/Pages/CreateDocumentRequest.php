@@ -29,7 +29,7 @@ class CreateDocumentRequest extends CreateRecord
 
     protected function getSteps(): array
     {
-        $isEmployee = auth()->user()?->hasRole('employee');
+        $isEmployee = auth()->user()?->isBasicRole();
 
         return [
             Step::make('Demandeur')

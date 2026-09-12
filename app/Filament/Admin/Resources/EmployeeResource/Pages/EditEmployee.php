@@ -12,7 +12,7 @@ class EditEmployee extends EditRecord
 
     public static function authorizeResourceAccess(): void
     {
-        if (auth()->user()?->hasRole('employee')) {
+        if (auth()->user()?->isBasicRole()) {
             return;
         }
 
@@ -23,7 +23,7 @@ class EditEmployee extends EditRecord
     {
         $user = auth()->user();
 
-        if ($user?->hasRole('employee')) {
+        if ($user?->isBasicRole()) {
             abort_unless(
                 $user->employee_id && (int) $this->record->id === (int) $user->employee_id,
                 403
@@ -36,7 +36,7 @@ class EditEmployee extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        if (auth()->user()?->hasRole('employee')) {
+        if (auth()->user()?->isBasicRole()) {
             return [];
         }
 

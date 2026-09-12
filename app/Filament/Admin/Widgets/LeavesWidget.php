@@ -24,7 +24,7 @@ class LeavesWidget extends BaseWidget
     public function table(Table $table): Table
     {
         $user = auth()->user();
-        $isEmployee = $user?->hasRole('employee');
+        $isEmployee = $user?->isBasicRole();
 
         $query = $isEmployee
             ? Leave::query()->where('employee_id', $user->employee_id)->orderByDesc('start_date')
@@ -37,7 +37,7 @@ class LeavesWidget extends BaseWidget
                     ->label('Employé')
                     ->searchable(['employees.first_name', 'employees.last_name'])
                     ->weight('semibold')
-                    ->hidden(fn () => auth()->user()?->hasRole('employee')),
+                    ->hidden(fn () => auth()->user()?->isBasicRole()),
                 TextColumn::make('categorie')
                     ->label('Type')
                     ->badge()

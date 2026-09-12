@@ -26,7 +26,7 @@ class CommunicationMethodResource extends Resource
     protected static \UnitEnum|string|null $navigationGroup = 'Paramétrage';
     protected static ?int $navigationSort = 30;
 
-    public static function canViewAny(): bool { return ! auth()->user()?->hasRole('employee'); }
+    public static function canViewAny(): bool { return ! auth()->user()?->isBasicRole(); }
 
     public static function form(Schema $schema): Schema
     {

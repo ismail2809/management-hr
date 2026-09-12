@@ -39,19 +39,19 @@ class DocumentAdministratifResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes documents' : 'Documents administratifs';
+        return auth()->user()?->isBasicRole() ? 'Mes documents' : 'Documents administratifs';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Demandes';
+        return auth()->user()?->isBasicRole() ? 'Mes demandes' : 'Demandes';
     }
 
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()->where('categorie', 'document');
 
-        if (auth()->user()?->hasRole('employee')) {
+        if (auth()->user()?->isBasicRole()) {
             $query->where('employee_id', auth()->user()->employee_id);
         }
 
@@ -60,7 +60,7 @@ class DocumentAdministratifResource extends Resource
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
@@ -75,7 +75,7 @@ class DocumentAdministratifResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $isEmployee = auth()->user()?->hasRole('employee');
+        $isEmployee = auth()->user()?->isBasicRole();
 
         return $schema->columns(1)->components([
             Hidden::make('categorie')->default('document'),
@@ -211,7 +211,7 @@ class DocumentAdministratifResource extends Resource
                         ->label('Télécharger PDF généré')
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->visible(fn (DocumentRequest $record) => view()->exists('pdf.documents.' . $record->type) && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (DocumentRequest $record) => view()->exists('pdf.documents.' . $record->type) && ! auth()->user()?->isBasicRole())
                         ->url(fn (DocumentRequest $record) => route('documents.pdf', $record))
                         ->openUrlInNewTab(),
 
@@ -236,7 +236,7 @@ class DocumentAdministratifResource extends Resource
                         ->label('Approuver')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->isBasicRole())
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
                             'status' => 'approuvé', 'processed_by' => auth()->id(), 'processed_at' => now(),
@@ -246,7 +246,7 @@ class DocumentAdministratifResource extends Resource
                         ->label('Refuser')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (DocumentRequest $record) => $record->status === 'en_attente' && ! auth()->user()?->isBasicRole())
                         ->requiresConfirmation()
                         ->action(fn (DocumentRequest $record) => $record->update([
                             'status' => 'refusé', 'processed_by' => auth()->id(), 'processed_at' => now(),

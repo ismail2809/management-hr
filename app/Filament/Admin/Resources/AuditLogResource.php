@@ -123,7 +123,7 @@ class AuditLogResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function getPages(): array

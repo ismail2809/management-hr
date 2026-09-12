@@ -49,16 +49,20 @@ class UserResource extends Resource
     {
         $isSuperAdmin = auth()->user()?->hasRole('super-admin');
 
+        $basicRoles = \App\Models\User::BASIC_ROLES;
         $allowed = $isSuperAdmin
-            ? ['super-admin', 'directeur', 'secretaire', 'surveillante', 'employee']
-            : ['directeur', 'secretaire', 'surveillante', 'employee'];
+            ? ['super-admin', 'directeur', 'secretaire', 'surveillante', ...$basicRoles]
+            : ['directeur', 'secretaire', 'surveillante', ...$basicRoles];
 
         $labels = [
-            'super-admin'  => 'Super Admin',
-            'directeur'    => 'Directeur',
-            'secretaire'   => 'Secrétaire',
-            'surveillante' => 'Surveillante',
-            'employee'     => 'Employé',
+            'super-admin'     => 'Super Admin',
+            'directeur'       => 'Directeur',
+            'secretaire'      => 'Secrétaire',
+            'surveillante'    => 'Surveillante',
+            'employee'        => 'Employé',
+            'femme-de-menage' => 'Femme de ménage',
+            'chauffeur'       => 'Chauffeur',
+            'gardien'         => 'Gardien',
         ];
 
         $roles = Role::whereIn('name', $allowed)
@@ -192,7 +196,7 @@ class UserResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function getPages(): array

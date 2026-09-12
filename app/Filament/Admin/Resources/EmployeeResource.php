@@ -40,13 +40,13 @@ class EmployeeResource extends Resource
     /** Disabled for employee if the field already has a value in DB. */
     private static function d(string $field): \Closure
     {
-        return fn ($record) => auth()->user()?->hasRole('employee') && filled($record?->{$field});
+        return fn ($record) => auth()->user()?->isBasicRole() && filled($record?->{$field});
     }
 
     /** Always disabled for employees (admin-only fields). */
     private static function dAdmin(): \Closure
     {
-        return fn () => (bool) auth()->user()?->hasRole('employee');
+        return fn () => (bool) auth()->user()?->isBasicRole();
     }
 
     public static function form(Schema $schema): Schema
@@ -58,7 +58,7 @@ class EmployeeResource extends Resource
             /* ══ 4. Situation familiale ════════════════ */
             Section::make('Situation familiale')
                 ->icon('heroicon-o-heart')
-                ->visible(fn () => ! auth()->user()?->hasRole('employee'))
+                ->visible(fn () => ! auth()->user()?->isBasicRole())
                 ->compact()
                 ->schema([
                     Grid::make(2)->schema([
@@ -280,13 +280,13 @@ class EmployeeResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
     {
         $user = auth()->user();
-        if ($user?->hasRole('employee')) {
+        if ($user?->isBasicRole()) {
             return $record->id === $user->employee_id;
         }
         return true;
@@ -295,7 +295,7 @@ class EmployeeResource extends Resource
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
         $user = auth()->user();
-        if ($user?->hasRole('employee')) {
+        if ($user?->isBasicRole()) {
             return $record->id === $user->employee_id;
         }
         return true;
@@ -303,7 +303,7 @@ class EmployeeResource extends Resource
 
     public static function canCreate(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool

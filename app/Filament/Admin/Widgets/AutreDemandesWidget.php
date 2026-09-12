@@ -17,7 +17,7 @@ class AutreDemandesWidget extends BaseWidget
 
     public static function canView(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public function table(Table $table): Table

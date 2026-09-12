@@ -43,7 +43,7 @@ class NatureDocumentResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return ! auth()->user()?->hasRole('employee');
+        return ! auth()->user()?->isBasicRole();
     }
 
     public static function form(Schema $schema): Schema

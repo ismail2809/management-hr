@@ -2,13 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 
 class RequireAppRole
 {
-    private const ALLOWED_ROLES = ['directeur', 'secretaire', 'surveillante', 'employee'];
-
     public function handle(Request $request, Closure $next)
     {
         $user = auth()->user();
@@ -22,7 +21,8 @@ class RequireAppRole
             return $next($request);
         }
 
-        if (! $user->hasAnyRole(self::ALLOWED_ROLES)) {
+        $allowed = ['directeur', 'secretaire', 'surveillante', ...User::BASIC_ROLES];
+        if (! $user->hasAnyRole($allowed)) {
             abort(403, 'Accès réservé au personnel de l\'entreprise.');
         }
 

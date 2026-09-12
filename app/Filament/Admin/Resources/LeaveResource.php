@@ -42,17 +42,17 @@ class LeaveResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return auth()->user()?->hasRole('employee') ? 'Demandes d\'absences' : 'Absences / Congés';
+        return auth()->user()?->isBasicRole() ? 'Demandes d\'absences' : 'Absences / Congés';
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return auth()->user()?->hasRole('employee') ? 'Mes demandes' : 'Congés & Présence';
+        return auth()->user()?->isBasicRole() ? 'Mes demandes' : 'Congés & Présence';
     }
 
     public static function getNavigationSort(): ?int
     {
-        return auth()->user()?->hasRole('employee') ? 1 : 7;
+        return auth()->user()?->isBasicRole() ? 1 : 7;
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
@@ -79,7 +79,7 @@ class LeaveResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (auth()->user()?->hasRole('employee')) {
+        if (auth()->user()?->isBasicRole()) {
             $query->where('employee_id', auth()->user()->employee_id);
         }
 
@@ -88,7 +88,7 @@ class LeaveResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        $isEmployee = auth()->user()?->hasRole('employee');
+        $isEmployee = auth()->user()?->isBasicRole();
 
         return $schema->columns(1)->components([
 
@@ -333,7 +333,7 @@ class LeaveResource extends Resource
                         ->label('Approuver')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->isBasicRole())
                         ->requiresConfirmation()
                         ->action(fn (Leave $record) => $record->update([
                             'status' => 'approuvé', 'approved_by' => auth()->id(), 'approved_at' => now(),
@@ -343,7 +343,7 @@ class LeaveResource extends Resource
                         ->label('Refuser')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->hasRole('employee'))
+                        ->visible(fn (Leave $record) => $record->status === 'en_attente' && ! auth()->user()?->isBasicRole())
                         ->requiresConfirmation()
                         ->action(fn (Leave $record) => $record->update([
                             'status' => 'refusé', 'approved_by' => auth()->id(), 'approved_at' => now(),
@@ -352,7 +352,7 @@ class LeaveResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn () => ! auth()->user()?->hasRole('employee')),
+                    DeleteBulkAction::make()->visible(fn () => ! auth()->user()?->isBasicRole()),
                 ]),
             ])
             ->defaultSort('start_date', 'desc');

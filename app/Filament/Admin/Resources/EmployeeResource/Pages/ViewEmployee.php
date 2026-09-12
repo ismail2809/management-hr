@@ -23,7 +23,7 @@ class ViewEmployee extends ViewRecord
     public static function authorizeResourceAccess(): void
     {
         // Employees bypass canViewAny — their access is controlled by authorizeAccess()
-        if (auth()->user()?->hasRole('employee')) {
+        if (auth()->user()?->isBasicRole()) {
             return;
         }
 
@@ -34,7 +34,7 @@ class ViewEmployee extends ViewRecord
     {
         $user = auth()->user();
 
-        if ($user?->hasRole('employee')) {
+        if ($user?->isBasicRole()) {
             abort_unless(
                 $user->employee_id && (int) $this->record->id === (int) $user->employee_id,
                 403
