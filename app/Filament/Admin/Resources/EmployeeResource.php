@@ -279,7 +279,8 @@ class EmployeeResource extends Resource
 
     public static function canViewAny(): bool
     {
-        return ! auth()->user()?->isBasicRole();
+        $user = auth()->user();
+        return ! $user?->isBasicRole() && ! $user?->hasRole('surveillante');
     }
 
     public static function canView(\Illuminate\Database\Eloquent\Model $record): bool
