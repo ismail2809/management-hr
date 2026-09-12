@@ -26,6 +26,13 @@ class EmployeeUserSeeder extends Seeder
         'Enseignante'            => 'enseignant',
     ];
 
+    /**
+     * Corrections d'emails erronés dans la table employees (employee_id => email correct)
+     */
+    private array $emailCorrections = [
+        1 => 'saadia.aabida@lesecolesalbaraime.com', // SAADIA AABIDA avait l'email de HASNAA ABASSI
+    ];
+
     public function run(): void
     {
         $password = Hash::make('Test1234$@#%');
@@ -39,7 +46,7 @@ class EmployeeUserSeeder extends Seeder
             ->get();
 
         foreach ($employees as $employee) {
-            $email = strtolower(trim($employee->email));
+            $email = strtolower(trim($this->emailCorrections[$employee->id] ?? $employee->email));
 
             // Skip duplicate emails
             if (in_array($email, $usedEmails)) {
