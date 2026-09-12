@@ -52,8 +52,23 @@ class Leave extends Model
         'appointment_date' => 'datetime',
     ];
 
+    protected function castAttribute($key, $value)
+    {
+        if (in_array($key, ['start_date', 'end_date', 'approved_at', 'appointment_date']) && $value !== null) {
+            try {
+                return parent::castAttribute($key, $value);
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+        return parent::castAttribute($key, $value);
+    }
+
     public function getDurationDaysAttribute(): int
     {
+        if (! $this->start_date || ! $this->end_date) {
+            return 0;
+        }
         return $this->start_date->diffInWeekdays($this->end_date) + 1;
     }
 

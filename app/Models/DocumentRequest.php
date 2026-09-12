@@ -46,6 +46,18 @@ class DocumentRequest extends Model
         'rencontre_employee_ids',
     ];
 
+    protected function castAttribute($key, $value)
+    {
+        if (in_array($key, ['processed_at', 'date_souhaitee', 'photocopie_date_souhaitee']) && $value !== null) {
+            try {
+                return parent::castAttribute($key, $value);
+            } catch (\Throwable) {
+                return null;
+            }
+        }
+        return parent::castAttribute($key, $value);
+    }
+
     protected $casts = [
         'processed_at'              => 'datetime',
         'date_souhaitee'            => 'date',

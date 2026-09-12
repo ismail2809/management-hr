@@ -18,7 +18,8 @@ class HrStatsOverview extends StatsOverviewWidget
 
     public static function canView(): bool
     {
-        return ! auth()->user()?->isBasicRole();
+        $user = auth()->user();
+        return ! $user?->isBasicRole() && ! $user?->isExtendedRole();
     }
 
     protected function getStats(): array

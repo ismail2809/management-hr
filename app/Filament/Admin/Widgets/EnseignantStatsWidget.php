@@ -28,7 +28,8 @@ class EnseignantStatsWidget extends StatsOverviewWidget
             ->where('categorie', 'conge')
             ->where('status', 'approuvé')
             ->whereYear('start_date', $year)
-            ->sum('duration_days');
+            ->get()
+            ->sum(fn ($l) => $l->duration_days);
 
         $absences = Leave::where('employee_id', $employeeId)
             ->where('categorie', 'absence')
@@ -36,7 +37,13 @@ class EnseignantStatsWidget extends StatsOverviewWidget
             ->whereYear('start_date', $year)
             ->count();
 
-        $demandesEnAttente = DocumentRequest::where('employee_id', $employeeId)
+        $docsEnAttente = DocumentRequest::where('employee_id', $employeeId)
+            ->where('categorie', 'document')
+            ->where('status', 'en_attente')
+            ->count();
+
+        $autresEnAttente = DocumentRequest::where('employee_id', $employeeId)
+            ->where('categorie', 'autre')
             ->where('status', 'en_attente')
             ->count();
 
@@ -45,6 +52,16 @@ class EnseignantStatsWidget extends StatsOverviewWidget
             ->count();
 
         return [
+            Stat::make('Documents administratifs en attente', $docsEnAttente)
+                ->description($docsEnAttente > 0 ? 'En attente de traitement' : 'Aucun document en attente')
+                ->descriptionIcon('heroicon-o-document-text')
+                ->color($docsEnAttente > 0 ? 'warning' : 'success'),
+
+            Stat::make('Autres demandes en attente', $autresEnAttente + $congesEnAttente)
+                ->description($autresEnAttente . ' demande(s) · ' . $congesEnAttente . ' congé(s)')
+                ->descriptionIcon('heroicon-o-inbox')
+                ->color($autresEnAttente + $congesEnAttente > 0 ? 'warning' : 'success'),
+
             Stat::make('Congés pris ' . $year, $congesPris . ' j')
                 ->description('Jours de congé approuvés cette année')
                 ->descriptionIcon('heroicon-o-calendar-days')
@@ -54,11 +71,6 @@ class EnseignantStatsWidget extends StatsOverviewWidget
                 ->description('Absences enregistrées cette année')
                 ->descriptionIcon('heroicon-o-clock')
                 ->color($absences > 0 ? 'warning' : 'success'),
-
-            Stat::make('Demandes en cours', $demandesEnAttente + $congesEnAttente)
-                ->description($demandesEnAttente . ' doc(s) · ' . $congesEnAttente . ' congé(s)')
-                ->descriptionIcon('heroicon-o-inbox')
-                ->color($demandesEnAttente + $congesEnAttente > 0 ? 'warning' : 'success'),
         ];
     }
 }

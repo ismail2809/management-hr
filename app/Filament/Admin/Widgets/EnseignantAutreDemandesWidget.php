@@ -2,18 +2,18 @@
 
 namespace App\Filament\Admin\Widgets;
 
-use App\Filament\Admin\Resources\DocumentAdministratifResource;
+use App\Filament\Admin\Resources\AutreDemandeResource;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
-class EnseignantDemandesWidget extends BaseWidget
+class EnseignantAutreDemandesWidget extends BaseWidget
 {
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
     protected int|string|array $columnSpan = 'full';
-    protected static ?string $heading = 'Mes documents administratifs';
+    protected static ?string $heading = 'Mes autres demandes';
 
     public static function canView(): bool
     {
@@ -28,18 +28,21 @@ class EnseignantDemandesWidget extends BaseWidget
             ->query(
                 DocumentRequest::query()
                     ->where('employee_id', $employeeId)
-                    ->where('categorie', 'document')
+                    ->where('categorie', 'autre')
                     ->whereIn('status', ['en_attente', 'approuvé'])
                     ->orderByDesc('created_at')
             )
             ->columns([
                 TextColumn::make('type')
-                    ->label('Type de document')
-                    ->formatStateUsing(fn ($state) => DocumentRequest::$documentTypes[$state]
+                    ->label('Type de demande')
+                    ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
                         ?? DocumentType::withoutGlobalScopes()->where('code', $state)->value('name')
                         ?? $state)
                     ->badge()
-                    ->color('primary'),
+                    ->color('info'),
+                TextColumn::make('date_souhaitee')
+                    ->label('Date souhaitée')
+                    ->formatStateUsing(fn ($state) => $state ? \Carbon\Carbon::parse($state)->format('d/m/Y') : '—'),
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -60,10 +63,10 @@ class EnseignantDemandesWidget extends BaseWidget
                     ->dateTime('d/m/Y')
                     ->sortable(),
             ])
-            ->recordUrl(fn (DocumentRequest $record) => DocumentAdministratifResource::getUrl('view', ['record' => $record]))
+            ->recordUrl(fn (DocumentRequest $record) => AutreDemandeResource::getUrl('view', ['record' => $record]))
             ->paginated(5)
-            ->emptyStateHeading('Aucun document en cours')
+            ->emptyStateHeading('Aucune autre demande en cours')
             ->emptyStateIcon('heroicon-o-check-circle')
-            ->emptyStateDescription('Vous n\'avez pas de demandes de documents en attente.');
+            ->emptyStateDescription('Vous n\'avez pas d\'autres demandes en attente.');
     }
 }
