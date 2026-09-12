@@ -21,7 +21,7 @@ class RequireAppRole
             return $next($request);
         }
 
-        $allowed = ['directeur', 'secretaire', 'surveillante', ...User::BASIC_ROLES];
+        $allowed = ['directeur', 'secretaire', 'surveillante', ...User::ALL_LIMITED_ROLES];
         if (! $user->hasAnyRole($allowed)) {
             abort(403, 'Accès réservé au personnel de l\'entreprise.');
         }
