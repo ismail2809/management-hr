@@ -35,6 +35,16 @@ class LeaveResource extends Resource
     protected static ?string $model = Leave::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-calendar-days';
     protected static ?string $navigationLabel = 'Absences / Congés';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('status', 'en_attente')->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
     protected static ?string $modelLabel = 'Demande d\'absence';
     protected static ?string $pluralModelLabel = 'Demandes d\'absences';
     protected static \UnitEnum|string|null $navigationGroup = 'Congés & Absences';

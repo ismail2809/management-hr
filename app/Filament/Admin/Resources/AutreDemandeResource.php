@@ -42,6 +42,16 @@ class AutreDemandeResource extends Resource
     protected static ?string $pluralModelLabel = 'Autres demandes';
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-right';
     protected static \UnitEnum|string|null $navigationGroup = 'Demandes';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('categorie', 'autre')->where('status', 'en_attente')->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
     protected static ?int $navigationSort = 12;
 
     public static function getNavigationLabel(): string

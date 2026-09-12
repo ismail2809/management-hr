@@ -35,6 +35,16 @@ class DocumentAdministratifResource extends Resource
     protected static ?string $pluralModelLabel = 'Documents administratifs';
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
     protected static \UnitEnum|string|null $navigationGroup = 'Demandes';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::where('categorie', 'document')->where('status', 'en_attente')->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
     protected static ?int $navigationSort = 11;
 
     public static function getNavigationLabel(): string

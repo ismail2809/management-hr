@@ -29,6 +29,11 @@ class UserResource extends Resource
     protected static ?string $slug = 'team';
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Utilisateurs';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
     protected static ?string $modelLabel = 'Utilisateur';
     protected static \UnitEnum|string|null $navigationGroup = 'Filament Shield';
     protected static ?int $navigationSort = 2;

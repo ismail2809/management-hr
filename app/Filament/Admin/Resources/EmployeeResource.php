@@ -33,6 +33,11 @@ class EmployeeResource extends Resource
     protected static ?string $model = Employee::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Employés';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) static::getModel()::count();
+    }
     protected static ?string $modelLabel = 'Employé';
     protected static \UnitEnum|string|null $navigationGroup = 'Personnel';
     protected static ?int $navigationSort = 1;
