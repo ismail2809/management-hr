@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\EmployeeResource\RelationManagers;
 
+use App\Models\EmployeeDocumentType;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -23,23 +24,21 @@ class DocumentsRelationManager extends RelationManager
         return true;
     }
 
-    public static array $typeLabels = [
-        'photo'           => 'Photo',
-        'extrait_naissance' => 'Extrait de naissance',
-        'cin'             => 'CIN (scan)',
-        'carte_cnss'      => 'Carte CNSS',
-        'rib'             => 'RIB (scan)',
-        'diplome'         => 'Diplôme',
-        'contrat_anapec'  => 'Contrat ANAPEC',
-        'autre'           => 'Autre',
-    ];
+    public static function getTypeOptions(): array
+    {
+        return EmployeeDocumentType::withoutGlobalScopes()
+            ->where('active', true)
+            ->orderBy('sort_order')
+            ->pluck('name', 'code')
+            ->toArray();
+    }
 
     public function form(Schema $schema): Schema
     {
         return $schema->components([
             Select::make('type_document')
                 ->label('Type de document')
-                ->options(self::$typeLabels)
+                ->options(fn () => self::getTypeOptions())
                 ->required(),
             FileUpload::make('file_path')
                 ->label('Fichier')
@@ -65,7 +64,7 @@ class DocumentsRelationManager extends RelationManager
                     ->label('Type')
                     ->badge()
                     ->color('info')
-                    ->formatStateUsing(fn ($state) => self::$typeLabels[$state] ?? $state),
+                    ->formatStateUsing(fn ($state) => self::getTypeOptions()[$state] ?? $state),
                 TextColumn::make('name')->label('Nom')->searchable(),
                 TextColumn::make('created_at')->label('Uploadé le')->date('d/m/Y')->sortable(),
             ])
