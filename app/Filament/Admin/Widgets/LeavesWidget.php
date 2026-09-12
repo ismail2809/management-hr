@@ -14,7 +14,12 @@ class LeavesWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
     protected int|string|array $columnSpan = 'full';
-    protected static ?string $heading = 'Absences & Congés';
+    protected static ?string $heading = null;
+
+    public function getHeading(): string
+    {
+        return auth()->user()?->isBasicRole() ? 'Mes absences & congés' : 'Absences & Congés';
+    }
 
     public static function canView(): bool
     {

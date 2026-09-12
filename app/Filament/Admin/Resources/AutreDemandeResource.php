@@ -45,7 +45,12 @@ class AutreDemandeResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::where('categorie', 'autre')->where('status', 'en_attente')->count() ?: null;
+        $user  = auth()->user();
+        $query = static::getModel()::where('categorie', 'autre')->where('status', 'en_attente');
+        if ($user?->isBasicRole()) {
+            $query->where('employee_id', $user->employee_id);
+        }
+        return (string) $query->count() ?: null;
     }
 
     public static function getNavigationBadgeColor(): ?string
