@@ -63,10 +63,12 @@
     </div>
 
     @php
-        $lastPayroll = \App\Models\Payroll::where('employee_id', $employee->id)
-            ->where('status', '!=', 'brouillon')
-            ->orderByDesc('year')->orderByDesc('month')
-            ->first();
+        $lastPayroll = class_exists(\App\Models\Payroll::class)
+            ? \App\Models\Payroll::where('employee_id', $employee->id)
+                ->where('status', '!=', 'brouillon')
+                ->orderByDesc('year')->orderByDesc('month')
+                ->first()
+            : null;
     @endphp
 
     @if($lastPayroll)
