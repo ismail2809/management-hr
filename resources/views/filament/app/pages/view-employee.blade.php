@@ -478,7 +478,7 @@
                     </div>
                     <div style="flex:1;min-width:0;">
                         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-                            <span style="font-size:12px;font-weight:600;color:#0f172a;" class="dark:text-gray-200">{{ $conge->leaveType?->name ?? 'Congé' }}</span>
+                            <span class="vp-row-name">{{ $conge->leaveType?->name ?? 'Congé' }}</span>
                             <span class="vp-pill" style="background:{{ $ls[0] }};color:{{ $ls[1] }};padding:2px 8px;">{{ ucfirst($conge->status) }}</span>
                         </div>
                         <div class="vp-row-meta">
