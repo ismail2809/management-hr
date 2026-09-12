@@ -27,6 +27,7 @@ class DocumentRequest extends Model
         'employee_id',
         'categorie',
         'type',
+        'date_souhaitee',
         'format',
         'reason',
         'description',
@@ -46,6 +47,7 @@ class DocumentRequest extends Model
 
     protected $casts = [
         'processed_at'              => 'datetime',
+        'date_souhaitee'            => 'date',
         'photocopie_date_souhaitee' => 'date',
         'photocopie_nb_copies'      => 'integer',
         'rencontre_employee_ids'    => 'array',

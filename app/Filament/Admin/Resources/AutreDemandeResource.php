@@ -134,12 +134,18 @@ class AutreDemandeResource extends Resource
 
             Section::make('Autre demande')
                 ->icon('heroicon-o-chat-bubble-left-right')
+                ->columns(2)
                 ->schema([
                     Select::make('type')
                         ->label('Type de demande')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
                         ->required()
                         ->live(),
+                    DatePicker::make('date_souhaitee')
+                        ->label('Date souhaitée')
+                        ->required()
+                        ->native(false)
+                        ->minDate(now()),
                 ]),
 
             Section::make('Détails Photocopie')
