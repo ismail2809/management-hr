@@ -10,12 +10,12 @@ trait HasRoleBasedDelete
 {
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
+        return auth()->user()?->hasRole('super-admin');
     }
 
     public static function canDeleteAny(): bool
     {
-        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
+        return auth()->user()?->hasRole('super-admin');
     }
 
     public static function canForceDelete(\Illuminate\Database\Eloquent\Model $record): bool

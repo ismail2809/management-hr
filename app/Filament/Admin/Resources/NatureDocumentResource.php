@@ -14,7 +14,9 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -108,6 +110,7 @@ class NatureDocumentResource extends Resource
             ->filters([
                 TernaryFilter::make('active')->label('Actif'),
             ])
+            ->actions([EditAction::make(), DeleteAction::make()])
             ->bulkActions([
                 BulkActionGroup::make([DeleteBulkAction::make()]),
             ])

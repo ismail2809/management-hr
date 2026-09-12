@@ -15,7 +15,9 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -153,6 +155,7 @@ class DocumentTypeResource extends Resource
                     ]),
                 TernaryFilter::make('active')->label('Actif'),
             ])
+            ->actions([EditAction::make(), DeleteAction::make()])
             ->bulkActions([
                 BulkActionGroup::make([DeleteBulkAction::make()]),
             ])
