@@ -7,6 +7,7 @@ use App\Models\EcoleSettings;
 use App\Models\Employee;
 use App\Models\User;
 use Filament\Schemas\Components\Grid;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
@@ -100,6 +101,11 @@ class UserResource extends Resource
                     ->visible($isSuperAdmin)
                     ->live()
                     ->helperText('Laisser vide = super-admin sans company'),
+
+                Hidden::make('ecole_setting_id')
+                    ->default(auth()->user()?->ecole_setting_id ?? \App\Models\EcoleSettings::withoutGlobalScopes()->value('id'))
+                    ->visible(! $isSuperAdmin)
+                    ->dehydrated(! $isSuperAdmin),
 
                 Select::make('roles')
                     ->label('Rôle')
