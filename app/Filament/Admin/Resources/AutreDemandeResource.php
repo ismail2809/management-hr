@@ -143,7 +143,8 @@ class AutreDemandeResource extends Resource
                         ->live(),
                     DatePicker::make('date_souhaitee')
                         ->label('Date souhaitée')
-                        ->required()
+                        ->required(fn (Get $get) => $get('type') && $get('type') !== 'photocopie')
+                        ->hidden(fn (Get $get) => $get('type') === 'photocopie')
                         ->native(false)
                         ->minDate(now()),
                 ]),
