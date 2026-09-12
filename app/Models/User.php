@@ -29,17 +29,30 @@ class User extends Authenticatable implements FilamentUser
             ->dontSubmitEmptyLogs();
     }
 
-    /** Rôles avec accès limité (espace perso, congés, documents uniquement) */
+    /** Accès limité sans Autres Demandes */
     public const BASIC_ROLES = ['employee', 'femme-de-menage', 'chauffeur', 'gardien'];
 
+    /** Accès limité + Autres Demandes */
+    public const EXTENDED_ROLES = ['enseignant', 'enseignante', 'assistante-transport'];
+
+    /** Tous les rôles à accès limité (basic + extended) */
+    public const ALL_LIMITED_ROLES = [...self::BASIC_ROLES, ...self::EXTENDED_ROLES];
+
+    /** Rôle à accès limité (espace perso, congés, documents) */
     public function isBasicRole(): bool
     {
-        return $this->hasAnyRole(self::BASIC_ROLES);
+        return $this->hasAnyRole(self::ALL_LIMITED_ROLES);
+    }
+
+    /** A accès aux Autres Demandes en plus */
+    public function isExtendedRole(): bool
+    {
+        return $this->hasAnyRole(self::EXTENDED_ROLES);
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasAnyRole(['super-admin', 'directeur', 'secretaire', 'surveillante', ...self::BASIC_ROLES]);
+        return $this->hasAnyRole(['super-admin', 'directeur', 'secretaire', 'surveillante', ...self::ALL_LIMITED_ROLES]);
     }
 
     protected $fillable = [

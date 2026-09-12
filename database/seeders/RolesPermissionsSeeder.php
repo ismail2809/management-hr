@@ -77,10 +77,17 @@ class RolesPermissionsSeeder extends Seeder
         $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'web']);
         $employeeRole->syncPermissions(Permission::whereIn('name', $employeePerms)->get());
 
-        // ─── Rôles par profession (même accès qu'employee) ─────────────────
+        // ─── Rôles basic (même accès qu'employee, sans Autres Demandes) ────
         foreach (['femme-de-menage', 'chauffeur', 'gardien'] as $roleName) {
             $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
             $role->syncPermissions(Permission::whereIn('name', $employeePerms)->get());
+        }
+
+        // ─── Rôles extended (employee + Autres Demandes) ───────────────────
+        $extendedPerms = $employeePerms; // DocumentRequest perms déjà inclus
+        foreach (['enseignant', 'enseignante', 'assistante-transport'] as $roleName) {
+            $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
+            $role->syncPermissions(Permission::whereIn('name', $extendedPerms)->get());
         }
 
         // Supprimer les anciens rôles inutilisés
@@ -95,9 +102,12 @@ class RolesPermissionsSeeder extends Seeder
                 ['secretaire',      $secretaireRole->permissions()->count(), 'Gestion complète sans suppression'],
                 ['surveillante',    $surveillanteRole->permissions()->count(), 'Gestion complète sans suppression'],
                 ['employee',        $employeeRole->permissions()->count(),  'Espace perso, congés, demandes'],
-                ['femme-de-menage', $employeeRole->permissions()->count(),  'Espace perso, congés, demandes'],
-                ['chauffeur',       $employeeRole->permissions()->count(),  'Espace perso, congés, demandes'],
-                ['gardien',         $employeeRole->permissions()->count(),  'Espace perso, congés, demandes'],
+                ['femme-de-menage',       $employeeRole->permissions()->count(), 'Espace perso, congés, docs'],
+                ['chauffeur',             $employeeRole->permissions()->count(), 'Espace perso, congés, docs'],
+                ['gardien',               $employeeRole->permissions()->count(), 'Espace perso, congés, docs'],
+                ['enseignant',            $employeeRole->permissions()->count(), 'Espace perso, congés, docs + autres demandes'],
+                ['enseignante',           $employeeRole->permissions()->count(), 'Espace perso, congés, docs + autres demandes'],
+                ['assistante-transport',  $employeeRole->permissions()->count(), 'Espace perso, congés, docs + autres demandes'],
             ]
         );
     }

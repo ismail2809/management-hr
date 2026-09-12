@@ -65,6 +65,15 @@ class AutreDemandeResource extends Resource
         return $query;
     }
 
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        // Admins : toujours oui
+        // Extended roles (enseignant, etc.) : oui (leurs propres demandes)
+        // Basic roles (femme-de-menage, chauffeur, gardien, employee) : non
+        return ! $user?->isBasicRole() || $user?->isExtendedRole();
+    }
+
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
         return ! auth()->user()?->isBasicRole();

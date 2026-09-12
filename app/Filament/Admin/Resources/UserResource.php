@@ -60,9 +60,12 @@ class UserResource extends Resource
             'secretaire'      => 'Secrétaire',
             'surveillante'    => 'Surveillante',
             'employee'        => 'Employé',
-            'femme-de-menage' => 'Femme de ménage',
-            'chauffeur'       => 'Chauffeur',
-            'gardien'         => 'Gardien',
+            'femme-de-menage'      => 'Femme de ménage',
+            'chauffeur'            => 'Chauffeur',
+            'gardien'              => 'Gardien',
+            'enseignant'           => 'Enseignant',
+            'enseignante'          => 'Enseignante',
+            'assistante-transport' => 'Assistante de transport',
         ];
 
         $roles = Role::whereIn('name', $allowed)
