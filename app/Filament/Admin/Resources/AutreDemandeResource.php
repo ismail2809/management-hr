@@ -270,8 +270,21 @@ class AutreDemandeResource extends Resource
                     ->rows(3)
                     ->nullable(),
 
+                FileUpload::make('fichier_joint')
+                    ->label('Pièce jointe (optionnel)')
+                    ->disk('public')
+                    ->directory('document-requests/joints')
+                    ->acceptedFileTypes([
+                        'application/pdf', 'image/jpeg', 'image/png', 'image/webp',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
+                    ->maxSize(10240)
+                    ->nullable()
+                    ->visible($isEmployee),
+
                 FileUpload::make('fichier_final')
-                    ->label('Fichier')
+                    ->label('Fichier final (réponse)')
                     ->disk('public')
                     ->directory('document-requests/finals')
                     ->acceptedFileTypes([
@@ -281,8 +294,7 @@ class AutreDemandeResource extends Resource
                     ])
                     ->maxSize(10240)
                     ->nullable()
-                    ->disabled($isEmployee)
-                    ->dehydrated(! $isEmployee),
+                    ->hidden($isEmployee),
             ]),
         ]);
     }

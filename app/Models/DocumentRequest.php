@@ -31,6 +31,7 @@ class DocumentRequest extends Model
         'format',
         'reason',
         'description',
+        'fichier_joint',
         'status',
         'generated_file_path',
         'fichier_final',
