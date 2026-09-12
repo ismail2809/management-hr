@@ -49,28 +49,12 @@ class UserResource extends Resource
     {
         $isSuperAdmin = auth()->user()?->hasRole('super-admin');
 
-        $basicRoles = \App\Models\User::BASIC_ROLES;
-        $allowed = $isSuperAdmin
-            ? ['super-admin', 'directeur', 'secretaire', 'surveillante', ...$basicRoles]
-            : ['directeur', 'secretaire', 'surveillante', ...$basicRoles];
-
-        $labels = [
-            'super-admin'     => 'Super Admin',
-            'directeur'       => 'Directeur',
-            'secretaire'      => 'Secrétaire',
-            'surveillante'    => 'Surveillante',
-            'employee'        => 'Employé',
-            'femme-de-menage'      => 'Femme de ménage',
-            'chauffeur'            => 'Chauffeur',
-            'gardien'              => 'Gardien',
-            'enseignant'           => 'Enseignant',
-            'enseignante'          => 'Enseignante',
-            'assistante-transport' => 'Assistante de transport',
-        ];
-
-        $roles = Role::whereIn('name', $allowed)
-            ->pluck('name', 'name')
-            ->mapWithKeys(fn ($name) => [$name => $labels[$name] ?? $name]);
+        // Lire tous les rôles depuis Spatie (comme Shield)
+        $rolesQuery = Role::orderBy('name');
+        if (! $isSuperAdmin) {
+            $rolesQuery->where('name', '!=', 'super-admin');
+        }
+        $roles = $rolesQuery->pluck('name', 'name');
 
         return $schema->columns(1)->components([
             Section::make('Informations de connexion')->columns(3)->schema([
@@ -107,13 +91,7 @@ class UserResource extends Resource
                 Select::make('roles')
                     ->label('Rôle')
                     ->options($roles)
-                    ->default('employee')
-                    ->required()
-                    ->helperText(implode(' · ', [
-                        'Super Admin : plateforme complète',
-                        'Secrétaire : gestion complète de la company',
-                        'Employé : accès limité à son espace personnel',
-                    ])),
+                    ->required(),
 
                 Select::make('employee_id')
                     ->label('Employé associé')
@@ -166,16 +144,20 @@ class UserResource extends Resource
                     ->label('Rôle(s)')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'super-admin' => 'danger',
-                        'secretaire'  => 'primary',
-                        'employee'    => 'gray',
-                        default       => 'gray',
+                        'super-admin'  => 'danger',
+                        'directeur'    => 'warning',
+                        'secretaire'   => 'primary',
+                        'surveillante' => 'info',
+                        default        => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'super-admin' => 'Super Admin',
-                        'secretaire'  => 'Secrétaire',
-                        'employee'    => 'Employé',
-                        default       => $state,
+                        'super-admin'          => 'Super Admin',
+                        'directeur'            => 'Directeur',
+                        'secretaire'           => 'Secrétaire',
+                        'surveillante'         => 'Surveillant(e) général(e)',
+                        'femme-de-menage'      => 'Femme de ménage',
+                        'assistante-transport' => 'Assistante transport',
+                        default                => $state,
                     }),
 
                 TextColumn::make('employee.full_name')

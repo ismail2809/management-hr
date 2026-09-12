@@ -58,9 +58,14 @@ class DocumentAdministratifResource extends Resource
         return $query;
     }
 
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur', 'secretaire']);
+    }
+
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
     {
-        return ! auth()->user()?->isBasicRole();
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur', 'secretaire']);
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool

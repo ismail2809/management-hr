@@ -30,10 +30,10 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /** Accès limité sans Autres Demandes */
-    public const BASIC_ROLES = ['employee', 'femme-de-menage', 'chauffeur', 'gardien'];
+    public const BASIC_ROLES = ['femme-de-menage', 'chauffeur', 'gardien'];
 
     /** Accès limité + Autres Demandes */
-    public const EXTENDED_ROLES = ['enseignant', 'enseignante', 'assistante-transport'];
+    public const EXTENDED_ROLES = ['enseignant', 'assistante-transport'];
 
     /** Tous les rôles à accès limité (basic + extended) */
     public const ALL_LIMITED_ROLES = [...self::BASIC_ROLES, ...self::EXTENDED_ROLES];
