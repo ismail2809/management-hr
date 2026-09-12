@@ -238,19 +238,6 @@ class EmployeeResource extends Resource
                 TextColumn::make('matricule')->label('Matricule')->searchable()->sortable(),
                 TextColumn::make('full_name')->label('Nom complet')->searchable(['first_name', 'last_name'])->sortable('last_name'),
                 TextColumn::make('profession.name')->label('Profession')->badge()->color('primary')->default('—')->sortable(),
-                TextColumn::make('profession_type')->label('Type')->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'permanent'  => 'success',
-                        'stagiaire'  => 'info',
-                        'vacataire'  => 'warning',
-                        default      => 'gray',
-                    })
-                    ->formatStateUsing(fn ($state) => match ($state) {
-                        'permanent'  => 'Permanent',
-                        'stagiaire'  => 'Stagiaire',
-                        'vacataire'  => 'Vacataire',
-                        default      => '—',
-                    }),
                 TextColumn::make('gender')->label('Sexe')->badge()
                     ->color(fn ($state) => match ($state) {
                         'M' => 'info', 'F' => 'pink', default => 'gray',
