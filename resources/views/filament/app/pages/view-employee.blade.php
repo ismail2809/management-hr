@@ -2,7 +2,7 @@
 @php
     $emp    = $this->record;
     $stats  = $this->getLeaveStats();
-    $docs   = $this->record->documents()->withoutGlobalScopes()->orderByDesc('created_at')->get();
+    $docs   = $this->record->documents()->orderByDesc('created_at')->get();
     $conges = $emp->leaves()->withoutGlobalScopes()->orderByDesc('created_at')->limit(6)->get();
 
     $statutFamilialMap = ['celibataire' => 'Célibataire', 'marie' => 'Marié(e)', 'divorce' => 'Divorcé(e)', 'veuf' => 'Veuf / Veuve'];
@@ -185,8 +185,12 @@
             <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;">
                 <div class="vp-avatar-wrap">
                     <div class="vp-avatar">
-                        @if($emp->photo)
-                            <img src="{{ Storage::url($emp->photo) }}" alt="{{ $emp->full_name }}">
+                        @php
+                            $photoPath = $emp->photo
+                                ?? $emp->documents->where('type_document', 'photo')->first()?->file_path;
+                        @endphp
+                        @if($photoPath)
+                            <img src="{{ Storage::url($photoPath) }}" alt="{{ $emp->full_name }}">
                         @else
                             <span class="vp-avatar-initials">{{ strtoupper(mb_substr($emp->first_name,0,1)) }}{{ strtoupper(mb_substr($emp->last_name,0,1)) }}</span>
                         @endif

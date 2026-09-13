@@ -234,6 +234,18 @@ class EmployeeResource extends Resource
         ]);
     }
 
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->with('documents');
+    }
+
+    public static function resolveRecordRouteBinding(int|string $key, ?\Closure $modifyQuery = null): ?\Illuminate\Database\Eloquent\Model
+    {
+        $record = parent::resolveRecordRouteBinding($key, $modifyQuery);
+        abort_if($record?->trashed(), 404);
+        return $record;
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -242,7 +254,13 @@ class EmployeeResource extends Resource
                     ->label('')
                     ->disk('public')
                     ->circular()
-                    ->defaultImageUrl(fn () => 'https://ui-avatars.com/api/?name=E&color=0da8b1&background=e0f7fa')
+                    ->getStateUsing(fn (Employee $record) =>
+                        $record->photo
+                        ?? $record->documents->where('type_document', 'photo')->first()?->file_path
+                    )
+                    ->defaultImageUrl(fn (Employee $record) =>
+                        'https://ui-avatars.com/api/?name=' . urlencode($record->first_name[0] . '+' . $record->last_name[0]) . '&color=0da8b1&background=e0f7fa'
+                    )
                     ->size(40),
                 TextColumn::make('matricule')->label('Matricule')->searchable()->sortable(),
                 TextColumn::make('full_name')->label('Nom complet')->searchable(['first_name', 'last_name'])->sortable('last_name'),
@@ -265,7 +283,6 @@ class EmployeeResource extends Resource
                 TextColumn::make('hire_date')->label('Embauche')->date('d/m/Y')->sortable(),
                 TextColumn::make('created_at')->label('Créé le')->dateTime('d/m/Y H:i')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')->label('Modifié le')->dateTime('d/m/Y H:i')->sortable()->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')->label('Supprimé le')->dateTime('d/m/Y H:i')->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')->label('Statut')->options(['actif' => 'Actif', 'inactif' => 'Inactif', 'sorti' => 'Sorti']),

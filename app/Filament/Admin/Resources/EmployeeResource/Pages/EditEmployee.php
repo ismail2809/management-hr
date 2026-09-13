@@ -21,6 +21,8 @@ class EditEmployee extends EditRecord
 
     protected function authorizeAccess(): void
     {
+        abort_if($this->record->trashed(), 404);
+
         $user = auth()->user();
 
         if ($user?->isBasicRole()) {
