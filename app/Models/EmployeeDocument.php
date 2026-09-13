@@ -6,12 +6,22 @@ use App\Models\Traits\HasCompanyScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class EmployeeDocument extends Model
 {
     use SoftDeletes, HasCompanyScope, LogsActivity;
+
+    protected static function booted(): void
+    {
+        static::forceDeleted(function (EmployeeDocument $doc) {
+            if ($doc->file_path) {
+                Storage::disk('public')->delete($doc->file_path);
+            }
+        });
+    }
 
     public function getActivitylogOptions(): LogOptions
     {

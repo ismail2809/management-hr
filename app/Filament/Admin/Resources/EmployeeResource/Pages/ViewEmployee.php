@@ -7,7 +7,6 @@ use App\Models\EmployeeDocument;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 
 class ViewEmployee extends ViewRecord
@@ -87,7 +86,6 @@ class ViewEmployee extends ViewRecord
     {
         $doc = EmployeeDocument::find($documentId);
         if ($doc && $doc->employee_id === $this->record->id) {
-            Storage::disk('public')->delete($doc->file_path);
             $doc->delete();
             $this->record->refresh();
 
