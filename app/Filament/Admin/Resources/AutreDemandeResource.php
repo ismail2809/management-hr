@@ -174,7 +174,7 @@ class AutreDemandeResource extends Resource
                 ->columns(2)
                 ->visible(fn (Get $get) => $get('type') === 'photocopie')
                 ->description(fn () => sprintf(
-                    'La demande doit être déposée au moins %d jour(s) avant la date souhaitée.',
+                    'La demande doit être déposée au moins %d jour(s) ouvré(s) à l\'avance (week-ends exclus).',
                     config('hr.photocopie_delay_days', 3)
                 ))
                 ->schema([
@@ -228,8 +228,20 @@ class AutreDemandeResource extends Resource
 
                     DatePicker::make('photocopie_date_souhaitee')
                         ->label('Date souhaitée')
-                        ->minDate(fn () => now()->addDays(config('hr.photocopie_delay_days', 3))->toDateString())
-                        ->hint(fn () => sprintf('Minimum %d jour(s) à l\'avance', config('hr.photocopie_delay_days', 3)))
+                        ->minDate(function () {
+                            $days = config('hr.photocopie_delay_days', 3);
+                            $date = now()->copy();
+                            // Le jour de la demande compte comme jour 1 s'il est ouvré
+                            $added = $date->isWeekend() ? 0 : 1;
+                            while ($added < $days) {
+                                $date->addDay();
+                                if (! $date->isWeekend()) {
+                                    $added++;
+                                }
+                            }
+                            return $date->toDateString();
+                        })
+                        ->hint(fn () => sprintf('Minimum %d jour(s) ouvré(s) à l\'avance (week-ends exclus)', config('hr.photocopie_delay_days', 3)))
                         ->hintIcon('heroicon-o-clock')
                         ->hintColor('warning')
                         ->required(),
