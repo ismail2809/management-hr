@@ -17,6 +17,11 @@ class EditAutreDemande extends EditRecord
         ];
     }
 
+    protected function beforeSave(): void
+    {
+        AutreDemandeResource::checkPhotocopieConflict($this->form->getState(), $this->record->id);
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

@@ -14,6 +14,11 @@ class CreateAutreDemande extends CreateRecord
         return $this->getResource()::getUrl('index');
     }
 
+    protected function beforeCreate(): void
+    {
+        AutreDemandeResource::checkPhotocopieConflict($this->form->getState());
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['categorie'] = 'autre';

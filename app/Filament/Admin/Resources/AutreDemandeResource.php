@@ -410,6 +410,53 @@ class AutreDemandeResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
+    /**
+     * Vérifie qu'il n'existe pas déjà une demande de photocopie de nature
+     * conflictuelle (Examen / Contrôle) pour le même groupe et la même date.
+     * Lance une ValidationException avec l'erreur positionnée sur le champ date.
+     */
+    public static function checkPhotocopieConflict(array $data, ?int $excludeId = null): void
+    {
+        $conflicting = config('hr.photocopie_conflicting_natures', ['Examen', 'Contrôle continu', "Contrôle d'essai"]);
+
+        if (
+            ($data['type'] ?? null) !== 'photocopie' ||
+            ! in_array($data['photocopie_sous_type'] ?? null, $conflicting) ||
+            empty($data['photocopie_groupe']) ||
+            empty($data['photocopie_date_souhaitee'])
+        ) {
+            return;
+        }
+
+        $query = \App\Models\DocumentRequest::where('categorie', 'autre')
+            ->where('type', 'photocopie')
+            ->where('photocopie_groupe', $data['photocopie_groupe'])
+            ->where('photocopie_date_souhaitee', $data['photocopie_date_souhaitee'])
+            ->whereIn('photocopie_sous_type', $conflicting)
+            ->where('status', '!=', 'refusé');
+
+        if ($excludeId) {
+            $query->where('id', '!=', $excludeId);
+        }
+
+        $existing = $query->first();
+
+        if (! $existing) {
+            return;
+        }
+
+        $dateFormatted = \Carbon\Carbon::parse($data['photocopie_date_souhaitee'])->translatedFormat('l d/m/Y');
+
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'data.photocopie_date_souhaitee' => sprintf(
+                'Le groupe "%s" a déjà une demande "%s" planifiée le %s. Veuillez choisir un autre jour.',
+                $data['photocopie_groupe'],
+                $existing->photocopie_sous_type,
+                $dateFormatted
+            ),
+        ]);
+    }
+
     public static function getPages(): array
     {
         return [
