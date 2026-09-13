@@ -41,7 +41,8 @@ class EmployeeResource extends Resource
     {
         return (string) static::getModel()::count();
     }
-    protected static ?string $modelLabel = 'Employé';
+    protected static ?string $modelLabel = 'Dossier Employé';
+    protected static ?string $pluralModelLabel = 'Dossiers Employés';
     protected static \UnitEnum|string|null $navigationGroup = 'Personnel';
     protected static ?int $navigationSort = 1;
 
