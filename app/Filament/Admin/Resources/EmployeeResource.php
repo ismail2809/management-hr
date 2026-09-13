@@ -4,7 +4,10 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Concerns\HasCompanyField;
 use App\Filament\Admin\Resources\EmployeeResource\Pages;
+use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\AccidentsRelationManager;
+use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\CreditsRelationManager;
 use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\DocumentsRelationManager;
+use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\FondationM6RelationManager;
 use App\Filament\Admin\Resources\EmployeeResource\RelationManagers\GroupesRelationManager;
 use App\Models\Employee;
 use App\Models\Groupe;
@@ -32,7 +35,7 @@ class EmployeeResource extends Resource
     use HasCompanyField;
     protected static ?string $model = Employee::class;
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationLabel = 'Employés';
+    protected static ?string $navigationLabel = 'Dossiers Employés';
 
     public static function getNavigationBadge(): ?string
     {
@@ -332,6 +335,9 @@ class EmployeeResource extends Resource
         return [
             DocumentsRelationManager::class,
             GroupesRelationManager::class,
+            AccidentsRelationManager::class,
+            FondationM6RelationManager::class,
+            CreditsRelationManager::class,
         ];
     }
 

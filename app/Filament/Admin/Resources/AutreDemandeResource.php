@@ -280,7 +280,7 @@ class AutreDemandeResource extends Resource
                 Textarea::make('description')
                     ->label('Description / détails')
                     ->rows(3)
-                    ->nullable(),
+                    ->required(),
 
                 FileUpload::make('fichier_joint')
                     ->label('Pièce jointe (optionnel)')

@@ -152,7 +152,7 @@ class DocumentRequestResource extends Resource
                 Textarea::make('description')
                     ->label('Description / détails')
                     ->rows(3)
-                    ->nullable(),
+                    ->required(),
 
                 Textarea::make('reason')
                     ->label('Remarques complémentaires')

@@ -158,7 +158,7 @@ class DocumentAdministratifResource extends Resource
                 Textarea::make('description')
                     ->label('Description / détails')
                     ->rows(3)
-                    ->nullable(),
+                    ->required(),
 
                 FileUpload::make('fichier_final')
                     ->label('Fichier final (uploadé par l\'admin)')

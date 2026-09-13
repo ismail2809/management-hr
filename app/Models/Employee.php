@@ -90,6 +90,9 @@ class Employee extends Model
     public function transport(): BelongsTo     { return $this->belongsTo(Transport::class); }
     public function profession(): BelongsTo { return $this->belongsTo(Profession::class); }
     public function documents(): HasMany   { return $this->hasMany(EmployeeDocument::class); }
+    public function accidents(): HasMany   { return $this->hasMany(EmployeeAccident::class); }
+    public function fondationM6(): HasMany { return $this->hasMany(EmployeeFondationM6::class); }
+    public function credits(): HasMany     { return $this->hasMany(EmployeeCredit::class); }
     public function leaves(): HasMany      { return $this->hasMany(Leave::class); }
 
     public function groupes(): BelongsToMany
