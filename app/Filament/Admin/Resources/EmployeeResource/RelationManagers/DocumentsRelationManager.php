@@ -6,6 +6,7 @@ use App\Models\EmployeeDocumentType;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -39,18 +40,21 @@ class DocumentsRelationManager extends RelationManager
             Select::make('type_document')
                 ->label('Type de document')
                 ->options(fn () => self::getTypeOptions())
-                ->required(),
+                ->required()
+                ->live(),
             FileUpload::make('file_path')
                 ->label('Fichier')
                 ->disk('public')
                 ->directory(fn ($livewire) => 'employees/' . $livewire->getOwnerRecord()->id . '/documents')
                 ->preserveFilenames()
-                ->acceptedFileTypes([
-                    'application/pdf',
-                    'image/*',
-                    'application/msword',
-                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                ])
+                ->acceptedFileTypes(fn (Get $get) => in_array($get('type_document'), ['photo', 'cin'])
+                    ? ['image/jpeg', 'image/png', 'image/webp']
+                    : ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+                )
+                ->hint(fn (Get $get) => in_array($get('type_document'), ['photo', 'cin'])
+                    ? 'Images uniquement (JPG, PNG, WEBP)'
+                    : 'Images ou PDF / Word'
+                )
                 ->maxSize(5120)
                 ->required(),
         ]);
