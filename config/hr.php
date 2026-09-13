@@ -33,6 +33,17 @@ return [
         "Contrôle d'essai",
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Photocopie — Niveaux soumis à la restriction de conflit
+    |--------------------------------------------------------------------------
+    | Seuls les groupes appartenant à ces niveaux sont soumis à la règle
+    | "1 seule évaluation par groupe par jour".
+    */
+    'photocopie_conflict_niveaux' => [
+        'Primaire',
+    ],
+
     'rencontre_direction_excluded_professions' => [
         'Enseignante',
         'Enseignant',

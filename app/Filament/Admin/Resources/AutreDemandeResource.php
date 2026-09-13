@@ -412,7 +412,8 @@ class AutreDemandeResource extends Resource
      */
     public static function checkPhotocopieConflict(array $data, ?int $excludeId = null): void
     {
-        $conflicting = config('hr.photocopie_conflicting_natures', ['Examen', 'Contrôle continu', "Contrôle d'essai"]);
+        $conflicting       = config('hr.photocopie_conflicting_natures', ['Examen', 'Contrôle continu', "Contrôle d'essai"]);
+        $conflictNiveaux   = config('hr.photocopie_conflict_niveaux', ['Primaire']);
 
         if (
             ($data['type'] ?? null) !== 'photocopie' ||
@@ -421,6 +422,17 @@ class AutreDemandeResource extends Resource
             empty($data['photocopie_date_souhaitee'])
         ) {
             return;
+        }
+
+        // Vérifier que le niveau appartient aux niveaux soumis à la restriction
+        $niveau = $data['photocopie_niveau'] ?? null;
+        if ($niveau) {
+            $match = collect($conflictNiveaux)->contains(
+                fn ($n) => str_contains(mb_strtolower($niveau), mb_strtolower($n))
+            );
+            if (! $match) {
+                return;
+            }
         }
 
         $query = \App\Models\DocumentRequest::where('categorie', 'autre')
