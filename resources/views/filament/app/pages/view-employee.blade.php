@@ -2,8 +2,8 @@
 @php
     $emp    = $this->record;
     $stats  = $this->getLeaveStats();
-    $docs   = $this->record->documents()->orderByDesc('created_at')->get();
-    $conges = $emp->leaves()->withoutGlobalScopes()->orderByDesc('created_at')->limit(6)->get();
+    $docs      = $this->record->documents()->orderByDesc('created_at')->get();
+    $conges    = $emp->leaves()->withoutGlobalScopes()->orderByDesc('created_at')->limit(6)->get();
 
     $statutFamilialMap = ['celibataire' => 'Célibataire', 'marie' => 'Marié(e)', 'divorce' => 'Divorcé(e)', 'veuf' => 'Veuf / Veuve'];
     $profTypeMap       = ['permanent' => 'Permanent', 'stagiaire' => 'Stagiaire', 'vacataire' => 'Vacataire'];
@@ -85,8 +85,7 @@
 .vp-kpi-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .7px; color: #94a3b8; margin-top: 4px; }
 
 /* ── Layout ── */
-.vp-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start; }
-@media (max-width: 900px) { .vp-layout { grid-template-columns: 1fr; } }
+.vp-layout { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── Card ── */
 .vp-card { background: white; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
@@ -410,6 +409,9 @@
         </div>
         @endif
 
+        </div>
+
+        {{-- Panel : Fondation M6 --}}
     </div>{{-- fin tabs --}}
 
     {{-- ── Sidebar ── --}}
