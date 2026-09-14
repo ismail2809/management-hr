@@ -46,7 +46,6 @@ class DocumentsRelationManager extends RelationManager
                 ->label('Fichier')
                 ->disk('public')
                 ->directory(fn ($livewire) => 'employees/' . $livewire->getOwnerRecord()->id . '/documents')
-                ->preserveFilenames()
                 ->acceptedFileTypes(fn (Get $get) => in_array($get('type_document'), ['photo', 'cin'])
                     ? ['image/jpeg', 'image/png', 'image/webp']
                     : ['application/pdf', 'image/jpeg', 'image/png', 'image/webp', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']

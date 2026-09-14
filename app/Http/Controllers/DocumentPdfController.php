@@ -39,6 +39,9 @@ class DocumentPdfController extends Controller
         $company  = $documentRequest->ecoleSettings;
         $date     = now()->locale('fr')->isoFormat('D MMMM YYYY');
 
+        $allowedTypes = array_keys(DocumentRequest::$documentTypes + DocumentRequest::$autreTypes);
+        abort_unless(in_array($documentRequest->type, $allowedTypes, true), 400);
+
         $view = 'pdf.documents.' . $documentRequest->type;
         if (! view()->exists($view)) {
             $view = 'pdf.documents.generic';
