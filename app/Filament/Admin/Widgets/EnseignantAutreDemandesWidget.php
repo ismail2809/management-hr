@@ -42,6 +42,7 @@ class EnseignantAutreDemandesWidget extends BaseWidget
                     ->color('info'),
                 TextColumn::make('date_souhaitee')
                     ->label('Date souhaitée')
+                    ->getStateUsing(fn ($record) => $record->date_souhaitee ?? $record->photocopie_date_souhaitee)
                     ->formatStateUsing(fn ($state) => $state ? \Carbon\Carbon::parse($state)->format('d/m/Y') : '—'),
                 TextColumn::make('status')
                     ->label('Statut')

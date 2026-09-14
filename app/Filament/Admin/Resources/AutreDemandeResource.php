@@ -334,6 +334,12 @@ class AutreDemandeResource extends Resource
                     ->badge()
                     ->color('warning'),
 
+                TextColumn::make('date_souhaitee')
+                    ->label('Date souhaitée')
+                    ->getStateUsing(fn ($record) => $record->date_souhaitee ?? $record->photocopie_date_souhaitee)
+                    ->formatStateUsing(fn ($state) => $state ? \Carbon\Carbon::parse($state)->format('d/m/Y') : '—')
+                    ->sortable(),
+
                 TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
