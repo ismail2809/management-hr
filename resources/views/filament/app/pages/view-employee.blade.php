@@ -6,7 +6,6 @@
     $accidents = $this->record->accidents()->orderByDesc('created_at')->get();
     $fondation = $this->record->fondationM6()->orderByDesc('created_at')->get();
     $credits   = $this->record->credits()->orderByDesc('created_at')->get();
-    $conges    = $emp->leaves()->withoutGlobalScopes()->orderByDesc('created_at')->limit(6)->get();
     $creditTypeLabels = ['voiture' => 'Voiture', 'immobilier' => 'Immobilier', 'consommation' => 'Consommation', 'education' => 'Éducation', 'autre' => 'Autre'];
 
     $statutFamilialMap = ['celibataire' => 'Célibataire', 'marie' => 'Marié(e)', 'divorce' => 'Divorcé(e)', 'veuf' => 'Veuf / Veuve'];
@@ -549,93 +548,6 @@
 
     </div>{{-- fin tabs --}}
 
-    {{-- ── Sidebar ── --}}
-    <div class="vp-stack">
-
-        {{-- Documents --}}
-        <div class="vp-card">
-            <div class="vp-card-hd">
-                <span class="vp-card-title">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-                    Documents
-                </span>
-                <span class="vp-count" style="background:#e6f7f8;color:#0da8b1;">{{ $docs->count() }}</span>
-            </div>
-            <div class="vp-card-bd" style="padding-top:6px;padding-bottom:10px;">
-                @forelse($docs as $doc)
-                @php $ext = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION)); @endphp
-                <div class="vp-row">
-                    <div class="vp-icon" style="background:{{ $ext === 'pdf' ? '#fee2e2' : (in_array($ext,['jpg','jpeg','png','webp']) ? '#fef3c7' : '#f1f5f9') }};">
-                        @if($ext === 'pdf')
-                            <svg fill="#ef4444" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
-                        @elseif(in_array($ext,['jpg','jpeg','png','webp']))
-                            <svg fill="none" stroke="#d97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        @else
-                            <svg fill="none" stroke="#64748b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        @endif
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                        <div class="vp-row-name">{{ $doc->name }}</div>
-                        <div class="vp-row-meta">{{ $doc->file_size_human }} · {{ $doc->created_at->format('d/m/Y') }}</div>
-                    </div>
-                    <div style="display:flex;gap:5px;flex-shrink:0;">
-                        <a href="{{ Storage::url($doc->file_path) }}" target="_blank" class="vp-btn" style="background:#e6f7f8;color:#0da8b1;">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                        </a>
-                        <button wire:click="deleteDocument({{ $doc->id }})" wire:confirm="Supprimer ce document ?" class="vp-btn" style="background:#fee2e2;color:#ef4444;">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        </button>
-                    </div>
-                </div>
-                @empty
-                <div class="vp-empty">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    <p>Aucun document</p>
-                </div>
-                @endforelse
-
-            </div>
-        </div>
-
-        {{-- Historique des congés --}}
-        @if($conges->count() > 0)
-        <div class="vp-card">
-            <div class="vp-card-hd">
-                <span class="vp-card-title">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Historique des congés
-                </span>
-                <span class="vp-count" style="background:#fef3c7;color:#92400e;">{{ $conges->count() }}</span>
-            </div>
-            <div class="vp-card-bd" style="padding-top:6px;padding-bottom:6px;">
-                @foreach($conges as $conge)
-                @php
-                    $lc = ['approuvé' => ['#d1fae5','#065f46'], 'en_attente' => ['#fef3c7','#92400e'], 'refusé' => ['#fee2e2','#991b1b']];
-                    $ls = $lc[$conge->status] ?? ['#f1f5f9','#64748b'];
-                @endphp
-                <div class="vp-row">
-                    <div class="vp-icon" style="background:#e6f7f8;">
-                        <svg fill="none" stroke="#0da8b1" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-                            <span class="vp-row-name">{{ $conge->leaveType?->name ?? 'Congé' }}</span>
-                            <span class="vp-pill" style="background:{{ $ls[0] }};color:{{ $ls[1] }};padding:2px 8px;">{{ ucfirst($conge->status) }}</span>
-                        </div>
-                        <div class="vp-row-meta">
-                            {{ $conge->start_date?->format('d/m/Y') }} → {{ $conge->end_date?->format('d/m/Y') }}
-                            @if($conge->start_date && $conge->end_date)
-                                · {{ $conge->start_date->diffInDays($conge->end_date) + 1 }} j
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
-        </div>
-        @endif
-
-    </div>{{-- fin sidebar --}}
 </div>{{-- fin layout --}}
 </div>{{-- fin vp --}}
 </x-filament-panels::page>
