@@ -409,9 +409,6 @@
         </div>
         @endif
 
-        </div>
-
-        {{-- Panel : Fondation M6 --}}
     </div>{{-- fin tabs --}}
 
     {{-- ── Sidebar ── --}}
