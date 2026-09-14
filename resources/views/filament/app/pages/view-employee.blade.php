@@ -3,7 +3,11 @@
     $emp    = $this->record;
     $stats  = $this->getLeaveStats();
     $docs      = $this->record->documents()->orderByDesc('created_at')->get();
+    $accidents = $this->record->accidents()->orderByDesc('created_at')->get();
+    $fondation = $this->record->fondationM6()->orderByDesc('created_at')->get();
+    $credits   = $this->record->credits()->orderByDesc('created_at')->get();
     $conges    = $emp->leaves()->withoutGlobalScopes()->orderByDesc('created_at')->limit(6)->get();
+    $creditTypeLabels = ['voiture' => 'Voiture', 'immobilier' => 'Immobilier', 'consommation' => 'Consommation', 'education' => 'Éducation', 'autre' => 'Autre'];
 
     $statutFamilialMap = ['celibataire' => 'Célibataire', 'marie' => 'Marié(e)', 'divorce' => 'Divorcé(e)', 'veuf' => 'Veuf / Veuve'];
     $profTypeMap       = ['permanent' => 'Permanent', 'stagiaire' => 'Stagiaire', 'vacataire' => 'Vacataire'];
@@ -268,6 +272,26 @@
                 <span class="vp-count" style="background:#f0fdf4;color:#16a34a;">{{ $emp->contracts->count() }}</span>
             </button>
             @endif
+            <button class="vp-tab-btn" :class="{ active: tab === 'documents' }" @click="tab = 'documents'">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                Documents
+                <span class="vp-count" style="background:#e6f7f8;color:#0da8b1;">{{ $docs->count() }}</span>
+            </button>
+            <button class="vp-tab-btn" :class="{ active: tab === 'accidents' }" @click="tab = 'accidents'">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                Accidents de travail
+                <span class="vp-count" style="background:#fee2e2;color:#ef4444;">{{ $accidents->count() }}</span>
+            </button>
+            <button class="vp-tab-btn" :class="{ active: tab === 'fondation' }" @click="tab = 'fondation'">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                Fondation M6
+                <span class="vp-count" style="background:#fef3c7;color:#d97706;">{{ $fondation->count() }}</span>
+            </button>
+            <button class="vp-tab-btn" :class="{ active: tab === 'credits' }" @click="tab = 'credits'">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                Crédits
+                <span class="vp-count" style="background:#ede9fe;color:#7c3aed;">{{ $credits->count() }}</span>
+            </button>
         </div>
 
         {{-- Panel : Identité --}}
@@ -408,6 +432,120 @@
             @endforeach
         </div>
         @endif
+
+        {{-- Panel : Documents --}}
+        <div x-show="tab === 'documents'" style="padding:16px 18px;">
+            @forelse($docs as $doc)
+            @php $ext = strtolower(pathinfo($doc->file_path, PATHINFO_EXTENSION)); @endphp
+            <div class="vp-row">
+                <div class="vp-icon" style="background:{{ $ext === 'pdf' ? '#fee2e2' : (in_array($ext,['jpg','jpeg','png','webp']) ? '#fef3c7' : '#f1f5f9') }};">
+                    @if($ext === 'pdf')
+                        <svg fill="#ef4444" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>
+                    @elseif(in_array($ext,['jpg','jpeg','png','webp']))
+                        <svg fill="none" stroke="#d97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    @else
+                        <svg fill="none" stroke="#64748b" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    @endif
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div class="vp-row-name">{{ $doc->name }}</div>
+                    <div class="vp-row-meta">{{ $doc->file_size_human }} · {{ $doc->created_at->format('d/m/Y') }}</div>
+                </div>
+                <a href="{{ Storage::url($doc->file_path) }}" target="_blank" class="vp-btn" style="background:#e6f7f8;color:#0da8b1;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Télécharger
+                </a>
+            </div>
+            @empty
+            <p style="color:#94a3b8;font-size:13px;text-align:center;padding:20px 0;">Aucun document</p>
+            @endforelse
+        </div>
+
+        {{-- Panel : Accidents de travail --}}
+        <div x-show="tab === 'accidents'" style="padding:16px 18px;">
+            @forelse($accidents as $acc)
+            <div class="vp-row">
+                <div class="vp-icon" style="background:#fee2e2;">
+                    <svg fill="none" stroke="#ef4444" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div class="vp-row-name" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                        <span>{{ $acc->date_accident?->format('d/m/Y H:i') ?? '—' }}</span>
+                        <span class="vp-pill" style="background:{{ $acc->rembourse ? '#d1fae5' : '#f1f5f9' }};color:{{ $acc->rembourse ? '#065f46' : '#64748b' }};">{{ $acc->rembourse ? 'Remboursé' : 'Non remboursé' }}</span>
+                    </div>
+                    @if($acc->montant)<div class="vp-row-meta">Montant : <strong>{{ number_format($acc->montant, 2, ',', ' ') }} MAD</strong></div>@endif
+                    @if($acc->description)<div class="vp-row-meta">{{ $acc->description }}</div>@endif
+                    @if($acc->dossiers)
+                    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+                        @foreach((array)$acc->dossiers as $file)
+                        <a href="{{ Storage::url($file) }}" target="_blank" class="vp-btn" style="background:#fee2e2;color:#ef4444;">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:11px;height:11px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Dossier {{ $loop->iteration }}
+                        </a>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @empty
+            <p style="color:#94a3b8;font-size:13px;text-align:center;padding:20px 0;">Aucun accident enregistré</p>
+            @endforelse
+        </div>
+
+        {{-- Panel : Fondation M6 --}}
+        <div x-show="tab === 'fondation'" style="padding:16px 18px;">
+            @forelse($fondation as $f)
+            <div class="vp-row">
+                <div class="vp-icon" style="background:#fef3c7;">
+                    <svg fill="none" stroke="#d97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div class="vp-row-name">Année scolaire : <strong>{{ $f->annee_scolaire ?? '—' }}</strong></div>
+                    @if($f->notes)<div class="vp-row-meta">{{ $f->notes }}</div>@endif
+                    @if($f->fichiers)
+                    <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+                        @foreach((array)$f->fichiers as $file)
+                        <a href="{{ Storage::url($file) }}" target="_blank" class="vp-btn" style="background:#fef3c7;color:#d97706;">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:11px;height:11px;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Fichier {{ $loop->iteration }}
+                        </a>
+                        @endforeach
+                    </div>
+                    @endif
+                </div>
+            </div>
+            @empty
+            <p style="color:#94a3b8;font-size:13px;text-align:center;padding:20px 0;">Aucune entrée Fondation M6</p>
+            @endforelse
+        </div>
+
+        {{-- Panel : Crédits --}}
+        <div x-show="tab === 'credits'" style="padding:16px 18px;">
+            @forelse($credits as $cr)
+            <div class="vp-row">
+                <div class="vp-icon" style="background:#ede9fe;">
+                    <svg fill="none" stroke="#7c3aed" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                </div>
+                <div style="flex:1;min-width:0;">
+                    @if($cr->types)
+                    <div class="vp-row-name" style="display:flex;flex-wrap:wrap;gap:4px;">
+                        @foreach((array)$cr->types as $t)
+                        <span class="vp-pill" style="background:#ede9fe;color:#7c3aed;">{{ $creditTypeLabels[$t] ?? $t }}</span>
+                        @endforeach
+                    </div>
+                    @endif
+                    <div class="vp-row-meta" style="margin-top:4px;">
+                        @if($cr->montant)Montant : <strong>{{ number_format($cr->montant, 2, ',', ' ') }} MAD</strong>@endif
+                        @if($cr->montant && $cr->mensualite) &nbsp;·&nbsp; @endif
+                        @if($cr->mensualite)Mensualité : <strong>{{ number_format($cr->mensualite, 2, ',', ' ') }} MAD</strong>@endif
+                    </div>
+                    @if($cr->notes)<div class="vp-row-meta">{{ $cr->notes }}</div>@endif
+                </div>
+            </div>
+            @empty
+            <p style="color:#94a3b8;font-size:13px;text-align:center;padding:20px 0;">Aucun crédit enregistré</p>
+            @endforelse
+        </div>
 
     </div>{{-- fin tabs --}}
 
