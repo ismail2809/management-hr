@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Concerns\HasCompanyField;
 use App\Filament\Admin\Resources\GroupeResource\Pages;
+use App\Models\AnneeScolaire;
 use App\Models\Groupe;
 use App\Models\NiveauScolaire;
 use Filament\Forms\Components\Select;
@@ -51,16 +52,8 @@ class GroupeResource extends Resource
                 ]),
                 Select::make('annee_scolaire')
                     ->label('Année scolaire')
-                    ->options(function () {
-                        $current = now()->month >= 9 ? now()->year : now()->year - 1;
-                        return collect(range($current - 1, $current + 1))
-                            ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
-                            ->toArray();
-                    })
-                    ->default(function () {
-                        $y = now()->month >= 9 ? now()->year : now()->year - 1;
-                        return "$y-" . ($y + 1);
-                    })
+                    ->options(fn () => AnneeScolaire::orderByDesc('name')->pluck('name', 'name')->toArray())
+                    ->default(fn () => AnneeScolaire::where('is_active', true)->value('name'))
                     ->required()
                     ->native(false),
             ]),
@@ -89,12 +82,8 @@ class GroupeResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*'))
             ->defaultSort('niveaux_scolaires.order')
             ->filters([
-                SelectFilter::make('annee_scolaire')->label('Année scolaire')->options(function () {
-                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
-                    return collect(range($current - 1, $current + 1))
-                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
-                        ->toArray();
-                }),
+                SelectFilter::make('annee_scolaire')->label('Année scolaire')
+                    ->options(fn () => AnneeScolaire::orderByDesc('name')->pluck('name', 'name')->toArray()),
                 SelectFilter::make('niveau_scolaire_id')
                     ->label('Niveau')
                     ->relationship('niveauScolaire', 'name'),

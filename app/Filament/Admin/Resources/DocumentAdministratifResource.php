@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources;
 
 use App\Filament\Admin\Concerns\HasCompanyField;
 use App\Filament\Admin\Resources\DocumentAdministratifResource\Pages;
+use App\Models\AnneeScolaire;
 use App\Models\DocumentRequest;
 use App\Models\DocumentType;
 use App\Models\Employee;
@@ -141,16 +142,8 @@ class DocumentAdministratifResource extends Resource
                 ->schema([
                     Select::make('annee_scolaire')
                         ->label('Année scolaire')
-                        ->options(function () {
-                            $current = now()->month >= 9 ? now()->year : now()->year - 1;
-                            return collect(range($current - 1, $current + 1))
-                                ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
-                                ->toArray();
-                        })
-                        ->default(function () {
-                            $y = now()->month >= 9 ? now()->year : now()->year - 1;
-                            return "$y-" . ($y + 1);
-                        })
+                        ->options(fn () => AnneeScolaire::orderByDesc('name')->pluck('name', 'name')->toArray())
+                        ->default(fn () => AnneeScolaire::where('is_active', true)->value('name'))
                         ->required()
                         ->native(false),
 
@@ -247,12 +240,8 @@ class DocumentAdministratifResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('annee_scolaire')->label('Année scolaire')->options(function () {
-                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
-                    return collect(range($current - 1, $current + 1))
-                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
-                        ->toArray();
-                }),
+                SelectFilter::make('annee_scolaire')->label('Année scolaire')
+                    ->options(fn () => AnneeScolaire::orderByDesc('name')->pluck('name', 'name')->toArray()),
                 SelectFilter::make('status')->label('Statut')->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé']),
                 SelectFilter::make('format')->label('Format')->options(['digital' => 'Digitale', 'papier' => 'Papier']),
             ])
