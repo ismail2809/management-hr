@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guide Utilisateur — Espace Perso Enseignant</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 13px;
+      color: #1e293b;
+      background: #fff;
+      line-height: 1.6;
+    }
+
+    /* ── PAGE DE GARDE ── */
+    .cover {
+      page-break-after: always;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
+      color: #fff;
+      text-align: center;
+      padding: 60px 40px;
+    }
+    .cover .logo-text {
+      font-size: 13px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      opacity: 0.7;
+      margin-bottom: 30px;
+    }
+    .cover h1 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .cover h2 {
+      font-size: 20px;
+      font-weight: 400;
+      opacity: 0.85;
+      margin-bottom: 40px;
+    }
+    .cover .divider {
+      width: 60px;
+      height: 4px;
+      background: rgba(255,255,255,0.5);
+      border-radius: 2px;
+      margin: 0 auto 40px;
+    }
+    .cover .badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 8px 24px;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+    .cover .version {
+      position: absolute;
+      bottom: 40px;
+      font-size: 11px;
+      opacity: 0.5;
+    }
+
+    /* ── SOMMAIRE ── */
+    .toc {
+      page-break-after: always;
+      padding: 60px 80px;
+    }
+    .toc h2 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 8px;
+    }
+    .toc .toc-line {
+      width: 50px;
+      height: 3px;
+      background: #2563eb;
+      border-radius: 2px;
+      margin-bottom: 40px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: baseline;
+      padding: 10px 0;
+      border-bottom: 1px dotted #cbd5e1;
+    }
+    .toc-item .num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #2563eb;
+      width: 50px;
+      flex-shrink: 0;
+    }
+    .toc-item .label {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .toc-item .dots {
+      flex: 1;
+      border-bottom: 1px dotted #cbd5e1;
+      margin: 0 10px;
+      position: relative;
+      top: -4px;
+    }
+    .toc-item .page {
+      font-size: 13px;
+      color: #64748b;
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      page-break-before: always;
+      padding: 50px 60px;
+    }
+    .section:first-of-type { page-break-before: avoid; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 30px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .section-number {
+      width: 44px;
+      height: 44px;
+      background: #2563eb;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1e3a5f;
+    }
+    .section-subtitle {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* ── STEPS ── */
+    .steps { display: flex; flex-direction: column; gap: 32px; }
+
+    .step {
+      display: flex;
+      gap: 20px;
+    }
+    .step-num {
+      width: 28px;
+      height: 28px;
+      background: #eff6ff;
+      border: 2px solid #2563eb;
+      color: #2563eb;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 6px;
+    }
+    .step-desc {
+      font-size: 13px;
+      color: #475569;
+      margin-bottom: 14px;
+      line-height: 1.7;
+    }
+
+    /* ── SCREENSHOT ── */
+    .screenshot {
+      display: block;
+      width: 100%;
+      max-width: 700px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      margin-top: 10px;
+    }
+    .screenshot-caption {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      display: flex;
+      gap: 12px;
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
+    .info-box .icon { font-size: 18px; flex-shrink: 0; }
+    .info-box .text { font-size: 13px; color: #1e40af; line-height: 1.6; }
+    .info-box .text strong { font-weight: 700; }
+
+    .warning-box {
+      display: flex;
+      gap: 12px;
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      border-radius: 0 8px 8px 0;
+      padding: 14px 16px;
+      margin: 14px 0;
+    }
+    .warning-box .text { font-size: 13px; color: #92400e; line-height: 1.6; }
+    .warning-box .text strong { font-weight: 700; }
+
+    /* ── TABLE RECAP ── */
+    .recap-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+      font-size: 13px;
+    }
+    .recap-table th {
+      background: #1e3a5f;
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+    }
+    .recap-table td {
+      padding: 9px 14px;
+      border-bottom: 1px solid #e2e8f0;
+      color: #374151;
+    }
+    .recap-table tr:nth-child(even) td { background: #f8fafc; }
+    .badge-green {
+      display: inline-block;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-yellow {
+      display: inline-block;
+      background: #fef9c3;
+      color: #854d0e;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-red {
+      display: inline-block;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ── SUBSECTION ── */
+    .subsection {
+      margin-top: 36px;
+      padding-top: 24px;
+      border-top: 1px dashed #cbd5e1;
+    }
+    .subsection-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a5f;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .subsection-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 18px;
+      background: #2563eb;
+      border-radius: 2px;
+    }
+
+    /* ── FOOTER ── */
+    @media print {
+      body { font-size: 12px; }
+      .cover { height: 100vh; }
+      .section { padding: 40px 50px; }
+      .screenshot { max-width: 100%; }
+      @page { margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     PAGE DE GARDE
+══════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="logo-text">Gestion du Personnel Scolaire</div>
+  <h1>Guide d'utilisation<br>Espace Perso</h1>
+  <h2>Profil Enseignant</h2>
+  <div class="divider"></div>
+  <div class="badge">Guide pas-à-pas avec captures d'écran</div>
+  <div class="version">Version 1.0 — 2026</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SOMMAIRE
+══════════════════════════════════════════════ -->
+<div class="toc">
+  <h2>Sommaire</h2>
+  <div class="toc-line"></div>
+
+  <div class="toc-item">
+    <span class="num">1</span>
+    <span class="label">Réinitialiser votre mot de passe</span>
+    <span class="dots"></span>
+  </div>
+  <div class="toc-item">
+    <span class="num">2</span>
+    <span class="label">Se connecter et découvrir le tableau de bord</span>
+    <span class="dots"></span>
+  </div>
+  <div class="toc-item">
+    <span class="num">3</span>
+    <span class="label">Mon profil — Consulter et modifier ses informations</span>
+    <span class="dots"></span>
+  </div>
+  <div class="toc-item">
+    <span class="num">4</span>
+    <span class="label">Demandes d'absence — Créer et suivre</span>
+    <span class="dots"></span>
+  </div>
+  <div class="toc-item">
+    <span class="num">5</span>
+    <span class="label">Documents administratifs — Faire une demande</span>
+    <span class="dots"></span>
+  </div>
+  <div class="toc-item">
+    <span class="num">6</span>
+    <span class="label">Autres demandes — Photocopies, matériel, grande salle...</span>
+    <span class="dots"></span>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 1 — MOT DE PASSE OUBLIÉ
+══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">1</div>
+    <div>
+      <div class="section-title">Réinitialiser votre mot de passe</div>
+      <div class="section-subtitle">Vous avez reçu un email pour créer votre mot de passe ou vous l'avez oublié</div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Accéder à la page de connexion</div>
+        <div class="step-desc">
+          Ouvrez votre navigateur et accédez à l'adresse de l'application fournie par votre administration.
+          Sur la page de connexion, cliquez sur <strong>"Mot de passe oublié ?"</strong>.
+        </div>
+        <img class="screenshot" src="mot de passe oublié.png" alt="Page mot de passe oublié" />
+        <div class="screenshot-caption">Page "Mot de passe oublié" — Espace Perso</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Saisir votre adresse email</div>
+        <div class="step-desc">
+          Entrez votre adresse email professionnelle dans le champ prévu, puis cliquez sur
+          <strong>"Envoyer l'email"</strong>. Un message de confirmation s'affichera à l'écran.
+        </div>
+        <div class="info-box">
+          <div class="icon">&#9432;</div>
+          <div class="text">
+            <strong>Important :</strong> Utilisez l'adresse email que votre administration a enregistrée pour vous
+            (ex : prenom.nom@lesecolesalbaraime.com).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Vérifier votre boîte mail et cliquer sur le lien</div>
+        <div class="step-desc">
+          Ouvrez votre messagerie. Vous recevrez un email de <strong>Les Ecoles AL BARAIME</strong>
+          avec le sujet <em>"Réinitialisation de votre mot de passe"</em>.
+          Cliquez sur le bouton <strong>"Réinitialiser mon mot de passe"</strong>.
+        </div>
+        <img class="screenshot" src="Réinitialisation de votre mot de passe .png" alt="Email de réinitialisation" />
+        <div class="screenshot-caption">Email reçu dans la boîte mail avec le lien de réinitialisation</div>
+        <div class="warning-box">
+          <div class="icon">&#9888;</div>
+          <div class="text">
+            <strong>Attention :</strong> Ce lien expire dans <strong>60 minutes</strong>.
+            Si vous ne l'utilisez pas à temps, recommencez la procédure depuis l'étape 1.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Créer votre nouveau mot de passe</div>
+        <div class="step-desc">
+          Une page s'ouvre dans votre navigateur. Entrez un nouveau mot de passe
+          (minimum 8 caractères, avec des lettres et des chiffres), confirmez-le,
+          puis cliquez sur <strong>"Réinitialiser le mot de passe"</strong>.
+          Vous serez redirigé automatiquement vers votre espace.
+        </div>
+        <div class="info-box">
+          <div class="icon">&#128274;</div>
+          <div class="text">
+            Choisissez un mot de passe que vous pouvez retenir facilement mais que les autres ne peuvent pas deviner.
+            Exemple : <strong>Yasmine2026!</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 2 — TABLEAU DE BORD
+══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">2</div>
+    <div>
+      <div class="section-title">Le Tableau de bord</div>
+      <div class="section-subtitle">La première page que vous voyez après connexion</div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Se connecter</div>
+        <div class="step-desc">
+          Sur la page de connexion, entrez votre <strong>adresse email</strong> et votre <strong>mot de passe</strong>,
+          puis cliquez sur <strong>"Se connecter"</strong>. Vous arrivez sur votre tableau de bord personnel.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Découvrir le tableau de bord</div>
+        <div class="step-desc">
+          Le tableau de bord affiche un résumé de votre situation en temps réel :
+        </div>
+        <img class="screenshot" src="tableau de board.png" alt="Tableau de bord" />
+        <div class="screenshot-caption">Vue du tableau de bord après connexion</div>
+
+        <table class="recap-table" style="margin-top:20px">
+          <tr>
+            <th>Indicateur</th>
+            <th>Description</th>
+          </tr>
+          <tr>
+            <td><strong>Documents administratifs en attente</strong></td>
+            <td>Nombre de demandes de documents en cours de traitement</td>
+          </tr>
+          <tr>
+            <td><strong>Autres demandes en attente</strong></td>
+            <td>Demandes de photocopies, matériel, grande salle...</td>
+          </tr>
+          <tr>
+            <td><strong>Congés pris (année en cours)</strong></td>
+            <td>Nombre de jours de congés approuvés cette année</td>
+          </tr>
+          <tr>
+            <td><strong>Absences (année en cours)</strong></td>
+            <td>Nombre d'absences enregistrées cette année</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Naviguer dans le menu</div>
+        <div class="step-desc">
+          Le menu à gauche contient toutes vos fonctionnalités :
+          <ul style="margin: 10px 0 0 20px; line-height: 2;">
+            <li><strong>Tableau de bord</strong> — Retour à l'accueil</li>
+            <li><strong>Mon profil</strong> — Vos informations personnelles</li>
+            <li><strong>Demandes d'absence</strong> — Créer et suivre vos absences</li>
+            <li><strong>Mes documents</strong> — Demander des documents administratifs</li>
+            <li><strong>Mes autres demandes</strong> — Photocopies, matériel, grande salle...</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 3 — MON PROFIL
+══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">3</div>
+    <div>
+      <div class="section-title">Mon profil</div>
+      <div class="section-subtitle">Consulter vos informations, les modifier et gérer vos documents personnels</div>
+    </div>
+  </div>
+
+  <!-- 3.1 Consulter -->
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Consulter votre dossier — Onglet Identité</div>
+        <div class="step-desc">
+          Cliquez sur <strong>"Mon profil"</strong> dans le menu gauche.
+          Votre fiche complète s'affiche avec votre nom, poste, matricule et statut (CDI, Actif...).
+          L'onglet <strong>"Identité"</strong> est ouvert par défaut : vous y trouvez vos informations
+          civiles (CIN, CNSS, date de naissance, diplôme...).
+        </div>
+        <img class="screenshot" src="profile - identité.png" alt="Profil - onglet Identité" />
+        <div class="screenshot-caption">Dossier employé — Onglet Identité</div>
+        <div class="info-box">
+          <div class="icon">&#128065;</div>
+          <div class="text">
+            Vous pouvez naviguer entre les onglets : <strong>Identité</strong>, Coordonnées,
+            Situation familiale, Poste &amp; Contrat, <strong>Documents</strong>,
+            <strong>Accidents de travail</strong>, <strong>Fondation M6</strong>, <strong>Crédits</strong>.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Modifier vos informations</div>
+        <div class="step-desc">
+          Cliquez sur le bouton <strong>"Modifier"</strong> en haut à droite de votre fiche.
+          Vous pouvez mettre à jour vos coordonnées, adresse, téléphone, etc.
+          Une fois les modifications faites, cliquez sur <strong>"Sauvegarder les modifications"</strong>.
+        </div>
+        <img class="screenshot" src="profile - edit.png" alt="Modifier le profil" />
+        <div class="screenshot-caption">Formulaire de modification du dossier employé</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.2 Documents -->
+  <div class="subsection">
+    <div class="subsection-title">Ajouter un document personnel</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <div class="step-title">Uploader un document (CIN, RIB, Diplôme...)</div>
+          <div class="step-desc">
+            Dans le formulaire de modification, faites défiler vers le bas jusqu'à la section <strong>Documents</strong>.
+            Cliquez sur <strong>"Ajouter un document"</strong>. Une fenêtre s'ouvre :
+            <ul style="margin: 10px 0 0 20px; line-height: 2;">
+              <li>Choisissez le <strong>type de document</strong> (Photo, CIN scan, Extrait de naissance, Carte CNSS, RIB scan, Diplôme, Contrat ANAPEC, Autre)</li>
+              <li>Faites glisser votre fichier ou cliquez sur <strong>"Parcourir"</strong></li>
+              <li>Cliquez sur <strong>"Créer"</strong></li>
+            </ul>
+          </div>
+          <img class="screenshot" src="profile - ajouter document.png" alt="Ajouter un document" />
+          <div class="screenshot-caption">Fenêtre d'ajout de document personnel</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.3 Accidents -->
+  <div class="subsection">
+    <div class="subsection-title">Déclarer un accident de travail</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <div class="step-title">Signaler un accident</div>
+          <div class="step-desc">
+            Faites défiler jusqu'à l'onglet <strong>"Accidents de travail"</strong> dans le formulaire de modification,
+            puis cliquez sur <strong>"Ajouter un accident"</strong>. Renseignez :
+            <ul style="margin: 10px 0 0 20px; line-height: 2;">
+              <li>La <strong>date et heure</strong> de l'accident</li>
+              <li>Si vous avez été <strong>remboursé</strong> et le montant</li>
+              <li>La <strong>description</strong> de l'accident</li>
+              <li>Les <strong>dossiers justificatifs</strong> (ordonnances, rapports médicaux...)</li>
+            </ul>
+          </div>
+          <img class="screenshot" src="profile - accident de travail.png" alt="Déclarer un accident" />
+          <div class="screenshot-caption">Formulaire de déclaration d'accident de travail</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.4 Fondation M6 -->
+  <div class="subsection">
+    <div class="subsection-title">Fondation M6</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <div class="step-title">Enregistrer une activité Fondation M6</div>
+          <div class="step-desc">
+            Dans l'onglet <strong>"Fondation M6"</strong>, cliquez sur <strong>"Ajouter"</strong>.
+            Renseignez l'<strong>année scolaire</strong> concernée, ajoutez des <strong>notes</strong>
+            et joignez les <strong>fichiers justificatifs</strong>.
+          </div>
+          <img class="screenshot" src="profile - foundation m6.png" alt="Fondation M6" />
+          <div class="screenshot-caption">Formulaire Fondation M6</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3.5 Crédits -->
+  <div class="subsection">
+    <div class="subsection-title">Crédits</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <div class="step-title">Déclarer un crédit</div>
+          <div class="step-desc">
+            Dans l'onglet <strong>"Crédits"</strong>, cliquez sur <strong>"Ajouter un crédit"</strong>.
+            Cochez le <strong>type de crédit</strong> (Voiture, Immobilier, Consommation, Éducation, Autre),
+            puis saisissez le <strong>montant total</strong> et la <strong>mensualité</strong> en MAD.
+          </div>
+          <img class="screenshot" src="profile - crédits.png" alt="Crédits" />
+          <div class="screenshot-caption">Formulaire de déclaration de crédit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 4 — DEMANDES D'ABSENCE
+══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">4</div>
+    <div>
+      <div class="section-title">Demandes d'absence</div>
+      <div class="section-subtitle">Soumettre une demande d'absence et suivre son statut</div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Créer une demande d'absence</div>
+        <div class="step-desc">
+          Dans le menu, cliquez sur <strong>"Demandes d'absence"</strong>, puis sur le bouton
+          <strong>"Créer"</strong> en haut à droite. Le formulaire suivant s'affiche :
+        </div>
+        <img class="screenshot" src="Créer Demande D'absence .png" alt="Créer une demande d'absence" />
+        <div class="screenshot-caption">Formulaire de création d'une demande d'absence</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Remplir le formulaire</div>
+        <div class="step-desc">
+          Renseignez les informations suivantes :
+        </div>
+        <table class="recap-table">
+          <tr>
+            <th>Champ</th>
+            <th>Quoi saisir</th>
+          </tr>
+          <tr>
+            <td><strong>Catégorie</strong></td>
+            <td>Choisir "Absence" ou "Congé" selon votre cas</td>
+          </tr>
+          <tr>
+            <td><strong>Date de début</strong></td>
+            <td>Premier jour d'absence</td>
+          </tr>
+          <tr>
+            <td><strong>Date de fin</strong></td>
+            <td>Dernier jour d'absence (la durée est calculée automatiquement)</td>
+          </tr>
+          <tr>
+            <td><strong>Motif</strong></td>
+            <td>Raison de l'absence (ex : Rendez-vous médical, Raison familiale...)</td>
+          </tr>
+          <tr>
+            <td><strong>Professeur remplaçant</strong></td>
+            <td>Le collègue qui vous remplace pendant votre absence</td>
+          </tr>
+          <tr>
+            <td><strong>Type de cours</strong></td>
+            <td>Cours théorique, Exercice, Examen, DS...</td>
+          </tr>
+          <tr>
+            <td><strong>Nombre de pages</strong></td>
+            <td>Volume de cours préparé pour le remplaçant</td>
+          </tr>
+          <tr>
+            <td><strong>Justificatif</strong></td>
+            <td>PDF ou image (max 5 Mo) — facultatif selon le motif</td>
+          </tr>
+        </table>
+        <div class="info-box" style="margin-top:14px">
+          <div class="icon">&#9432;</div>
+          <div class="text">
+            Cliquez sur <strong>"Créer"</strong> pour soumettre la demande,
+            ou sur <strong>"Créer &amp; Ajouter un autre"</strong> si vous devez soumettre plusieurs demandes.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Suivre vos demandes d'absence</div>
+        <div class="step-desc">
+          Cliquez sur <strong>"Demandes d'absence"</strong> dans le menu pour voir la liste de toutes vos demandes
+          avec leur statut.
+        </div>
+        <img class="screenshot" src="Liste Demande D'absence .png" alt="Liste des demandes d'absence" />
+        <div class="screenshot-caption">Liste des demandes d'absence avec statut</div>
+
+        <table class="recap-table" style="margin-top:16px">
+          <tr>
+            <th>Statut</th>
+            <th>Signification</th>
+          </tr>
+          <tr>
+            <td><span class="badge-yellow">en attente</span></td>
+            <td>Votre demande est soumise, en cours de traitement par la secrétaire</td>
+          </tr>
+          <tr>
+            <td><span class="badge-green">approuvé</span></td>
+            <td>Votre absence est acceptée</td>
+          </tr>
+          <tr>
+            <td><span class="badge-red">refusé</span></td>
+            <td>Votre demande a été refusée — contactez la secrétaire pour plus d'informations</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 5 — DOCUMENTS ADMINISTRATIFS
+══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">5</div>
+    <div>
+      <div class="section-title">Documents administratifs</div>
+      <div class="section-subtitle">Demander une attestation de travail, un certificat, une attestation salaire...</div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Créer une demande de document</div>
+        <div class="step-desc">
+          Dans le menu, cliquez sur <strong>"Mes documents"</strong>, puis sur <strong>"Créer"</strong>
+          en haut à droite.
+        </div>
+        <img class="screenshot" src="Créer Document Administratif .png" alt="Créer un document administratif" />
+        <div class="screenshot-caption">Formulaire de demande de document administratif</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Remplir la demande</div>
+        <div class="step-desc">
+          Choisissez le <strong>type de document</strong> souhaité :
+        </div>
+        <table class="recap-table">
+          <tr>
+            <th>Type de document</th>
+            <th>Utilisation habituelle</th>
+          </tr>
+          <tr>
+            <td><strong>Attestation de travail</strong></td>
+            <td>Banque, ambassade, école des enfants, dossiers administratifs</td>
+          </tr>
+          <tr>
+            <td><strong>Attestation de salaire</strong></td>
+            <td>Demande de crédit, logement, administration</td>
+          </tr>
+          <tr>
+            <td><strong>Certificat de travail</strong></td>
+            <td>Fin de contrat, mutation</td>
+          </tr>
+          <tr>
+            <td><strong>Attestation CNSS</strong></td>
+            <td>CNSS, AMO, couverture médicale</td>
+          </tr>
+          <tr>
+            <td><strong>Ordre de mission</strong></td>
+            <td>Déplacement professionnel</td>
+          </tr>
+        </table>
+        <div style="margin-top:14px">
+          Choisissez ensuite le <strong>format souhaité</strong> (Version papier ou PDF numérique),
+          ajoutez une <strong>description</strong> si nécessaire, puis cliquez sur <strong>"Créer"</strong>.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Suivre votre demande</div>
+        <div class="step-desc">
+          La liste affiche toutes vos demandes avec le type de document, le statut et le format.
+          Quand votre document est prêt, le statut passe à <span class="badge-green">approuvé</span>.
+        </div>
+        <img class="screenshot" src="Liste Documents Administratifs .png" alt="Liste des documents administratifs" />
+        <div class="screenshot-caption">Liste des demandes de documents administratifs</div>
+        <div class="info-box" style="margin-top:14px">
+          <div class="icon">&#128221;</div>
+          <div class="text">
+            Si vous avez demandé un document en format <strong>papier</strong>, vous devrez le récupérer
+            auprès du secrétariat. Si c'est un <strong>PDF numérique</strong>, vous pourrez le télécharger
+            directement depuis cette liste.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     SECTION 6 — AUTRES DEMANDES
+══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-number">6</div>
+    <div>
+      <div class="section-title">Autres demandes</div>
+      <div class="section-subtitle">Photocopies, réservation grande salle, matériel pédagogique...</div>
+    </div>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Créer une autre demande</div>
+        <div class="step-desc">
+          Dans le menu, cliquez sur <strong>"Mes autres demandes"</strong>, puis sur <strong>"Créer"</strong>.
+        </div>
+        <img class="screenshot" src="Créer Autre Demande.png" alt="Créer une autre demande" />
+        <div class="screenshot-caption">Formulaire de création d'une autre demande (exemple : Photocopie)</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Choisir le type de demande</div>
+        <div class="step-desc">
+          Sélectionnez le <strong>type de demande</strong> dans le menu déroulant.
+          Le formulaire s'adapte automatiquement selon le type choisi :
+        </div>
+        <table class="recap-table">
+          <tr>
+            <th>Type de demande</th>
+            <th>Informations requises</th>
+          </tr>
+          <tr>
+            <td><strong>Photocopie</strong></td>
+            <td>Nature du document, niveau, groupe/classe, nombre de copies, date souhaitée, fichier à photocopier</td>
+          </tr>
+          <tr>
+            <td><strong>Grande salle</strong></td>
+            <td>Motif, date et horaire souhaités</td>
+          </tr>
+          <tr>
+            <td><strong>Matériel</strong></td>
+            <td>Description du matériel demandé, quantité</td>
+          </tr>
+        </table>
+        <div class="warning-box" style="margin-top:14px">
+          <div class="icon">&#9888;</div>
+          <div class="text">
+            Pour les <strong>photocopies</strong>, la demande doit être soumise
+            <strong>au minimum 3 jours ouvrables à l'avance</strong> (week-ends exclus).
+            Respectez ce délai pour que votre demande soit traitée à temps.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Suivre vos autres demandes</div>
+        <div class="step-desc">
+          La liste affiche toutes vos demandes avec le type, le statut et un éventuel fichier joint.
+        </div>
+        <img class="screenshot" src="Liste Autre Demande.png" alt="Liste des autres demandes" />
+        <div class="screenshot-caption">Liste des autres demandes avec statuts variés</div>
+
+        <table class="recap-table" style="margin-top:16px">
+          <tr>
+            <th>Statut</th>
+            <th>Signification</th>
+          </tr>
+          <tr>
+            <td><span class="badge-yellow">en attente</span></td>
+            <td>Demande soumise, en cours de traitement</td>
+          </tr>
+          <tr>
+            <td><span class="badge-green">approuvé</span></td>
+            <td>Demande acceptée — vous pouvez récupérer vos photocopies / le matériel</td>
+          </tr>
+          <tr>
+            <td><span class="badge-red">refusé</span></td>
+            <td>Demande refusée — contactez le secrétariat pour connaître la raison</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     PAGE FINALE
+══════════════════════════════════════════════ -->
+<div class="section" style="text-align:center; padding: 80px 60px;">
+  <div style="font-size:48px; margin-bottom:20px;">&#127891;</div>
+  <h2 style="font-size:24px; color:#1e3a5f; margin-bottom:12px;">Vous avez tout en main !</h2>
+  <p style="color:#64748b; font-size:14px; max-width:480px; margin:0 auto 30px; line-height:1.8;">
+    Ce guide couvre toutes les fonctionnalités de votre Espace Perso.
+    En cas de difficulté, contactez votre secrétaire RH qui pourra vous accompagner.
+  </p>
+  <div style="display:inline-block; background:#eff6ff; border-radius:12px; padding:20px 40px; border:1px solid #bfdbfe;">
+    <div style="font-size:13px; color:#1e40af; font-weight:600; margin-bottom:8px;">Contact secrétariat</div>
+    <div style="font-size:13px; color:#475569;">Adressez-vous à votre secrétaire RH pour toute aide</div>
+  </div>
+
+  <div style="margin-top:50px; padding-top:30px; border-top:1px solid #e2e8f0;">
+    <div style="font-size:11px; color:#94a3b8; letter-spacing:2px; text-transform:uppercase; margin-bottom:20px;">Application développée par</div>
+    <div style="font-size:18px; font-weight:700; color:#1e3a5f; margin-bottom:20px;">Ismail ABOUNASR</div>
+    <div style="display:flex; justify-content:center; gap:30px; flex-wrap:wrap;">
+      <a href="mailto:ismaelabounasr@gmail.com" style="display:flex; align-items:center; gap:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 20px; text-decoration:none; color:#1e293b;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <span style="font-size:13px; font-weight:500;">ismaelabounasr@gmail.com</span>
+      </a>
+      <a href="https://www.linkedin.com/in/ismail-abounasr-1a638814b/" style="display:flex; align-items:center; gap:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 20px; text-decoration:none; color:#1e293b;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#0a66c2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        <span style="font-size:13px; font-weight:500;">linkedin.com/in/ismail-abounasr</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
