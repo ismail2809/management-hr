@@ -138,6 +138,21 @@ class LeaveResource extends Resource
                                 ->required()
                                 ->live(),
 
+                            Select::make('annee_scolaire')
+                                ->label('Année scolaire')
+                                ->options(function () {
+                                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                                    return collect(range($current - 1, $current + 1))
+                                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                                        ->toArray();
+                                })
+                                ->default(function () {
+                                    $y = now()->month >= 9 ? now()->year : now()->year - 1;
+                                    return "$y-" . ($y + 1);
+                                })
+                                ->required()
+                                ->native(false),
+
                             Select::make('leave_type_id')
                                 ->label('Type de congé')
                                 ->options(fn () => LeaveType::orderBy('name')->pluck('name', 'id')->toArray())
@@ -315,6 +330,7 @@ class LeaveResource extends Resource
                     ->label('Type de congé')
                     ->default('—')
                     ->sortable(),
+                TextColumn::make('annee_scolaire')->label('Année scolaire')->sortable()->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('start_date')->label('Début')->date('d/m/Y')->sortable(),
                 TextColumn::make('end_date')->label('Fin')->date('d/m/Y')->sortable(),
                 TextColumn::make('duration_days')->label('Durée')->suffix(' j'),
@@ -339,6 +355,12 @@ class LeaveResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('annee_scolaire')->label('Année scolaire')->options(function () {
+                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                    return collect(range($current - 1, $current + 1))
+                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                        ->toArray();
+                }),
                 SelectFilter::make('categorie')->label('Catégorie')->options(['conge' => 'Congé', 'absence' => 'Absence']),
                 SelectFilter::make('status')->label('Statut')->options([
                     'en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé',

@@ -139,6 +139,21 @@ class DocumentAdministratifResource extends Resource
             Section::make('Document administratif')
                 ->icon('heroicon-o-document-text')
                 ->schema([
+                    Select::make('annee_scolaire')
+                        ->label('Année scolaire')
+                        ->options(function () {
+                            $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                            return collect(range($current - 1, $current + 1))
+                                ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                                ->toArray();
+                        })
+                        ->default(function () {
+                            $y = now()->month >= 9 ? now()->year : now()->year - 1;
+                            return "$y-" . ($y + 1);
+                        })
+                        ->required()
+                        ->native(false),
+
                     Grid::make(2)->schema([
                         Select::make('type')
                             ->label('Type de document')
@@ -194,6 +209,8 @@ class DocumentAdministratifResource extends Resource
                     ->sortable()
                     ->weight('semibold'),
 
+                TextColumn::make('annee_scolaire')->label('Année scolaire')->sortable()->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('type')
                     ->label('Type de document')
                     ->formatStateUsing(fn ($state) => DocumentRequest::$documentTypes[$state] ?? $state)
@@ -230,6 +247,12 @@ class DocumentAdministratifResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('annee_scolaire')->label('Année scolaire')->options(function () {
+                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                    return collect(range($current - 1, $current + 1))
+                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                        ->toArray();
+                }),
                 SelectFilter::make('status')->label('Statut')->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé']),
                 SelectFilter::make('format')->label('Format')->options(['digital' => 'Digitale', 'papier' => 'Papier']),
             ])

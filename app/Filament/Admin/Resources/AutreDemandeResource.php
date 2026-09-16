@@ -156,6 +156,21 @@ class AutreDemandeResource extends Resource
                 ->icon('heroicon-o-chat-bubble-left-right')
                 ->columns(2)
                 ->schema([
+                    Select::make('annee_scolaire')
+                        ->label('Année scolaire')
+                        ->options(function () {
+                            $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                            return collect(range($current - 1, $current + 1))
+                                ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                                ->toArray();
+                        })
+                        ->default(function () {
+                            $y = now()->month >= 9 ? now()->year : now()->year - 1;
+                            return "$y-" . ($y + 1);
+                        })
+                        ->required()
+                        ->native(false),
+
                     Select::make('type')
                         ->label('Type de demande')
                         ->options(fn () => DocumentType::where('active', true)->where('categorie', 'autre')->orderBy('sort_order')->pluck('name', 'code')->toArray() ?: DocumentRequest::$autreTypes)
@@ -326,6 +341,8 @@ class AutreDemandeResource extends Resource
                     ->sortable()
                     ->weight('semibold'),
 
+                TextColumn::make('annee_scolaire')->label('Année scolaire')->sortable()->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('type')
                     ->label('Type de demande')
                     ->formatStateUsing(fn ($state) => DocumentRequest::$autreTypes[$state]
@@ -371,6 +388,12 @@ class AutreDemandeResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                SelectFilter::make('annee_scolaire')->label('Année scolaire')->options(function () {
+                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                    return collect(range($current - 1, $current + 1))
+                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                        ->toArray();
+                }),
                 SelectFilter::make('status')->label('Statut')->options(['en_attente' => 'En attente', 'approuvé' => 'Approuvé', 'refusé' => 'Refusé']),
             ])
             ->actions([

@@ -26,6 +26,7 @@ class DocumentRequest extends Model
         'ecole_setting_id',
         'employee_id',
         'categorie',
+        'annee_scolaire',
         'type',
         'date_souhaitee',
         'format',

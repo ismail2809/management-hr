@@ -49,6 +49,20 @@ class GroupeResource extends Resource
                         ->required(),
                     TextInput::make('name')->label('Nom du groupe')->required()->maxLength(100),
                 ]),
+                Select::make('annee_scolaire')
+                    ->label('Année scolaire')
+                    ->options(function () {
+                        $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                        return collect(range($current - 1, $current + 1))
+                            ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                            ->toArray();
+                    })
+                    ->default(function () {
+                        $y = now()->month >= 9 ? now()->year : now()->year - 1;
+                        return "$y-" . ($y + 1);
+                    })
+                    ->required()
+                    ->native(false),
             ]),
         ]);
     }
@@ -59,6 +73,7 @@ class GroupeResource extends Resource
             ->columns([
                 TextColumn::make('niveauScolaire.name')->label('Niveau')->sortable()->badge()->color('info'),
                 TextColumn::make('name')->label('Groupe')->searchable()->sortable(),
+                TextColumn::make('annee_scolaire')->label('Année scolaire')->sortable()->badge()->color('gray'),
                 TextColumn::make('employees_count')->label('Professeurs affectés')->counts('employees')->sortable(),
                 TextColumn::make('created_at')
                     ->label('Créé le')
@@ -74,6 +89,12 @@ class GroupeResource extends Resource
             ->modifyQueryUsing(fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*'))
             ->defaultSort('niveaux_scolaires.order')
             ->filters([
+                SelectFilter::make('annee_scolaire')->label('Année scolaire')->options(function () {
+                    $current = now()->month >= 9 ? now()->year : now()->year - 1;
+                    return collect(range($current - 1, $current + 1))
+                        ->mapWithKeys(fn ($y) => ["$y-" . ($y + 1) => "$y-" . ($y + 1)])
+                        ->toArray();
+                }),
                 SelectFilter::make('niveau_scolaire_id')
                     ->label('Niveau')
                     ->relationship('niveauScolaire', 'name'),

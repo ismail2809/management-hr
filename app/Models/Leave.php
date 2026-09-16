@@ -26,6 +26,7 @@ class Leave extends Model
         'ecole_setting_id',
         'employee_id',
         'categorie',
+        'annee_scolaire',
         'leave_type_id',
         'start_date',
         'end_date',
