@@ -54,6 +54,15 @@ class AppPanelProvider extends PanelProvider
                 PanelsRenderHook::STYLES_AFTER,
                 fn () => new HtmlString('<link rel="stylesheet" href="' . asset('css/hr-theme.css') . '?v=14">')
             )
+            ->renderHook(
+                PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
+                fn () => new HtmlString(
+                    '<p style="text-align:center;margin-top:1rem;font-size:0.8125rem;color:#94a3b8;">' .
+                    'En vous connectant, vous acceptez notre ' .
+                    '<a href="/politique-confidentialite" target="_blank" style="color:#1e40af;text-decoration:underline;">Politique de confidentialité</a>.' .
+                    '</p>'
+                )
+            )
             ->navigationGroups([
                 NavigationGroup::make('Personnel')
                     ->icon('heroicon-o-users'),

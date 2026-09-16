@@ -9,6 +9,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/politique-confidentialite', fn () => view('politique-confidentialite'))
+    ->name('politique-confidentialite');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/documents/{documentRequest}/pdf', [\App\Http\Controllers\DocumentPdfController::class, 'download'])
         ->name('documents.pdf');
