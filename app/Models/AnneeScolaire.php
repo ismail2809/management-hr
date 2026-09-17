@@ -28,6 +28,18 @@ class AnneeScolaire extends Model
 
     protected $casts = ['is_active' => 'boolean'];
 
+    protected static function booted(): void
+    {
+        static::saved(function (AnneeScolaire $model) {
+            if ($model->is_active) {
+                static::withoutGlobalScopes()
+                    ->where('ecole_setting_id', $model->ecole_setting_id)
+                    ->where('id', '!=', $model->id)
+                    ->update(['is_active' => false]);
+            }
+        });
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(EcoleSettings::class, 'ecole_setting_id');
