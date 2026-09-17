@@ -22,7 +22,9 @@ class AnneeScolaire extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    protected $fillable = ['ecole_setting_id', 'name', 'is_active'];
+    protected $table = 'annees_scolaires';
+
+    protected $fillable = ['ecole_setting_id', 'name', 'is_active', 'note'];
 
     protected $casts = ['is_active' => 'boolean'];
 

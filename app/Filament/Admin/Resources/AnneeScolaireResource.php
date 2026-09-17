@@ -7,6 +7,7 @@ use App\Filament\Admin\Concerns\HasRoleBasedDelete;
 use App\Filament\Admin\Resources\AnneeScolaireResource\Pages;
 use App\Models\AnneeScolaire;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -55,6 +56,12 @@ class AnneeScolaireResource extends Resource
                     ->label('Année en cours')
                     ->helperText('Marque cette année comme année scolaire active (pré-sélectionnée dans les formulaires).')
                     ->default(false),
+
+                Textarea::make('note')
+                    ->label('Note')
+                    ->rows(2)
+                    ->nullable()
+                    ->maxLength(500),
             ]),
         ]);
     }
@@ -74,6 +81,12 @@ class AnneeScolaireResource extends Resource
                     ->boolean()
                     ->trueColor('success')
                     ->falseColor('gray'),
+
+                TextColumn::make('note')
+                    ->label('Note')
+                    ->limit(60)
+                    ->default('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
                     ->label('Créé le')
