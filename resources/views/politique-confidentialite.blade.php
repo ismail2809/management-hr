@@ -15,7 +15,7 @@
         }
 
         .header {
-            background: #1e40af;
+            background: #ffffff;
             padding: 1.25rem 2rem;
             display: flex;
             align-items: center;
@@ -29,7 +29,7 @@
         }
 
         .back-link {
-            color: #93c5fd;
+            color: #000000;
             text-decoration: none;
             font-size: 0.875rem;
             display: flex;
@@ -39,7 +39,7 @@
             transition: color 0.15s;
         }
 
-        .back-link:hover { color: #fff; }
+        .back-link:hover { color: #000000; }
 
         .container {
             max-width: 820px;
@@ -152,7 +152,7 @@
 <body>
 
 <div class="header">
-    <h1>Gestion RH — Politique de Confidentialité</h1>
+    <img src="/images/logo.png" alt="Gestion RH" style="max-height: 60px;">
     <a href="/admin/login" class="back-link">
         ← Retour à la connexion
     </a>
