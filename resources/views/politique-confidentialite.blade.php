@@ -144,6 +144,11 @@
             color: #94a3b8;
         }
 
+        .footer-note a {
+            color: #94a3b8;
+            text-decoration: underline;
+        }
+
         @media (max-width: 640px) {
             .card { padding: 1.5rem; }
         }
@@ -260,7 +265,8 @@
         </div>
 
         <div class="footer-note">
-            &copy; {{ date('Y') }} Gestion RH — Tous droits réservés
+            &copy; {{ date('Y') }} Gestion RH — Tous droits réservés &nbsp;·&nbsp;
+            <a href="/mentions-legales">Mentions légales</a>
         </div>
     </div>
 </div>

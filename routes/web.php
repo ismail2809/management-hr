@@ -12,6 +12,9 @@ Route::get('/', function () {
 Route::get('/politique-confidentialite', fn () => view('politique-confidentialite'))
     ->name('politique-confidentialite');
 
+Route::get('/mentions-legales', fn () => view('mentions-legales'))
+    ->name('mentions-legales');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/documents/{documentRequest}/pdf', [\App\Http\Controllers\DocumentPdfController::class, 'download'])
         ->name('documents.pdf');

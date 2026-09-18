@@ -59,7 +59,9 @@ class AppPanelProvider extends PanelProvider
                 fn () => new HtmlString(
                     '<p style="text-align:center;margin-top:1rem;font-size:0.8125rem;color:#94a3b8;">' .
                     'En vous connectant, vous acceptez notre ' .
-                    '<a href="/politique-confidentialite" target="_blank" style="color:#1e40af;text-decoration:underline;">Politique de confidentialité</a>.' .
+                    '<a href="/politique-confidentialite" target="_blank" style="color:#1e40af;text-decoration:underline;">Politique de confidentialité</a>' .
+                    ' &nbsp;·&nbsp; ' .
+                    '<a href="/mentions-legales" target="_blank" style="color:#1e40af;text-decoration:underline;">Mentions légales</a>.' .
                     '</p>'
                 )
             )
