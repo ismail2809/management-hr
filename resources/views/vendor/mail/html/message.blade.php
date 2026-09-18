@@ -22,7 +22,7 @@
 <x-slot:footer>
 <x-mail::footer>
 @php $nomEcole = \App\Models\EcoleSettings::withoutGlobalScopes()->first()?->nom_ecole ?? 'RH Les Écoles Al Baraime'; @endphp
-© {{ date('Y') }} {{ $nomEcole }}. Tous droits réservés.
+© {{ date('Y') }} {{ $nomEcole }}. Tous droits réservés. · <a href="{{ url('/politique-confidentialite') }}" style="color: #6b7280; text-decoration: underline;">Politique de confidentialité</a>
 </x-mail::footer>
 </x-slot:footer>
 </x-mail::layout>

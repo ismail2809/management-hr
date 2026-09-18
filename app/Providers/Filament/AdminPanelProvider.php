@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::Full)
             ->sidebarWidth('240px')
             ->sidebarCollapsibleOnDesktop()
-            ->plugin(FilamentShieldPlugin::make())
+            ->plugin(FilamentShieldPlugin::make()->navigationGroup('Rôles et Utilisateurs'))
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\\Filament\\Admin\\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\\Filament\\Admin\\Pages')
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')

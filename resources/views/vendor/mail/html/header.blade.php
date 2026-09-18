@@ -13,7 +13,7 @@
     @if ($logoUrl)
         <img src="{{ $logoUrl }}" alt="{{ $nomEcole }}" style="max-height: 70px; max-width: 200px; object-fit: contain;">
     @else
-        <span style="font-size: 20px; font-weight: bold; color: #1e40af;">{{ $nomEcole }}</span>
+        <img src="{{ asset('images/logo.png') }}" alt="{{ $nomEcole }}" style="max-height: 70px; max-width: 200px; object-fit: contain;">
     @endif
 </a>
 </td>

@@ -37,7 +37,7 @@ class UserResource extends Resource
         return (string) static::getModel()::count();
     }
     protected static ?string $modelLabel = 'Utilisateur';
-    protected static \UnitEnum|string|null $navigationGroup = 'Filament Shield';
+    protected static \UnitEnum|string|null $navigationGroup = 'Rôles et Utilisateurs';
     protected static ?int $navigationSort = 2;
 
     // Limiter la liste aux utilisateurs de la même company (sauf super-admin)

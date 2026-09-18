@@ -7,6 +7,11 @@ use Spatie\Permission\Models\Role;
 
 class RoleResource extends ShieldRoleResource
 {
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Rôles et Utilisateurs';
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return (string) Role::count();
