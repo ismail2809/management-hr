@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 'info'     => Color::hex('#6366f1'),
                 'gray'     => Color::Slate,
             ])
+            ->profile(false)
             ->brandName('GestionHR — Admin')
             ->maxContentWidth(Width::Full)
             ->sidebarWidth('240px')
