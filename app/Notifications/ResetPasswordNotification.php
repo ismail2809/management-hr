@@ -8,6 +8,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPasswordNotification extends FilamentResetPassword
 {
+    public string $connection = 'sync';
+
     public function toMail($notifiable): MailMessage
     {
         $ecole    = EcoleSettings::withoutGlobalScopes()->first();
