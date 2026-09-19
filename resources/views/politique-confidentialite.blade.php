@@ -41,6 +41,22 @@
 
         .back-link:hover { color: #000000; }
 
+        .pdf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: #1e40af;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            padding: 0.4rem 0.875rem;
+            border-radius: 6px;
+            transition: background 0.15s;
+        }
+
+        .pdf-btn:hover { background: #1e3a8a; }
+
         .container {
             max-width: 820px;
             margin: 2.5rem auto;
@@ -158,6 +174,9 @@
 
 <div class="header">
     <img src="/images/logo.png" alt="Gestion RH" style="max-height: 60px;">
+    <a href="{{ route('politique-confidentialite.pdf') }}" class="pdf-btn" target="_blank">
+        ⬇ Télécharger PDF
+    </a>
     <a href="/admin/login" class="back-link">
         ← Retour à la connexion
     </a>
