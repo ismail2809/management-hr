@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Select;
@@ -180,6 +181,7 @@ class DocumentRequestResource extends Resource
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
                     ->maxSize(10240)
+                    ->rules([new SafeFileUpload()])
                     ->nullable()
                     ->hidden($isEmployee),
             ]),
@@ -225,6 +227,15 @@ class DocumentRequestResource extends Resource
                         'refusé'     => 'danger',
                         default      => 'gray',
                     }),
+
+                TextColumn::make('fichier_final')
+                    ->label('Document final')
+                    ->default('—')
+                    ->formatStateUsing(fn ($state) => $state && $state !== '—' ? 'Télécharger' : '—')
+                    ->icon(fn ($state) => $state && $state !== '—' ? 'heroicon-o-arrow-down-tray' : null)
+                    ->color(fn ($state) => $state && $state !== '—' ? 'primary' : 'gray')
+                    ->url(fn (DocumentRequest $record) => $record->fichier_final ? asset('storage/' . $record->fichier_final) : null)
+                    ->openUrlInNewTab(),
 
                 TextColumn::make('nb_telechargements')
                     ->label('Téléchargements')

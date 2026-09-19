@@ -17,6 +17,7 @@ use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -300,6 +301,7 @@ class AutreDemandeResource extends Resource
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
                     ->maxSize(10240)
+                    ->rules([new SafeFileUpload()])
                     ->nullable()
                     ->visible($isEmployee),
 
@@ -313,6 +315,7 @@ class AutreDemandeResource extends Resource
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
                     ->maxSize(10240)
+                    ->rules([new SafeFileUpload()])
                     ->nullable()
                     ->hidden($isEmployee),
             ]),
@@ -360,13 +363,13 @@ class AutreDemandeResource extends Resource
                         default      => 'gray',
                     }),
 
-                TextColumn::make('fichier_final')
-                    ->label('Fichier')
+                TextColumn::make('fichier_joint')
+                    ->label('Pièce jointe')
                     ->default('—')
-                    ->formatStateUsing(fn ($state) => $state && $state !== '—' ? 'Télécharger' : '—')
+                    ->formatStateUsing(fn ($state) => $state && $state !== '—' ? 'Voir pièce jointe' : '—')
                     ->icon(fn ($state) => $state && $state !== '—' ? 'heroicon-o-paper-clip' : null)
-                    ->color(fn ($state) => $state && $state !== '—' ? 'primary' : 'gray')
-                    ->url(fn (DocumentRequest $record) => $record->fichier_final ? asset('storage/' . $record->fichier_final) : null)
+                    ->color(fn ($state) => $state && $state !== '—' ? 'info' : 'gray')
+                    ->url(fn (DocumentRequest $record) => $record->fichier_joint ? asset('storage/' . $record->fichier_joint) : null)
                     ->openUrlInNewTab(),
 
                 TextColumn::make('created_at')
@@ -389,14 +392,13 @@ class AutreDemandeResource extends Resource
                 ActionGroup::make([
                     ViewAction::make()->label('Voir'),
 
-                    Action::make('download_final')
-                        ->label('Télécharger document')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('primary')
-                        ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && $record->fichier_final)
-                        ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
-                        ->openUrlInNewTab()
-                        ->action(fn (DocumentRequest $record) => $record->increment('nb_telechargements')),
+                    Action::make('download_joint')
+                        ->label('Voir pièce jointe')
+                        ->icon('heroicon-o-paper-clip')
+                        ->color('info')
+                        ->visible(fn (DocumentRequest $record) => (bool) $record->fichier_joint)
+                        ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_joint))
+                        ->openUrlInNewTab(),
 
                     Action::make('approve')
                         ->label('Approuver')
