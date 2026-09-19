@@ -29,7 +29,7 @@ class DocumentPdfController extends Controller
 
         if ($download) {
             $documentRequest->update([
-                'status'       => 'traité',
+                'status'       => 'approuvé',
                 'processed_by' => auth()->id(),
                 'processed_at' => now(),
             ]);

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
@@ -178,6 +179,7 @@ class DocumentAdministratifResource extends Resource
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
                     ->maxSize(10240)
+                    ->rules([new SafeFileUpload()])
                     ->nullable()
                     ->openable()
                     ->downloadable()
@@ -255,14 +257,6 @@ class DocumentAdministratifResource extends Resource
                         ->color('info')
                         ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && view()->exists('pdf.documents.' . $record->type))
                         ->url(fn (DocumentRequest $record) => route('documents.preview', $record))
-                        ->openUrlInNewTab(),
-
-                    Action::make('generer_pdf')
-                        ->label('Télécharger PDF généré')
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('success')
-                        ->visible(fn (DocumentRequest $record) => view()->exists('pdf.documents.' . $record->type) && ! auth()->user()?->isBasicRole())
-                        ->url(fn (DocumentRequest $record) => route('documents.pdf', $record))
                         ->openUrlInNewTab(),
 
                     Action::make('voir_fichier')
