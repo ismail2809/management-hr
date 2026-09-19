@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\EmployeeResource\RelationManagers;
 
 use App\Models\EmployeeDocumentType;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -55,6 +56,7 @@ class DocumentsRelationManager extends RelationManager
                     : 'Images ou PDF / Word'
                 )
                 ->maxSize(5120)
+                ->rules([new SafeFileUpload()])
                 ->required(),
         ]);
     }

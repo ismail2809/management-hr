@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\EmployeeResource\RelationManagers;
 
 use Filament\Forms\Components\DateTimePicker;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -64,6 +65,7 @@ class AccidentsRelationManager extends RelationManager
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 ])
                 ->maxSize(10240)
+                ->rules([new SafeFileUpload()])
                 ->nullable()
                 ->columnSpanFull(),
         ]);

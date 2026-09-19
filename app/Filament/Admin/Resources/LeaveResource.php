@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Schemas\Components\Grid;
@@ -295,6 +296,7 @@ class LeaveResource extends Resource
                         ->directory('leaves/justificatifs')
                         ->acceptedFileTypes(['application/pdf', 'image/*'])
                         ->maxSize(5120)
+                        ->rules([new SafeFileUpload()])
                         ->nullable()
                         ->openable()
                         ->downloadable()

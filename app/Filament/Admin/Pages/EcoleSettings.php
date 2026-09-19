@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Pages;
 
 use App\Models\EcoleSettings as EcoleSettingsModel;
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -135,6 +136,7 @@ class EcoleSettings extends Page
                                 ->directory('ecole')
                                 ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg'])
                                 ->maxSize(2048)
+                                ->rules([new SafeFileUpload()])
                                 ->helperText('Format recommandé : PNG transparent, 300x100px'),
 
                             FileUpload::make('cachet')
@@ -143,6 +145,7 @@ class EcoleSettings extends Page
                                 ->directory('ecole')
                                 ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg'])
                                 ->maxSize(2048)
+                                ->rules([new SafeFileUpload()])
                                 ->helperText('Format recommandé : PNG transparent, 200x200px'),
                         ]),
 

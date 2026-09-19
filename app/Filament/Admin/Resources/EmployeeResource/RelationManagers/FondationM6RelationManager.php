@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\EmployeeResource\RelationManagers;
 
+use App\Rules\SafeFileUpload;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -47,6 +48,7 @@ class FondationM6RelationManager extends RelationManager
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 ])
                 ->maxSize(10240)
+                ->rules([new SafeFileUpload()])
                 ->nullable()
                 ->columnSpanFull(),
         ]);
