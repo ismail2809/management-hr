@@ -20,7 +20,7 @@ class GroupesRelationManager extends RelationManager
 
     public static function canViewForRecord(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): bool
     {
-        return $ownerRecord->profession?->name === 'Professeur';
+        return $ownerRecord->isProfesseur();
     }
 
     public function form(Schema $schema): Schema

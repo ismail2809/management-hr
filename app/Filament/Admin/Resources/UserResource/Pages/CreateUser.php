@@ -23,8 +23,9 @@ class CreateUser extends CreateRecord
 
     protected function afterCreate(): void
     {
-        $role = $this->data['roles'] ?? 'employee';
-        $this->record->syncRoles([$role]);
+        if (! empty($this->data['roles'])) {
+            $this->record->syncRoles([$this->data['roles']]);
+        }
     }
 
     protected function getRedirectUrl(): string

@@ -64,7 +64,7 @@ class LeaveResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return auth()->user()?->isBasicRole() ? 'Mes demandes' : 'Congés & Présence';
+        return auth()->user()?->isBasicRole() ? 'Mes demandes' : 'Congés & Absences';
     }
 
     public static function getNavigationSort(): ?int
@@ -390,7 +390,7 @@ class LeaveResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->visible(fn () => ! auth()->user()?->isBasicRole()),
+                    DeleteBulkAction::make()->visible(fn () => auth()->user()?->hasRole('super-admin')),
                 ]),
             ])
             ->defaultSort('start_date', 'desc');

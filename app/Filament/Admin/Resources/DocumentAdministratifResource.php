@@ -272,9 +272,8 @@ class DocumentAdministratifResource extends Resource
                         ->icon('heroicon-o-paper-clip')
                         ->color('primary')
                         ->visible(fn (DocumentRequest $record) => $record->status === 'approuvé' && $record->fichier_final)
-                        ->url(fn (DocumentRequest $record) => asset('storage/' . $record->fichier_final))
-                        ->openUrlInNewTab()
-                        ->action(fn (DocumentRequest $record) => $record->increment('nb_telechargements')),
+                        ->url(fn (DocumentRequest $record) => route('documents.download-final', $record))
+                        ->openUrlInNewTab(),
 
                     Action::make('approve')
                         ->label('Approuver')
@@ -297,7 +296,7 @@ class DocumentAdministratifResource extends Resource
                         ])),
                 ])->icon('heroicon-m-ellipsis-horizontal'),
             ])
-            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()->visible(fn () => auth()->user()?->hasRole('super-admin'))])])
             ->defaultSort('created_at', 'desc');
     }
 

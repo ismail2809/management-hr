@@ -60,7 +60,17 @@ class ListEmployees extends ListRecords
                     $path = Storage::disk('local')->path($data['file']);
 
                     $service = new EmployeeImportService();
-                    $result  = $service->import($path, $companyId);
+                    try {
+                        $result = $service->import($path, $companyId);
+                    } catch (\Throwable $e) {
+                        Storage::disk('local')->delete($data['file']);
+                        Notification::make()
+                            ->title('Fichier illisible')
+                            ->body('Le fichier n\'est pas un classeur Excel valide.')
+                            ->danger()
+                            ->send();
+                        return;
+                    }
 
                     // Supprimer le fichier temporaire
                     Storage::disk('local')->delete($data['file']);

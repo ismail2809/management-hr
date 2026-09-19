@@ -34,7 +34,7 @@ class UserResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) static::getModel()::count();
+        return (string) static::getEloquentQuery()->count();
     }
     protected static ?string $modelLabel = 'Utilisateur';
     protected static \UnitEnum|string|null $navigationGroup = 'Rôles et Utilisateurs';
@@ -186,7 +186,7 @@ class UserResource extends Resource
             ->actions([EditAction::make(), DeleteAction::make()])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()->visible(fn () => auth()->user()?->hasRole('super-admin')),
                 ]),
             ])
             ->defaultSort('name');

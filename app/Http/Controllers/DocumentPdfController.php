@@ -12,6 +12,20 @@ class DocumentPdfController extends Controller
         return $this->render($documentRequest, download: true);
     }
 
+    public function downloadFinal(DocumentRequest $documentRequest)
+    {
+        $user = auth()->user();
+        abort_if(
+            ! $user->hasRole('super-admin') && $user->ecole_setting_id !== $documentRequest->ecole_setting_id,
+            403
+        );
+        abort_unless(filled($documentRequest->fichier_final), 404);
+
+        $documentRequest->increment('nb_telechargements');
+
+        return redirect()->away(asset('storage/' . $documentRequest->fichier_final));
+    }
+
     public function preview(DocumentRequest $documentRequest)
     {
         return $this->render($documentRequest, download: false);

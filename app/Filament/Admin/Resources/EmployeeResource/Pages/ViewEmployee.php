@@ -55,6 +55,12 @@ class ViewEmployee extends ViewRecord
 
     public function uploadDocument(): void
     {
+        $user = auth()->user();
+        abort_unless(
+            $user && (! $user->isBasicRole() || (int) $this->record->id === (int) $user->employee_id),
+            403
+        );
+
         $this->validate([
             'uploadedFile' => 'required|file|max:10240',
             'documentName' => 'required|string|max:255',
@@ -84,6 +90,8 @@ class ViewEmployee extends ViewRecord
 
     public function deleteDocument(int $documentId): void
     {
+        abort_unless(auth()->user() && ! auth()->user()->isBasicRole(), 403);
+
         $doc = EmployeeDocument::find($documentId);
         if ($doc && $doc->employee_id === $this->record->id) {
             $doc->delete();
@@ -97,9 +105,9 @@ class ViewEmployee extends ViewRecord
     {
         $leaves = $this->record->leaves()->withoutGlobalScopes()->get();
         return [
-            'pris'       => $leaves->where('status', 'approuvé')->sum(fn ($l) => $l->start_date->diffInDays($l->end_date) + 1),
-            'en_attente' => $leaves->where('status', 'en_attente')->sum(fn ($l) => $l->start_date->diffInDays($l->end_date) + 1),
-            'refuses'    => $leaves->where('status', 'refusé')->sum(fn ($l) => $l->start_date->diffInDays($l->end_date) + 1),
+            'pris'       => $leaves->where('status', 'approuvé')->sum(fn ($l) => $l->duration_days),
+            'en_attente' => $leaves->where('status', 'en_attente')->sum(fn ($l) => $l->duration_days),
+            'refuses'    => $leaves->where('status', 'refusé')->sum(fn ($l) => $l->duration_days),
         ];
     }
 }

@@ -187,7 +187,7 @@ class EmployeeResource extends Resource
                 ->icon('heroicon-o-squares-plus')
                 ->visible(fn ($get) => in_array(
                     Profession::find($get('profession_id'))?->name,
-                    ['Professeur', 'Chauffeur']
+                    ['Professeur', 'Enseignant', 'Enseignante', 'Chauffeur']
                 ))
                 ->schema([
                     Select::make('groupes')
@@ -196,7 +196,7 @@ class EmployeeResource extends Resource
                         ->relationship('groupes', 'name', fn ($query) => $query->join('niveaux_scolaires', 'niveaux_scolaires.id', '=', 'groupes.niveau_scolaire_id')->select('groupes.*', 'niveaux_scolaires.order as niveau_order')->orderBy('niveau_order'))
                         ->getOptionLabelFromRecordUsing(fn (Groupe $record) => "{$record->niveauScolaire?->name} — {$record->name}")
                         ->preload()
-                        ->visible(fn ($get) => Profession::find($get('profession_id'))?->name === 'Professeur')
+                        ->visible(fn ($get) => in_array(Profession::find($get('profession_id'))?->name, ['Professeur', 'Enseignant', 'Enseignante']))
                         ->disabled(static::dAdmin()),
                     Select::make('transport_id')
                         ->label('Transport affecté')
@@ -295,7 +295,7 @@ class EmployeeResource extends Resource
             ->defaultSort('last_name')
             ->recordUrl(fn (Employee $record) => static::getUrl('view', ['record' => $record]))
             ->actions([ViewAction::make()->label('Profil')])
-            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()->visible(fn () => auth()->user()?->hasRole('super-admin'))])]);
     }
 
     public static function canViewAny(): bool

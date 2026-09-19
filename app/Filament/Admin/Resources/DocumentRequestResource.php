@@ -36,6 +36,11 @@ class DocumentRequestResource extends Resource
     protected static ?int $navigationSort = 10;
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole('super-admin');
+    }
+
     public static function getNavigationLabel(): string
     {
         return auth()->user()?->isBasicRole() ? 'Mes demandes' : 'Demandes';

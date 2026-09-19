@@ -82,7 +82,7 @@ TextColumn::make('leaves_count')
 
     public static function canViewAny(): bool
     {
-        return auth()->user()?->hasRole('super-admin');
+        return auth()->user()?->hasAnyRole(['super-admin', 'directeur']);
     }
 
     public static function getPages(): array

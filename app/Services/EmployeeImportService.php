@@ -182,21 +182,7 @@ class EmployeeImportService
     {
         $data = [];
         foreach ($columnMap as $field => $colIndex) {
-            $raw = null;
-            if (in_array($field, ['birth_date', 'hire_date', 'exit_date'])) {
-                foreach ([$colIndex, $colIndex - 1, $colIndex - 2] as $tryCol) {
-                    if ($tryCol < 0) {
-                        continue;
-                    }
-                    $val = $row[$tryCol] ?? null;
-                    if ($val !== null && $val !== '') {
-                        $raw = $val;
-                        break;
-                    }
-                }
-            } else {
-                $raw = $row[$colIndex] ?? null;
-            }
+            $raw = $row[$colIndex] ?? null;
 
             if ($raw === null || $raw === '') {
                 continue;
@@ -218,7 +204,7 @@ class EmployeeImportService
         $lower = mb_strtolower(trim($value));
         $keywords = ['liste', 'personnel', 'total', 'sous-total', 'nom', 'prénom', 'prenom', 'matricule', 'scolaire', 'page'];
         foreach ($keywords as $kw) {
-            if (str_contains($lower, $kw)) {
+            if (preg_match('/(?<![a-z])' . preg_quote($kw, '/') . '(?![a-z])/u', $lower)) {
                 return true;
             }
         }
@@ -257,8 +243,12 @@ class EmployeeImportService
 
     private function parseCnss(mixed $raw): string
     {
-        // Supprimer .0 des flottants Excel
-        return (string) (int) $raw;
+        $str = trim((string) $raw);
+        // Supprimer le suffixe .0 des flottants Excel sans perdre les zéros de tête
+        if (str_ends_with($str, '.0')) {
+            $str = substr($str, 0, -2);
+        }
+        return $str;
     }
 
     private function parseMatricule(mixed $raw): string

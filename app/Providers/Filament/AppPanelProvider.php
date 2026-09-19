@@ -72,8 +72,12 @@ class AppPanelProvider extends PanelProvider
                     ->icon('heroicon-o-calendar-days'),
                 NavigationGroup::make('Demandes')
                     ->icon('heroicon-o-document-text'),
+                NavigationGroup::make('Mes demandes')
+                    ->icon('heroicon-o-inbox'),
                 NavigationGroup::make('Administration')
                     ->icon('heroicon-o-cog-6-tooth'),
+                NavigationGroup::make('Rôles et Utilisateurs')
+                    ->icon('heroicon-o-shield-check'),
                 NavigationGroup::make('Paramétrage')
                     ->icon('heroicon-o-adjustments-horizontal'),
                 NavigationGroup::make('Journal d\'audit')

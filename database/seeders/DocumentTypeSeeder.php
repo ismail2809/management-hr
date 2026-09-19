@@ -10,12 +10,15 @@ class DocumentTypeSeeder extends Seeder
     public function run(): void
     {
         $documents = [
-            ['code' => 'attestation_travail',  'name' => 'Attestation de travail',  'categorie' => 'document', 'sort_order' => 1],
-            ['code' => 'attestation_salaire',  'name' => 'Attestation de salaire',  'categorie' => 'document', 'sort_order' => 2],
-            ['code' => 'bulletin_paie',        'name' => 'Bulletin de paie',         'categorie' => 'document', 'sort_order' => 3],
-            ['code' => 'attestation_ir',       'name' => 'Attestation IR',           'categorie' => 'document', 'sort_order' => 4],
-            ['code' => 'credit_irrevocable',   'name' => 'Crédit irrévocable',       'categorie' => 'document', 'sort_order' => 5],
-            ['code' => 'attestation_cnss',     'name' => 'Attestation CNSS',         'categorie' => 'document', 'sort_order' => 6],
+            ['code' => 'attestation_travail',  'name' => 'Attestation de travail',  'categorie' => 'document', 'sort_order' => 1, 'active' => true],
+            ['code' => 'attestation_salaire',  'name' => 'Attestation de salaire',  'categorie' => 'document', 'sort_order' => 2, 'active' => true],
+            ['code' => 'attestation_cnss',     'name' => 'Attestation CNSS',         'categorie' => 'document', 'sort_order' => 3, 'active' => true],
+            ['code' => 'certificat_travail',   'name' => 'Certificat de travail',    'categorie' => 'document', 'sort_order' => 4, 'active' => true],
+            ['code' => 'ordre_mission',        'name' => 'Ordre de mission',         'categorie' => 'document', 'sort_order' => 5, 'active' => true],
+            // Types sans gabarit PDF — désactivés
+            ['code' => 'bulletin_paie',        'name' => 'Bulletin de paie',         'categorie' => 'document', 'sort_order' => 6, 'active' => false],
+            ['code' => 'attestation_ir',       'name' => 'Attestation IR',           'categorie' => 'document', 'sort_order' => 7, 'active' => false],
+            ['code' => 'credit_irrevocable',   'name' => 'Crédit irrévocable',       'categorie' => 'document', 'sort_order' => 8, 'active' => false],
             ['code' => 'materiel',             'name' => 'Matériel',                 'categorie' => 'autre',    'sort_order' => 1],
             ['code' => 'grande_salle',         'name' => 'Grande salle',             'categorie' => 'autre',    'sort_order' => 2],
             ['code' => 'photocopie',           'name' => 'Photocopie',               'categorie' => 'autre',    'sort_order' => 3],
@@ -27,7 +30,9 @@ class DocumentTypeSeeder extends Seeder
         ];
 
         foreach ($documents as $data) {
-            DocumentType::firstOrCreate(['code' => $data['code']], array_merge($data, ['active' => true]));
+            $active = $data['active'] ?? true;
+            unset($data['active']);
+            DocumentType::updateOrCreate(['code' => $data['code']], array_merge($data, ['active' => $active]));
         }
     }
 }

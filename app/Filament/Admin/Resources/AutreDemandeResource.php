@@ -273,8 +273,7 @@ class AutreDemandeResource extends Resource
                                 ->pluck('id');
 
                             return Employee::with('profession')
-                                ->whereNotIn('profession_id', $excludedIds)
-                                ->orWhereNull('profession_id')
+                                ->where(fn ($q) => $q->whereNotIn('profession_id', $excludedIds)->orWhereNull('profession_id'))
                                 ->get()
                                 ->mapWithKeys(fn (Employee $e) => [
                                     $e->id => $e->full_name . ($e->profession ? ' — ' . $e->profession->name : ''),
@@ -347,7 +346,11 @@ class AutreDemandeResource extends Resource
                     ->label('Date souhaitée')
                     ->getStateUsing(fn ($record) => $record->date_souhaitee ?? $record->photocopie_date_souhaitee)
                     ->formatStateUsing(fn ($state) => $state ? \Carbon\Carbon::parse($state)->format('d/m/Y') : '—')
-                    ->sortable(),
+                    ->sortable(query: function ($query, string $direction) {
+                        return $query->orderByRaw(
+                            'COALESCE(date_souhaitee, photocopie_date_souhaitee) ' . $direction
+                        );
+                    }),
 
                 TextColumn::make('status')
                     ->label('Statut')
@@ -417,7 +420,7 @@ class AutreDemandeResource extends Resource
                         ])),
                 ])->icon('heroicon-m-ellipsis-horizontal'),
             ])
-            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
+            ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()->visible(fn () => auth()->user()?->hasRole('super-admin'))])])
             ->defaultSort('created_at', 'desc');
     }
 

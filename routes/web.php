@@ -26,4 +26,6 @@ Route::middleware(['auth'])->group(function () {
         ->name('documents.pdf');
     Route::get('/documents/{documentRequest}/preview', [\App\Http\Controllers\DocumentPdfController::class, 'preview'])
         ->name('documents.preview');
+    Route::get('/documents/{documentRequest}/download-final', [\App\Http\Controllers\DocumentPdfController::class, 'downloadFinal'])
+        ->name('documents.download-final');
 });

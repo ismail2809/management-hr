@@ -24,7 +24,7 @@ class HrStatsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $congesEnAttente         = Leave::where('status', 'en_attente')->count();
+        $congesEnAttente         = Leave::where('categorie', 'conge')->where('status', 'en_attente')->count();
         $absencesEnAttente       = Leave::where('categorie', 'absence')->where('status', 'en_attente')->count();
         $docsEnAttente           = DocumentRequest::where('categorie', 'document')->where('status', 'en_attente')->count();
         $autresDemandesEnAttente = DocumentRequest::where('categorie', 'autre')->where('status', 'en_attente')->count();

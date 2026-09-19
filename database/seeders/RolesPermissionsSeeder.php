@@ -58,19 +58,12 @@ class RolesPermissionsSeeder extends Seeder
         $surveillanteRole = Role::firstOrCreate(['name' => 'surveillante', 'guard_name' => 'web']);
         $surveillanteRole->syncPermissions(Permission::whereIn('name', $surveillantePerms)->get());
 
-        // ─── directeur : accès complet + suppression ───────────────────────
+        // ─── directeur : accès complet sans suppression (réservée au super-admin) ─────
         $directeurPerms = array_values(array_filter(array_merge(
             $employees, $leaveTypes, $leaves,
             $documents, $users, $auditLogs,
             ['ApproveLeave', 'View:HrStatsOverview', 'View:MonEspace', 'View:Dashboard'],
         ), fn($p) => ! str_starts_with($p, 'Delete')));
-        $directeurPerms = array_merge($directeurPerms, [
-            "Delete:Employee", "DeleteAny:Employee",
-            "Delete:Leave",    "DeleteAny:Leave",
-            "Delete:DocumentRequest", "DeleteAny:DocumentRequest",
-            "Delete:User",    "DeleteAny:User",
-            "Delete:LeaveType", "DeleteAny:LeaveType",
-        ]);
         $directeurRole = Role::firstOrCreate(['name' => 'directeur', 'guard_name' => 'web']);
         $directeurRole->syncPermissions(Permission::whereIn('name', $directeurPerms)->get());
 

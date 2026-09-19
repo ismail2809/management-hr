@@ -23,6 +23,11 @@ class CreateDocumentAdministratif extends CreateRecord
             $data['ecole_setting_id'] = $user?->ecole_setting_id;
         }
 
+        if ($user?->isBasicRole()) {
+            $data['employee_id'] = $user->employee_id;
+            $data['status']      = 'en_attente';
+        }
+
         return $data;
     }
 }

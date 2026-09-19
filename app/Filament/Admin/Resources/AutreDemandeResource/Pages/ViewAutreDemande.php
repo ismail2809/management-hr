@@ -14,12 +14,12 @@ class ViewAutreDemande extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('download_final')
-                ->label('Télécharger document')
-                ->icon('heroicon-o-arrow-down-tray')
+            Action::make('download_joint')
+                ->label('Télécharger pièce jointe')
+                ->icon('heroicon-o-paper-clip')
                 ->color('primary')
-                ->visible(fn () => $this->record->status === 'approuvé' && filled($this->record->fichier_final))
-                ->url(fn () => asset('storage/' . $this->record->fichier_final))
+                ->visible(fn () => filled($this->record->fichier_joint))
+                ->url(fn () => asset('storage/' . $this->record->fichier_joint))
                 ->openUrlInNewTab(),
 
             EditAction::make(),

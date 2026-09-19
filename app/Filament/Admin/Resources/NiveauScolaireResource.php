@@ -30,7 +30,7 @@ class NiveauScolaireResource extends Resource
     protected static \UnitEnum|string|null $navigationGroup = 'Paramétrage';
     protected static ?int $navigationSort = 21;
 
-    public static function canViewAny(): bool { return auth()->user()?->hasRole('super-admin'); }
+    public static function canViewAny(): bool { return auth()->user()?->hasAnyRole(['super-admin', 'directeur']); }
 
     public static function form(Schema $schema): Schema
     {
