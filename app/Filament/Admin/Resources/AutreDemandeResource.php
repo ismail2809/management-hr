@@ -25,8 +25,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Placeholder;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Illuminate\Support\HtmlString;
 use Filament\Schemas\Schema;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -305,19 +307,13 @@ class AutreDemandeResource extends Resource
                     ->nullable()
                     ->visible($isEmployee),
 
-                FileUpload::make('fichier_final')
-                    ->label('Fichier final (réponse)')
-                    ->disk('public')
-                    ->directory('document-requests/finals')
-                    ->acceptedFileTypes([
-                        'application/pdf', 'image/jpeg', 'image/png', 'image/webp',
-                        'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    ])
-                    ->maxSize(10240)
-                    ->rules([new SafeFileUpload()])
-                    ->nullable()
-                    ->hidden($isEmployee),
+                Placeholder::make('fichier_joint_view')
+                    ->label('Pièce jointe de l\'employé')
+                    ->visible(! $isEmployee)
+                    ->content(fn ($record) => $record?->fichier_joint
+                        ? new HtmlString('<a href="' . asset('storage/' . $record->fichier_joint) . '" target="_blank" class="text-primary-600 hover:underline font-medium">Ouvrir le fichier</a>')
+                        : new HtmlString('<span class="text-gray-400">Aucun fichier joint</span>')
+                    ),
             ]),
         ]);
     }
