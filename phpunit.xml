@@ -10,8 +10,28 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <exclude>tests/Feature/Bugs</exclude>
+        </testsuite>
+        <!--
+            Suite "Bugs" : régressions documentées dans BUGS.md.
+            Ces tests ECHOUENT volontairement tant que les anomalies ne sont pas corrigées.
+            Hors suite par défaut. Pour les lancer : php artisan test [tiret][tiret]testsuite=Bugs
+        -->
+        <testsuite name="Bugs">
+            <directory>tests/Feature/Bugs</directory>
         </testsuite>
     </testsuites>
+    <!--
+        Les tests marqués #[Group('bugs')] décrivent le comportement ATTENDU
+        d'anomalies non corrigées : ils échouent par construction et sont donc
+        hors du lot par défaut. Pour les exécuter :
+            php artisan test [tiret][tiret]group=bugs
+    -->
+    <groups>
+        <exclude>
+            <group>bugs</group>
+        </exclude>
+    </groups>
     <source>
         <include>
             <directory>app</directory>
@@ -23,8 +43,14 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <!--
+            MySQL et non SQLite : le PHP de cet environnement n'embarque aucun driver sqlite
+            (`PDO::getAvailableDrivers()` ne renvoie que "mysql"). Base dédiée, recréée par
+            RefreshDatabase — ne jamais pointer sur la base de développement.
+            Prérequis : CREATE DATABASE management_hr_test;
+        -->
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_DATABASE" value="management_hr_test"/>
         <env name="DB_URL" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>

@@ -24,7 +24,15 @@ class DatabaseSeeder extends Seeder
 
         // Générer les permissions Shield avant d'assigner les rôles
         $this->command->info('Generating Shield permissions...');
-        Artisan::call('shield:generate', ['--all' => true, '--panel' => 'app']);
+        // --option est obligatoire ici : sans lui, shield:generate ouvre un prompt
+        // interactif dont l'affichage est avalé par le buffer d'Artisan::call()
+        // et le seeder se fige en attendant une saisie invisible.
+        Artisan::call('shield:generate', [
+            '--all'            => true,
+            '--panel'          => 'app',
+            '--option'         => 'policies_and_permissions',
+            '--no-interaction' => true,
+        ]);
         $this->command->info(Artisan::output());
 
         $this->call([
