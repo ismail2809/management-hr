@@ -87,7 +87,7 @@ return [
     */
 
     'panel_user' => [
-        'enabled' => true,
+        'enabled' => false,
         'name' => 'panel_user',
     ],
 
@@ -233,9 +233,10 @@ return [
     */
 
     'custom_permissions' => [
-        'approve_leave',
-        'validate_payroll',
-        'mark_payroll_paid',
+        'ApproveLeave',
+        'View:HrStatsOverview',
+        'View:MonEspace',
+        'View:Dashboard',
     ],
 
     /*
