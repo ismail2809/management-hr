@@ -42,34 +42,4 @@ class GroupePolicy
         return $authUser->can('DeleteAny:Groupe');
     }
 
-    public function restore(AuthUser $authUser, Groupe $groupe): bool
-    {
-        return $authUser->can('Restore:Groupe');
-    }
-
-    public function forceDelete(AuthUser $authUser, Groupe $groupe): bool
-    {
-        return $authUser->can('ForceDelete:Groupe');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Groupe');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Groupe');
-    }
-
-    public function replicate(AuthUser $authUser, Groupe $groupe): bool
-    {
-        return $authUser->can('Replicate:Groupe');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:Groupe');
-    }
-
 }

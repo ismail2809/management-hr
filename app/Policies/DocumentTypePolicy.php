@@ -42,34 +42,4 @@ class DocumentTypePolicy
         return $authUser->can('DeleteAny:DocumentType');
     }
 
-    public function restore(AuthUser $authUser, DocumentType $documentType): bool
-    {
-        return $authUser->can('Restore:DocumentType');
-    }
-
-    public function forceDelete(AuthUser $authUser, DocumentType $documentType): bool
-    {
-        return $authUser->can('ForceDelete:DocumentType');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:DocumentType');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:DocumentType');
-    }
-
-    public function replicate(AuthUser $authUser, DocumentType $documentType): bool
-    {
-        return $authUser->can('Replicate:DocumentType');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:DocumentType');
-    }
-
 }

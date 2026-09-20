@@ -42,34 +42,4 @@ class DocumentRequestPolicy
         return $authUser->can('DeleteAny:DocumentRequest');
     }
 
-    public function restore(AuthUser $authUser, DocumentRequest $documentRequest): bool
-    {
-        return $authUser->can('Restore:DocumentRequest');
-    }
-
-    public function forceDelete(AuthUser $authUser, DocumentRequest $documentRequest): bool
-    {
-        return $authUser->can('ForceDelete:DocumentRequest');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:DocumentRequest');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:DocumentRequest');
-    }
-
-    public function replicate(AuthUser $authUser, DocumentRequest $documentRequest): bool
-    {
-        return $authUser->can('Replicate:DocumentRequest');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:DocumentRequest');
-    }
-
 }

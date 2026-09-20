@@ -42,34 +42,4 @@ class NiveauScolairePolicy
         return $authUser->can('DeleteAny:NiveauScolaire');
     }
 
-    public function restore(AuthUser $authUser, NiveauScolaire $niveauScolaire): bool
-    {
-        return $authUser->can('Restore:NiveauScolaire');
-    }
-
-    public function forceDelete(AuthUser $authUser, NiveauScolaire $niveauScolaire): bool
-    {
-        return $authUser->can('ForceDelete:NiveauScolaire');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:NiveauScolaire');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:NiveauScolaire');
-    }
-
-    public function replicate(AuthUser $authUser, NiveauScolaire $niveauScolaire): bool
-    {
-        return $authUser->can('Replicate:NiveauScolaire');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:NiveauScolaire');
-    }
-
 }

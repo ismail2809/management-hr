@@ -42,34 +42,4 @@ class LeaveTypePolicy
         return $authUser->can('DeleteAny:LeaveType');
     }
 
-    public function restore(AuthUser $authUser, LeaveType $leaveType): bool
-    {
-        return $authUser->can('Restore:LeaveType');
-    }
-
-    public function forceDelete(AuthUser $authUser, LeaveType $leaveType): bool
-    {
-        return $authUser->can('ForceDelete:LeaveType');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:LeaveType');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:LeaveType');
-    }
-
-    public function replicate(AuthUser $authUser, LeaveType $leaveType): bool
-    {
-        return $authUser->can('Replicate:LeaveType');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:LeaveType');
-    }
-
 }

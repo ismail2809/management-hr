@@ -42,34 +42,4 @@ class ProfessionPolicy
         return $authUser->can('DeleteAny:Profession');
     }
 
-    public function restore(AuthUser $authUser, Profession $profession): bool
-    {
-        return $authUser->can('Restore:Profession');
-    }
-
-    public function forceDelete(AuthUser $authUser, Profession $profession): bool
-    {
-        return $authUser->can('ForceDelete:Profession');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Profession');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Profession');
-    }
-
-    public function replicate(AuthUser $authUser, Profession $profession): bool
-    {
-        return $authUser->can('Replicate:Profession');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:Profession');
-    }
-
 }

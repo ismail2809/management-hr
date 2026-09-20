@@ -42,34 +42,4 @@ class AnneeScolairePolicy
         return $authUser->can('DeleteAny:AnneeScolaire');
     }
 
-    public function restore(AuthUser $authUser, AnneeScolaire $anneeScolaire): bool
-    {
-        return $authUser->can('Restore:AnneeScolaire');
-    }
-
-    public function forceDelete(AuthUser $authUser, AnneeScolaire $anneeScolaire): bool
-    {
-        return $authUser->can('ForceDelete:AnneeScolaire');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:AnneeScolaire');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:AnneeScolaire');
-    }
-
-    public function replicate(AuthUser $authUser, AnneeScolaire $anneeScolaire): bool
-    {
-        return $authUser->can('Replicate:AnneeScolaire');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:AnneeScolaire');
-    }
-
 }

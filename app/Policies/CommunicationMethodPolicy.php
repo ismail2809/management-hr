@@ -42,34 +42,4 @@ class CommunicationMethodPolicy
         return $authUser->can('DeleteAny:CommunicationMethod');
     }
 
-    public function restore(AuthUser $authUser, CommunicationMethod $communicationMethod): bool
-    {
-        return $authUser->can('Restore:CommunicationMethod');
-    }
-
-    public function forceDelete(AuthUser $authUser, CommunicationMethod $communicationMethod): bool
-    {
-        return $authUser->can('ForceDelete:CommunicationMethod');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:CommunicationMethod');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:CommunicationMethod');
-    }
-
-    public function replicate(AuthUser $authUser, CommunicationMethod $communicationMethod): bool
-    {
-        return $authUser->can('Replicate:CommunicationMethod');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:CommunicationMethod');
-    }
-
 }

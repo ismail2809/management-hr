@@ -42,34 +42,4 @@ class TransportPolicy
         return $authUser->can('DeleteAny:Transport');
     }
 
-    public function restore(AuthUser $authUser, Transport $transport): bool
-    {
-        return $authUser->can('Restore:Transport');
-    }
-
-    public function forceDelete(AuthUser $authUser, Transport $transport): bool
-    {
-        return $authUser->can('ForceDelete:Transport');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Transport');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Transport');
-    }
-
-    public function replicate(AuthUser $authUser, Transport $transport): bool
-    {
-        return $authUser->can('Replicate:Transport');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:Transport');
-    }
-
 }

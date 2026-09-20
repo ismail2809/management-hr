@@ -42,34 +42,4 @@ class LeavePolicy
         return $authUser->can('DeleteAny:Leave');
     }
 
-    public function restore(AuthUser $authUser, Leave $leave): bool
-    {
-        return $authUser->can('Restore:Leave');
-    }
-
-    public function forceDelete(AuthUser $authUser, Leave $leave): bool
-    {
-        return $authUser->can('ForceDelete:Leave');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Leave');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Leave');
-    }
-
-    public function replicate(AuthUser $authUser, Leave $leave): bool
-    {
-        return $authUser->can('Replicate:Leave');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:Leave');
-    }
-
 }

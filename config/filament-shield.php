@@ -1,6 +1,14 @@
 <?php
 
 declare(strict_types=1);
+use App\Filament\Admin\Pages\EcoleSettings;
+use App\Filament\Admin\Widgets\AutreDemandesWidget;
+use App\Filament\Admin\Widgets\DocumentsAdministratifsWidget;
+use App\Filament\Admin\Widgets\EnseignantAutreDemandesWidget;
+use App\Filament\Admin\Widgets\EnseignantDemandesWidget;
+use App\Filament\Admin\Widgets\EnseignantStatsWidget;
+use App\Filament\Admin\Widgets\HrStatsOverview;
+use App\Filament\Admin\Widgets\LeavesWidget;
 use BezhanSalleh\FilamentShield\Resources\Roles\RoleResource;
 use Filament\Pages\Dashboard;
 use Filament\Widgets\AccountWidget;
@@ -126,16 +134,12 @@ return [
         'merge' => true,
         'generate' => true,
         'methods' => [
-            'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny', 'restore',
-            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+            'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny',
         ],
         'single_parameter_methods' => [
             'viewAny',
             'create',
             'deleteAny',
-            'forceDeleteAny',
-            'restoreAny',
-            'reorder',
         ],
     ],
 
@@ -198,6 +202,7 @@ return [
         'prefix' => 'view',
         'exclude' => [
             Dashboard::class,
+            EcoleSettings::class,
         ],
     ],
 
@@ -218,6 +223,13 @@ return [
         'exclude' => [
             AccountWidget::class,
             FilamentInfoWidget::class,
+            HrStatsOverview::class,
+            LeavesWidget::class,
+            AutreDemandesWidget::class,
+            DocumentsAdministratifsWidget::class,
+            EnseignantAutreDemandesWidget::class,
+            EnseignantDemandesWidget::class,
+            EnseignantStatsWidget::class,
         ],
     ],
 

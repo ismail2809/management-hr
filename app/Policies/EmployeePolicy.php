@@ -42,34 +42,4 @@ class EmployeePolicy
         return $authUser->can('DeleteAny:Employee');
     }
 
-    public function restore(AuthUser $authUser, Employee $employee): bool
-    {
-        return $authUser->can('Restore:Employee');
-    }
-
-    public function forceDelete(AuthUser $authUser, Employee $employee): bool
-    {
-        return $authUser->can('ForceDelete:Employee');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Employee');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Employee');
-    }
-
-    public function replicate(AuthUser $authUser, Employee $employee): bool
-    {
-        return $authUser->can('Replicate:Employee');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:Employee');
-    }
-
 }

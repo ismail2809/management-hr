@@ -42,34 +42,4 @@ class NatureDocumentPolicy
         return $authUser->can('DeleteAny:NatureDocument');
     }
 
-    public function restore(AuthUser $authUser, NatureDocument $natureDocument): bool
-    {
-        return $authUser->can('Restore:NatureDocument');
-    }
-
-    public function forceDelete(AuthUser $authUser, NatureDocument $natureDocument): bool
-    {
-        return $authUser->can('ForceDelete:NatureDocument');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:NatureDocument');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:NatureDocument');
-    }
-
-    public function replicate(AuthUser $authUser, NatureDocument $natureDocument): bool
-    {
-        return $authUser->can('Replicate:NatureDocument');
-    }
-
-    public function reorder(AuthUser $authUser): bool
-    {
-        return $authUser->can('Reorder:NatureDocument');
-    }
-
 }
