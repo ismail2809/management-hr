@@ -13,6 +13,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Photocopie — Quota journalier de copies
+    |--------------------------------------------------------------------------
+    | Nombre maximum de copies acceptées sur l'ensemble des demandes
+    | de photocopie pour une même date. Configurable via PHOTOCOPIE_MAX_COPIES_PER_DAY.
+    */
+    'photocopie_max_copies_per_day' => (int) env('PHOTOCOPIE_MAX_COPIES_PER_DAY', 300),
+
+    /*
+    |--------------------------------------------------------------------------
     | Rencontre Direction — Professions exclues
     |--------------------------------------------------------------------------
     | Liste des noms de profession à exclure du sélecteur d'employés pour

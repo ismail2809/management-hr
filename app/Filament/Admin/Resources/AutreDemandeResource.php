@@ -235,6 +235,10 @@ class AutreDemandeResource extends Resource
                         ->label('Nombre de copies souhaitées')
                         ->numeric()
                         ->minValue(1)
+                        ->maxValue(config('hr.photocopie_max_copies_per_day', 300))
+                        ->hint(fn () => sprintf('Maximum %d copies par jour', config('hr.photocopie_max_copies_per_day', 300)))
+                        ->hintIcon('heroicon-o-printer')
+                        ->hintColor('warning')
                         ->required(),
 
                     DatePicker::make('photocopie_date_souhaitee')
@@ -433,6 +437,39 @@ class AutreDemandeResource extends Resource
     {
         $conflicting       = config('hr.photocopie_conflicting_natures', ['Examen', 'Contrôle continu', "Contrôle d'essai"]);
         $conflictNiveaux   = config('hr.photocopie_conflict_niveaux', ['Primaire']);
+
+        // ── Vérification du quota journalier de copies ───────────────────────
+        $maxCopies = config('hr.photocopie_max_copies_per_day', 300);
+        if (
+            ($data['type'] ?? null) === 'photocopie' &&
+            ! empty($data['photocopie_date_souhaitee']) &&
+            ! empty($data['photocopie_nb_copies'])
+        ) {
+            $query = \App\Models\DocumentRequest::where('categorie', 'autre')
+                ->where('type', 'photocopie')
+                ->where('photocopie_date_souhaitee', $data['photocopie_date_souhaitee'])
+                ->where('status', '!=', 'refusé');
+
+            if ($excludeId) {
+                $query->where('id', '!=', $excludeId);
+            }
+
+            $existingTotal = (int) $query->sum('photocopie_nb_copies');
+            $newTotal      = $existingTotal + (int) $data['photocopie_nb_copies'];
+
+            if ($newTotal > $maxCopies) {
+                $remaining     = max(0, $maxCopies - $existingTotal);
+                $dateFormatted = \Carbon\Carbon::parse($data['photocopie_date_souhaitee'])->translatedFormat('l d/m/Y');
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'data.photocopie_nb_copies' => sprintf(
+                        'Le quota journalier de %d copies est dépassé pour le %s. Copies restantes disponibles : %d.',
+                        $maxCopies,
+                        $dateFormatted,
+                        $remaining
+                    ),
+                ]);
+            }
+        }
 
         if (
             ($data['type'] ?? null) !== 'photocopie' ||
