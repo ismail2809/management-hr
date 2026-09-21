@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 use App\Filament\Admin\Pages\EcoleSettings;
+use App\Filament\Admin\Widgets\AccountWidget as AppAccountWidget;
 use App\Filament\Admin\Widgets\AutreDemandesWidget;
 use App\Filament\Admin\Widgets\DocumentsAdministratifsWidget;
 use App\Filament\Admin\Widgets\EnseignantAutreDemandesWidget;
@@ -222,6 +223,7 @@ return [
         'prefix' => 'view',
         'exclude' => [
             AccountWidget::class,
+            AppAccountWidget::class,
             FilamentInfoWidget::class,
             HrStatsOverview::class,
             LeavesWidget::class,
