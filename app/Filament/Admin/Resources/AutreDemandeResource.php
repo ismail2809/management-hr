@@ -95,8 +95,7 @@ class AutreDemandeResource extends Resource
 
     public static function canCreate(): bool
     {
-        // Secretaire : vue seule sur Autres Demandes
-        return ! auth()->user()?->hasRole('secretaire');
+        return true;
     }
 
     public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
@@ -106,8 +105,7 @@ class AutreDemandeResource extends Resource
         if ($user?->isBasicRole()) {
             return $record->employee_id === $user->employee_id && $record->status === 'en_attente';
         }
-        // Secretaire : vue seule
-        return $user?->hasAnyRole(['super-admin', 'directeur', 'surveillante']);
+        return $user?->hasAnyRole(['super-admin', 'directeur', 'surveillante', 'secretaire']);
     }
 
     public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
